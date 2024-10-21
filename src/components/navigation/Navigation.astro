@@ -9,6 +9,7 @@ import "./navigation.css";
         <div class="bottom-bun" id="bottom-bun"></div>
     </div>
     <div id="nav-menu-container">
+        <div class="menu-wrapper"></div>
         <ul class="nav-menu" id="nav-menu">
             <h3>MENU</h3>
             <li class="nav-item">
@@ -75,10 +76,18 @@ import "./navigation.css";
     const hamburgerIcon = document.getElementById("hamburger-icon");
     const navMenu = document.getElementById("nav-menu");
     const navMenuContainer = document.getElementById("nav-menu-container");
+    const allElements = [
+        document.querySelector("main"),
+        document.querySelector("footer"),
+        document.querySelector("header")?.firstElementChild,
+    ];
     function toggleNavBar() {
         hamburgerIcon?.classList.toggle("active");
         navMenuContainer?.classList.toggle("nav-menu-container");
         navMenu?.classList.toggle("visible");
+        allElements.forEach((element) => {
+            element?.classList.toggle("reduced-opacity");
+        });
     }
     hamburgerIcon?.addEventListener("click", function () {
         toggleNavBar();

@@ -84,6 +84,7 @@
 
 .active {
     z-index: 2;
+    opacity: 1;
 }
 
 .nav-item>* {
@@ -109,11 +110,13 @@
     color: purple;
 }
 
-.nav-menu-container {
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    position: fixed;
-    background-color: rgba(128, 128, 128, 0.5);
+
+body,
+main,
+footer {
+    transition: ease opacity 0.5s;
+}
+
+.reduced-opacity {
+    opacity: 0.25;
 }
