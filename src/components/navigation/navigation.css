@@ -43,16 +43,19 @@ nav {
     bottom: 0;
 }
 
-.hamburger-icon:hover .top-bun {
+.hamburger-icon:hover .top-bun,
+.active .top-bun {
     transform: translateY(calc(var(--burger-height) / 2 - var(--bar-height) / 2)) rotate(45deg);
 }
 
 
-.hamburger-icon:hover .bottom-bun {
+.hamburger-icon:hover .bottom-bun,
+.active .bottom-bun {
     transform: translateY(calc(var(--burger-height) / -2 + var(--bar-height)/ 2)) rotate(-45deg);
 }
 
-.hamburger-icon:hover .patty {
+.hamburger-icon:hover .patty,
+.active .patty {
     transform: translateX(2rem);
     opacity: 0;
 }
