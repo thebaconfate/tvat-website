@@ -3,7 +3,7 @@ import "./navigation.css";
 ---
 
 <nav>
-    <div class="hamburger-icon">
+    <div class="hamburger-icon" id="hamburger-icon">
         <div class="top-bun"></div>
         <div class="patty"></div>
         <div class="bottom-bun"></div>
@@ -27,3 +27,10 @@ import "./navigation.css";
         <li class="nav-item"><a href="inloggen">inloggen</a></li>
     </ul>
 </nav>
+
+<script>
+    const hamburgerIcon = document.getElementById("hamburger-icon");
+    hamburgerIcon?.addEventListener("click", function () {
+        alert("navbar clicked");
+    });
+</script>
