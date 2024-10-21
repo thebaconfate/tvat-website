@@ -1,0 +1,58 @@
+nav {
+    display: flex;
+    justify-content: center;
+    --burger-width: 2rem;
+    --burger-height: 1.5rem;
+}
+
+.nav-menu {
+    display: none;
+}
+
+
+.hamburger-icon {
+    cursor: pointer;
+    width: var(--burger-width);
+    height: var(--burger-height);
+    position: relative;
+    --bar-height: 3px;
+    overflow: hidden;
+}
+
+.top-bun,
+.bottom-bun,
+.patty {
+    height: var(--bar-height);
+    background-color: black;
+    width: var(--burger-width);
+    transition: all 0.5s;
+    position: absolute;
+}
+
+
+.top-bun {
+    top: 0;
+}
+
+.patty {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.bottom-bun {
+    bottom: 0;
+}
+
+.hamburger-icon:hover .top-bun {
+    transform: translateY(calc(var(--burger-height) / 2 - var(--bar-height) / 2)) rotate(45deg);
+}
+
+
+.hamburger-icon:hover .bottom-bun {
+    transform: translateY(calc(var(--burger-height) / -2 + var(--bar-height)/ 2)) rotate(-45deg);
+}
+
+.hamburger-icon:hover .patty {
+    transform: translateX(2rem);
+    opacity: 0;
+}
