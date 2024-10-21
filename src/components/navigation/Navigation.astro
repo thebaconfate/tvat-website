@@ -2,35 +2,89 @@
 import "./navigation.css";
 ---
 
-<nav>
+<nav class="nav-container">
     <div class="hamburger-icon" id="hamburger-icon">
-        <div class="top-bun"></div>
-        <div class="patty"></div>
-        <div class="bottom-bun"></div>
+        <div class="top-bun" id="top-bun"></div>
+        <div class="patty" id="patty"></div>
+        <div class="bottom-bun" id="bottom-bun"></div>
     </div>
-    <ul class="nav-menu">
-        <li class="nav-item">
-            <a href="/home">Home</a>
-        </li>
-        <li class="nav-item"><a href="/lustrumgalabal">Lustrumgalabal</a></li>
-        <li class="nav-item"><a href="bestuur">Bestuur & oud bestuur</a></li>
-        <li class="nav-item"><a href="clublied">Clublied</a></li>
-        <li class="nav-item"><a href="geschiedenis">Geschiedenis</a></li>
-        <li class="nav-item"><a href="krambambouli">Krambambouli</a></li>
-        <li class="nav-item"><a href="codex">Codex Challenge</a></li>
-        <li class="nav-item"><a href="youtube">Youtube</a></li>
-        <li class="nav-item">
-            <a href="inschrijven">Inschrijven mailingslijst</a>
-        </li>
-        <li class="nav-item"><a href="lidworden">Lid worden</a></li>
-        <li class="nav-item"><a href="contact">contact</a></li>
-        <li class="nav-item"><a href="inloggen">inloggen</a></li>
-    </ul>
+    <div id="nav-menu-container">
+        <ul class="nav-menu" id="nav-menu">
+            <h3>MENU</h3>
+            <li class="nav-item">
+                <a href="/home">Home</a>
+                <div class="horizontal-line"></div>
+            </li>
+            <li class="nav-item">
+                <a href="/lustrumgalabal">Lustrumgalabal</a><div
+                    class="horizontal-line"
+                >
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="bestuur">Bestuur & oud bestuur</a><div
+                    class="horizontal-line"
+                >
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="clublied">Clublied</a><div class="horizontal-line">
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="geschiedenis">Geschiedenis</a><div
+                    class="horizontal-line"
+                >
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="krambambouli">Krambambouli</a><div
+                    class="horizontal-line"
+                >
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="codex">Codex Challenge</a><div class="horizontal-line">
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="youtube">Youtube</a><div class="horizontal-line"></div>
+            </li>
+            <li class="nav-item">
+                <a href="inschrijven">Inschrijven mailingslijst</a><div
+                    class="horizontal-line"
+                >
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="lidworden">Lid worden</a><div class="horizontal-line">
+                </div>
+            </li>
+            <li class="nav-item">
+                <a href="contact">Contact</a><div class="horizontal-line"></div>
+            </li>
+            <li class="nav-item">
+                <a href="inloggen">Inloggen</a><div class="horizontal-line">
+                </div>
+            </li>
+        </ul>
+    </div>
 </nav>
 
 <script>
     const hamburgerIcon = document.getElementById("hamburger-icon");
+    const navMenu = document.getElementById("nav-menu");
+    const navMenuContainer = document.getElementById("nav-menu-container");
+    function toggleNavBar() {
+        hamburgerIcon?.classList.toggle("active");
+        navMenuContainer?.classList.toggle("nav-menu-container");
+        navMenu?.classList.toggle("visible");
+    }
     hamburgerIcon?.addEventListener("click", function () {
-        alert("navbar clicked");
+        toggleNavBar();
+    });
+
+    navMenuContainer?.addEventListener("click", function () {
+        toggleNavBar();
     });
 </script>

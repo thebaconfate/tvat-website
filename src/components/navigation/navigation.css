@@ -1,34 +1,51 @@
-nav {
+.nav-container {
     display: flex;
     justify-content: center;
     --burger-width: 2rem;
-    --burger-height: 1.5rem;
+    --burger-height: 1.75rem;
 }
 
 .nav-menu {
-    display: none;
+    list-style: none;
+    position: fixed;
+    top: 0;
+    right: -20rem;
+    bottom: 0;
+    padding: 2.5rem;
+    background-color: gray;
+    transition: all 0.5s;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
-
 
 .hamburger-icon {
     cursor: pointer;
     width: var(--burger-width);
     height: var(--burger-height);
     position: relative;
-    --bar-height: 3px;
-    overflow: hidden;
+    --bar-height: 4px;
+    --bar-color: #585858;
+    z-index: 1;
 }
 
 .top-bun,
 .bottom-bun,
 .patty {
     height: var(--bar-height);
-    background-color: black;
+    border: 1px solid var(--bar-color);
+    border-radius: 5px;
+    background-color: var(--bar-color);
     width: var(--burger-width);
     transition: all 0.5s;
     position: absolute;
 }
 
+.visible {
+    transform: translateX(-20rem);
+    z-index: 1;
+}
 
 .top-bun {
     top: 0;
@@ -43,19 +60,60 @@ nav {
     bottom: 0;
 }
 
-.hamburger-icon:hover .top-bun,
+.hamburger-icon:hover>* {
+    background-color: purple;
+    border-color: purple;
+}
+
 .active .top-bun {
-    transform: translateY(calc(var(--burger-height) / 2 - var(--bar-height) / 2)) rotate(45deg);
+    transform: translateY(calc(var(--burger-height) / 2 - var(--bar-height) / 2)) translateX(-20rem) rotate(45deg);
+    z-index: 1;
 }
 
 
-.hamburger-icon:hover .bottom-bun,
 .active .bottom-bun {
-    transform: translateY(calc(var(--burger-height) / -2 + var(--bar-height)/ 2)) rotate(-45deg);
+    transform: translateY(calc(var(--burger-height) / -2 + var(--bar-height)/ 2)) translateX(-20rem) rotate(-45deg);
+    z-index: 1;
 }
 
-.hamburger-icon:hover .patty,
 .active .patty {
-    transform: translateX(2rem);
+    transform: translateX(10rem);
     opacity: 0;
+    z-index: -1;
+}
+
+.active {
+    z-index: 2;
+}
+
+.nav-item>* {
+    display: grid;
+    grid-template-rows: auto 2px;
+    color: white;
+    text-decoration: none;
+}
+
+.horizontal-line {
+    display: block;
+    background-color: purple;
+    height: 2px;
+    width: 100%;
+}
+
+.nav-item> :first-child {
+    padding: 1rem 1rem 1rem 0rem;
+}
+
+.nav-item>*:hover {
+    transition: ease all 0.3s;
+    color: purple;
+}
+
+.nav-menu-container {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: fixed;
+    background-color: rgba(128, 128, 128, 0.5);
 }

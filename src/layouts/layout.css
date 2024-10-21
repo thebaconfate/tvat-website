@@ -8,6 +8,7 @@ body {
     display: grid;
     grid-template-rows: repeat(3, auto);
     margin: 2rem;
+    overflow: hidden;
 }
 
 
