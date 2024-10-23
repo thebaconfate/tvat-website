@@ -60,7 +60,7 @@
 }
 
 .active>.patty {
-    transform: translateX(10rem);
+    transform: translateX(30rem);
     opacity: 0;
     z-index: -1;
 }
