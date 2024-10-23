@@ -1,5 +1,10 @@
 ---
 import "./navigation.css";
+import { websiteRoutes } from "../../lib/routes";
+const codexChallengeUrl =
+    websiteRoutes.codex.url + websiteRoutes.codex.challenge.url;
+const mailingslistUrl =
+    websiteRoutes.mailingslist.url + websiteRoutes.mailingslist.enroll.url;
 ---
 
 <nav class="nav-container">
@@ -12,54 +17,74 @@ import "./navigation.css";
     <ul class="nav-menu" id="nav-menu">
         <h3>MENU</h3>
         <li class="nav-item">
-            <a href="/home">Home</a>
+            <a href={websiteRoutes.home.url}>Home</a>
             <div class="horizontal-line"></div>
         </li>
         <li class="nav-item">
-            <a href="/lustrumgalabal">Lustrumgalabal</a><div
+            <a href={websiteRoutes.lustrumGala.url}>Lustrumgalabal</a><div
                 class="horizontal-line"
             >
             </div>
         </li>
         <li class="nav-item">
-            <a href="bestuur">Bestuur & oud bestuur</a><div
+            <a href={websiteRoutes.board.url}>Bestuur & oud bestuur</a><div
                 class="horizontal-line"
             >
             </div>
         </li>
         <li class="nav-item">
-            <a href="clublied">Clublied</a><div class="horizontal-line"></div>
-        </li>
-        <li class="nav-item">
-            <a href="geschiedenis">Geschiedenis</a><div class="horizontal-line">
-            </div>
-        </li>
-        <li class="nav-item">
-            <a href="krambambouli">Krambambouli</a><div class="horizontal-line">
-            </div>
-        </li>
-        <li class="nav-item">
-            <a href="codex">Codex Challenge</a><div class="horizontal-line">
-            </div>
-        </li>
-        <li class="nav-item">
-            <a href="youtube">Youtube</a><div class="horizontal-line"></div>
-        </li>
-        <li class="nav-item">
-            <a href="inschrijven">Inschrijven mailingslijst</a><div
+            <a href={websiteRoutes.clubsong.url}>Clublied</a><div
                 class="horizontal-line"
             >
             </div>
         </li>
         <li class="nav-item">
-            <a href="lidworden">Lid worden</a><div class="horizontal-line">
+            <a href={websiteRoutes.history.url}>Geschiedenis</a><div
+                class="horizontal-line"
+            >
             </div>
         </li>
         <li class="nav-item">
-            <a href="contact">Contact</a><div class="horizontal-line"></div>
+            <a href={websiteRoutes.krambambouli.url}>Krambambouli</a><div
+                class="horizontal-line"
+            >
+            </div>
         </li>
         <li class="nav-item">
-            <a href="inloggen">Inloggen</a><div class="horizontal-line"></div>
+            <a href={codexChallengeUrl}>Codex Challenge</a><div
+                class="horizontal-line"
+            >
+            </div>
+        </li>
+        <li class="nav-item">
+            <a href={websiteRoutes.youtube.url}>Youtube</a><div
+                class="horizontal-line"
+            >
+            </div>
+        </li>
+        <li class="nav-item">
+            <a href={mailingslistUrl}>Inschrijven mailingslijst</a><div
+                class="horizontal-line"
+            >
+            </div>
+        </li>
+        <li class="nav-item">
+            <a href={websiteRoutes.membership.url}>Lid worden</a><div
+                class="horizontal-line"
+            >
+            </div>
+        </li>
+        <li class="nav-item">
+            <a href={websiteRoutes.contact.url}>Contact</a><div
+                class="horizontal-line"
+            >
+            </div>
+        </li>
+        <li class="nav-item">
+            <a href={websiteRoutes.login.url}>Inloggen</a><div
+                class="horizontal-line"
+            >
+            </div>
         </li>
     </ul>
 </nav>
