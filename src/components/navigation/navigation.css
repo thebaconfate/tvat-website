@@ -5,26 +5,12 @@
     --burger-height: 1.75rem;
 }
 
-.nav-menu {
-    list-style: none;
-    position: fixed;
-    top: 0;
-    right: -20rem;
-    bottom: 0;
-    padding: 2.5rem;
-    background-color: gray;
-    transition: all 0.5s;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
 
 .hamburger-icon {
     cursor: pointer;
     width: var(--burger-width);
     height: var(--burger-height);
-    position: relative;
+    position: sticky;
     --bar-height: 4px;
     --bar-color: #585858;
     z-index: 1;
@@ -40,11 +26,6 @@
     width: var(--burger-width);
     transition: all 0.5s;
     position: absolute;
-}
-
-.visible {
-    transform: translateX(-20rem);
-    z-index: 1;
 }
 
 .top-bun {
@@ -66,13 +47,13 @@
 }
 
 .active .top-bun {
-    transform: translateY(calc(var(--burger-height) / 2 - var(--bar-height) / 2)) translateX(-20rem) rotate(45deg);
+    transform: translateY(calc(var(--burger-height) / 2 - var(--bar-height) / 2)) translateX(-15rem) rotate(45deg);
     z-index: 1;
 }
 
 
 .active .bottom-bun {
-    transform: translateY(calc(var(--burger-height) / -2 + var(--bar-height)/ 2)) translateX(-20rem) rotate(-45deg);
+    transform: translateY(calc(var(--burger-height) / -2 + var(--bar-height)/ 2)) translateX(-15rem) rotate(-45deg);
     z-index: 1;
 }
 
@@ -80,11 +61,6 @@
     transform: translateX(10rem);
     opacity: 0;
     z-index: -1;
-}
-
-.active {
-    z-index: 2;
-    opacity: 1;
 }
 
 .nav-item>* {
@@ -110,13 +86,50 @@
     color: purple;
 }
 
-
-body,
-main,
-footer {
-    transition: ease opacity 0.5s;
+#nav-menu-container {
+    position: fixed;
+    overflow-y: scroll;
+    top: 0;
+    height: 100%;
+    left: 0;
+    right: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-content: flex-end;
 }
 
-.reduced-opacity {
-    opacity: 0.25;
+#nav-menu-container> :first-child {
+    display: none;
+    position: fixed;
+    min-height: 100vh;
+    background: rgba(225, 225, 255, 0.6);
+}
+
+#nav-menu-container.active> :first-child {
+    display: block;
+    scroll-behavior: none;
+}
+
+
+.nav-menu {
+    position: absolute;
+
+    list-style: none;
+    background-color: rgb(88, 88, 88);
+    transition: all ease 0.5s;
+    overflow-x: hidden;
+    display: flex;
+    padding: 2rem;
+    flex-direction: column;
+    gap: 1rem;
+    right: -20rem;
+    z-index: 1000;
+}
+
+.nav-menu.active {
+    transform: translateX(-20rem);
+}
+
+.nav-menu> :first-child {
+    color: white;
 }

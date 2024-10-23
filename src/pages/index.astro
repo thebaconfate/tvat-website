@@ -1,9 +1,71 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import Vatschild from "../svgs/vatschild.astro";
 ---
 
 <Layout title="Home">
     <main>
-        Krambambouli schuimt niet en is ook niet blond
-	</main>
+        <div class="shield-container">
+            <Vatschild />
+        </div>
+        <div class="main-content-container">
+            <h1>Welkom</h1>
+            <p>
+                ’t VAT is een “regionale” studentenkring die in de praktijk meer
+                lijkt op een soort gilde of orde dan op een gewone
+                studentenkring. Het regionale aspect van ’t VAT is in de loop
+                der jaren verloren gegaan en de kring heeft zich sinds zijn
+                oprichting in maart 1969 omgevormd tot een kring die sterk de
+                nadruk legt op de sfeervolle beleving van de studentenfolklore
+                en het uitbreiden van eenieders codexkennis.
+            </p>
+            <p>
+                Een van de dingen die ’t VAT het meest onderscheidt van andere
+                kringen is de manier van ledenwerving. Men kan namelijk niet
+                zelf kiezen om zich bij ’t VAT aan te sluiten; het bestuur van
+                ’t VAT kiest zelf elk jaar zo’n tien tot twintig uitverkorenen
+                die bij minstens één andere studentenkring aan de VUB, EhB of
+                KMS gedoopt zijn en die worden dan individueel uitgenodigd om
+                dat jaar Vatschacht te zijn. Die uitnodiging is echter geen
+                vrijgeleide om uiteindelijk ook tot de kring toe te treden; de
+                Vatschachten moeten zich doorheen het academiejaar bewijzen
+                tegenover het bestuur om uiteindelijk tot volwaardig Vatter
+                ontgroend te worden. Zij die zich niet bewijzen, worden door de
+                schachtentemmers uit de groep Vatschachten gezet en behoren
+                vanaf dan niet meer tot ’t VAT.
+            </p>
+            <p>
+                Verder wordt ’t VAT gekenmerkt door zijn prominente aanwezigheid
+                op menig cantus. De meeste andere kringen zien ’t VAT graag
+                komen naar hun cantus omdat de Vatters vaak het niveau van de
+                cantus merkbaar omhoog trekken en omdat veel anderen aan de
+                corona nog heel wat kunnen bijleren van hen. Op een cantus van
+                ’t VAT zelf worden dan weer verschillende liedjes gezongen die
+                bij andere kringen ongekend zijn, wat het ook steeds interessant
+                maakt voor niet-Vatters om eens een cantus van ’t VAT mee te
+                maken.
+            </p>
+            <p>
+                Zo is er bijvoorbeeld de befaamde Krambamboulicantus waar ‘t VAT
+                als enige kring binnen de VUB, EhB en KMS de studentikoze
+                godendrank genaamd ‘krambambouli’ brouwt. Krambambouli is een
+                donkerrode drank op basis van wijn, rum, suiker en kruiden die
+                het best warm geserveerd wordt en die bezongen wordt in het alom
+                bekende cantuslied 'Krambambouli'.
+            </p>
+            <a href="/krambambouli">Kom meer te weten over Krambambouli</a>
+        </div>
+        <div class="side-content-container"><h2>ACTIVITEITEN</h2></div>
+    </main>
 </Layout>
+<style>
+    main {
+        display: grid;
+        grid-template-columns: 0.8fr 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .shield-container > * {
+        object-fit: contain;
+    }
+</style>
