@@ -12,7 +12,7 @@
     height: var(--burger-height);
     top: 2rem;
     right: 2rem;
-    position: absolute;
+    position: fixed;
     --bar-height: 4px;
     --bar-color: #585858;
     z-index: 1;
@@ -98,7 +98,7 @@
 }
 
 .nav-menu {
-    position: absolute;
+    position: fixed;
     list-style: none;
     background-color: rgb(88, 88, 88);
     transition: all ease 0.5s;
@@ -120,7 +120,7 @@
 }
 
 .menu-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -131,4 +131,5 @@
 
 .menu-overlay.active {
     display: block;
+    scroll-behavior: none;
 }

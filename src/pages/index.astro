@@ -55,17 +55,52 @@ import Vatschild from "../svgs/vatschild.astro";
             </p>
             <a href="/krambambouli">Kom meer te weten over Krambambouli</a>
         </div>
-        <div class="side-content-container"><h2>ACTIVITEITEN</h2></div>
+        <div class="side-content-container">
+            <div class="saint-ve-countdown-container">
+                <h2>SAINT-VÉ</h2>
+            </div>
+            <h2>ACTIVITEITEN</h2>
+            <iframe
+                name="f7cd28a6a6c7e0617"
+                width="500px"
+                height="1000px"
+                data-testid="fb:page Facebook Social Plugin"
+                title="fb:page Facebook Social Plugin"
+                allowtransparency="true"
+                allowfullscreen="true"
+                allow="encrypted-media"
+                src="https://www.facebook.com/v9.0/plugins/page.php?adapt_container_width=true&app_id=2443529859126218&channel=https%3A%2F%2Fstaticxx.facebook.com%2Fx%2Fconnect%2Fxd_arbiter%2F%3Fversion%3D46%23cb%3Df961c524945d19026%26domain%3Dwww.tvat.be%26is_canvas%3Dfalse%26origin%3Dhttps%253A%252F%252Fwww.tvat.be%252Ff8e0f9384169f0c82%26relation%3Dparent.parent&container_width=266&hide_cover=false&href=https%3A%2F%2Fwww.facebook.com%2Ftvatbrussel%2F&locale=en_GB&sdk=joey&show_facepile=false&small_header=true&tabs=events&width=500"
+                style="border: none; visibility: visible; width: 266px; height: 71px;"
+                class=""
+            >
+            </iframe>
+        </div>
     </main>
 </Layout>
 <style>
     main {
         display: grid;
-        grid-template-columns: 0.8fr 2fr 1fr;
+        grid-template-columns: 20% 50% auto;
         gap: 2rem;
     }
 
     .shield-container > * {
         object-fit: contain;
+    }
+
+    .main-content-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .main-content-container > :first-child {
+        font-weight: 700;
+        font-size: 2.75rem;
+    }
+
+    .main-content-container > :first-child,
+    .main-content-container > p {
+        color: var(--text-colour);
     }
 </style>

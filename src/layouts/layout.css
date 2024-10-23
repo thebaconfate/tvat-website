@@ -2,13 +2,15 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    color: var(--text-colour);
 }
 
 body {
-    display: grid;
-    grid-template-rows: repeat(3, auto);
-    overflow: hidden;
-    --padding-left: 8rem;
+    display: flex;
+    flex-direction: column;
+    --standard-padding: 2rem;
+    --text-colour: #585858;
+    overflow-x: hidden;
 }
 
 
@@ -20,8 +22,8 @@ header> :first-child {
     display: grid;
     grid-template-columns: 2rem auto;
     gap: 1rem;
-    padding-top: 2rem;
-    padding-left: var(--padding-left);
+    padding-top: var(--standard-padding);
+    padding-left: calc(var(--standard-padding) * 3);
     align-items: center;
     justify-self: flex-start;
 }
@@ -29,7 +31,7 @@ header> :first-child {
 header> :first-child>:last-child {
     font-weight: 900;
     letter-spacing: .15rem;
-    color: #585858;
+    color: var(--text-colour);
     text-decoration: none;
 }
 
@@ -38,5 +40,6 @@ header> :last-child {
 }
 
 main {
-    padding-left: var(--padding-left);
+    padding: var(--standard-padding);
+    padding-left: calc(var(--standard-padding) * 3);
 }
