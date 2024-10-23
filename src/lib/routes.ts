@@ -12,3 +12,5 @@ const websiteRoutes = {
   contact: { url: "/contact" },
   login: { url: "/login" },
 };
+
+export { websiteRoutes };
