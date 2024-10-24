@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import './saint-ve-countdown.css'
 
-function stripDateUTC(date: Date) {
-    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+function stripDate(date: Date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
 
 function createStVDate(today: Date) {
     const year = today.getFullYear();
     const november = 11 - 1; // months are indexed from 0
-    const thisYearNormalDate = new Date(Date.UTC(year, november, 20))
-    const strippedToday = stripDateUTC(today)
-    const normalDate = strippedToday <= thisYearNormalDate ? thisYearNormalDate : new Date(Date.UTC(year + 1, november, 20));
+    const thisYearNormalDate = new Date(year, november, 20)
+    const strippedToday = stripDate(today)
+    const normalDate = strippedToday <= thisYearNormalDate ? thisYearNormalDate : new Date(year + 1, november, 20);
     const saturday = 0;
     const sunday = 6;
-    if (normalDate.getDay() === saturday) return new Date(Date.UTC(year, november, 18));
-    if (normalDate.getDay() === sunday) return new Date(Date.UTC(year, november, 19));
+    if (normalDate.getDay() === saturday) return new Date(year, november, 18);
+    if (normalDate.getDay() === sunday) return new Date(year, november, 19);
     return normalDate;
 }
 
@@ -23,8 +23,8 @@ function calculateInvertedPercentage(current: number, goal: number) {
 }
 
 function calcDifferenceInDates(date1: Date, date2: Date) {
-    const strippedDate1 = stripDateUTC(date1);
-    const strippedDate2 = stripDateUTC(date2);
+    const strippedDate1 = stripDate(date1);
+    const strippedDate2 = stripDate(date2);
     if (strippedDate1.getTime() === strippedDate2.getTime()) return {
         days: 0,
         hours: 0,
