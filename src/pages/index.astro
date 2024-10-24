@@ -2,6 +2,35 @@
 import Layout from "../layouts/Layout.astro";
 import Vatschild from "../svgs/vatschild.astro";
 import SaintVeCountdown from "../components/saint-ve-countdown/SaintVeCountdown";
+
+const activitiesList = [
+    {
+        title: "Kroegentocht",
+        date: new Date(2024, 9, 31, 18),
+        address: "Centrum Brussel",
+    },
+    {
+        title: "Rouge-et-vert Cantus",
+        date: new Date(2024, 10, 13, 20),
+        address: "BSG zaal",
+    },
+    {
+        title: "Helium cantus",
+        date: new Date(2024, 10, 26, 20),
+        address: "BOJ zaal",
+    },
+    {
+        title: "Krambambouli cantus",
+        date: new Date(2024, 11, 13, 20),
+        address: "BSG zaal",
+    },
+];
+
+const now = new Date();
+const strippedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+const filteredActivitiesList = activitiesList.filter(
+    (activity) => activity.date.getTime() > strippedDate.getTime(),
+);
 ---
 
 <Layout title="Home">
@@ -57,9 +86,7 @@ import SaintVeCountdown from "../components/saint-ve-countdown/SaintVeCountdown"
             <a href="/krambambouli">Kom meer te weten over Krambambouli</a>
         </div>
         <div class="side-content-container">
-            <div class="saint-ve-countdown-container">
-                <h2>SAINT-VÉ</h2>
-                <SaintVeCountdown client:visible />
+            <div class="activities-container">
                 <h2>ACTIVITEITEN</h2>
                 <iframe
                     name="f7cd28a6a6c7e0617"
@@ -75,6 +102,27 @@ import SaintVeCountdown from "../components/saint-ve-countdown/SaintVeCountdown"
                     class=""
                 >
                 </iframe>
+                <ul class="activities-list">
+                    {
+                        filteredActivitiesList.map((activity) => (
+                            <li class="activity-container">
+                                <h3 class="activity-title">{activity.title}</h3>
+                                <p class="activity-date">
+                                    Datum:
+                                    {activity.date.toString()}
+                                </p>
+                                <p class="activity-location">
+                                    Plaats:
+                                    {activity.address}
+                                </p>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+            <div class="saint-ve-countdown-container">
+                <h2>SAINT-VÉ</h2>
+                <SaintVeCountdown client:visible />
             </div>
         </div>
     </main>
