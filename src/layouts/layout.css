@@ -41,5 +41,4 @@ header> :last-child {
 
 main {
     padding: var(--standard-padding);
-    padding-left: calc(var(--standard-padding) * 3);
 }
