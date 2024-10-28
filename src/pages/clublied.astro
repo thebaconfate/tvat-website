@@ -4,4 +4,89 @@ import Layout from "../layouts/Layout.astro";
 const title = "Clublied";
 ---
 
-<Layout title={title}> Work in progress </Layout>
+<Layout title={title}>
+    <main>
+        <picture>
+            <img src="/brussel.png" alt="Grote markt" />
+        </picture>
+        <div class="shout-container">
+            <h1 class="shout-title">Kreet</h1>
+            <p class="shout">GELIJK ALS DE...BIESTE!!! (TER)</p>
+        </div>
+        <div class="clubsong-container">
+            <h1 class="clubsong-title">Clublied</h1>
+            <p class="text">T: De Wizze</p>
+            <p class="melody">M: 'Le grenadier de Flandre'</p>
+            <p class="first verse">
+                Dat nu tot boordevol <br />
+                Men onze pint volschenke <br />
+                Dat nu weer met een kol <br />
+                Het bier ons blijve wenke <br />We blijven alle dol <br />
+                Van het gerstegeschenke
+            </p>
+            <p class="chorus">
+                We zijn van 't Vat <br />
+                We zuipen ons zat <br />
+                We zien de pint in 't groot, dedju <br />
+                Een porreke op de schoot, dedju <br />
+                Discipels van Bacchus <br />
+                En van de heer Gambrinus <br />
+            </p>
+            <p class="second verse">
+                We vrezen niet of nooit Zij die ons nu belagen <br />
+                De flik of de kaloot <br />
+                En al die and're zagen <br />
+                We vinden totterdood <br />
+                In 't goede bier behagen <br />
+            </p>
+            <p class="chorus">Refrein</p>
+            <p class="third verse">
+                En wanneer de dag komt <br />
+                Dat wij dan moeten gaan <br />
+                Dat niemand dan verstomd <br />
+                Het is nog niet gedaan <br />
+                Ik wil als doodskist rond <br />
+                In een vat bier vergaan <br />
+            </p>
+            <p class="chorus">Refrein</p>
+            <p class="fourth verse">
+                En wanneer ik paraat <br />
+                Sta voor de heer Sint Pietre <br />
+                Dan zeg ik: "Beste maat <br />
+                De porren heb ik liever <br />
+                En ook het bier van 't Vat <br />
+                Stuur mij maar weer wat dieper" <br />
+            </p>
+            <p class="chorus">Laatste refrein:</p>
+            <p class="chorus">
+                We blijven van 't Vat <br />
+                We poepen ons nat <br />
+                Een porreke in ons bed, dedju <br />
+                We zuigen aan haar tet, dedju <br />
+                Discipels van Bacchus <br />
+                En van de heer Gambrinus <br />
+            </p>
+        </div>
+    </main>
+
+    Work in progress
+</Layout>
+
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: var(--standard-padding);
+        padding-right: var(--standard-padding);
+    }
+    picture {
+        display: flex;
+        justify-content: center;
+        margin: 1rem;
+    }
+
+    img {
+        width: 90%;
+    }
+</style>
