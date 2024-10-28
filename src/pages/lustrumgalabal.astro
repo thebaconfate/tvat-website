@@ -1,7 +1,28 @@
 ---
+import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 
 const title = "Lustrumgalabal";
 ---
 
-<Layout title={title}> Work in progress </Layout>
+<Layout title={title}>
+    <main>
+        <picture class="banner-container">
+            <img class="banner" src="/public/bannerforms.png" alt="" />
+        </picture>
+        <h1>Inschrijven voor het Lustrumgalabal</h1>
+        Moest de form hier niet werken kan je altijd nog inschrijven via de google
+        form zelf. Die vind je hier.
+    </main>
+</Layout>
+
+<style>
+    .banner-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .banner {
+        width: 80%;
+    }
+</style>
