@@ -3,16 +3,42 @@ import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
 
 const title = "Lustrumgalabal";
+const establishedYear = 1969;
+const establishedMonth = 2; //March
+const establishedDay = 15;
+const establishedDate = new Date(
+    establishedYear,
+    establishedMonth,
+    establishedDay,
+);
+const formActive = false;
+function calcDiffYears() {
+    const now = new Date();
+    const strippedNow = new Date(now.getFullYear(), now.getMonth());
+    let nextLustrum = establishedDate.getFullYear();
+    for (; nextLustrum <= strippedNow.getFullYear(); ) {
+        nextLustrum += 5;
+    }
+    return nextLustrum - strippedNow.getFullYear();
+}
 ---
 
 <Layout title={title}>
     <main>
         <picture class="banner-container">
-            <img class="banner" src="/public/bannerforms.png" alt="" />
+            <img class="banner" src="/bannerforms.png" alt="" />
         </picture>
-        <h1>Inschrijven voor het Lustrumgalabal</h1>
-        Moest de form hier niet werken kan je altijd nog inschrijven via de google
-        form zelf. Die vind je hier.
+        <div class="form-container">
+            <h1>Inschrijven voor het Lustrumgalabal</h1>
+            {
+                (formActive && <p>the form is active </p>) || (
+                    <p>
+                        De form is momenteel niet beschikbaar, kom terug over
+                        {` ${calcDiffYears()} jaar`}
+                    </p>
+                )
+            }
+        </div>
     </main>
 </Layout>
 
@@ -24,5 +50,21 @@ const title = "Lustrumgalabal";
 
     .banner {
         width: 80%;
+    }
+    .form-container {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .form-container > h1,
+    .form-container > p {
+        text-align: center;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
     }
 </style>
