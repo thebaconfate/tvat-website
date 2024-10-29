@@ -1,7 +1,95 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import RepeatOnce from "../svgs/Repeat-once.astro";
+import Cookbook from "../svgs/Cookbook.astro";
+import Medicine from "../svgs/Medicine.astro";
+import Expertise from "../svgs/Expertise.astro";
+import Wine from "../svgs/Wine.astro";
+import Cooking from "../svgs/Cooking.astro";
 
 const title = "Krambambouli";
 ---
 
-<Layout title={title}> Work in progress </Layout>
+<Layout title={title}>
+    <main>
+        <picture class="brouwers-image-container">
+            <img
+                src="banner.jpg"
+                alt="brouwers aan het werk"
+                class="brouwers"
+            />
+        </picture>
+        <ul class="intro-text">
+            <li class="row-container">
+                <Cookbook />
+                <p>
+                    Krambambouli is een drank op basis van wijn, rum, karamel,
+                    kaneel en een heleboel geheime ingrediënten.
+                </p>
+            </li>
+            <li class="row-container">
+                <RepeatOnce />
+                <p>
+                    Wordt 1 maal per jaar op een speciale 'Krambamboulikneipe'
+                    bereid, volgens een even vast als uitgebreid ritueel.
+                </p>
+            </li>
+            <li class="row-container">
+                <Expertise />
+                <p>Wordt met liefde en expertise door 't VAT gebrouwen.</p>
+            </li>
+            <li class="row-container">
+                <Wine />
+                <p>
+                    Bevat meer dan 20% procent alcohol en wordt meestal warm
+                    gedronken.
+                </p>
+            </li>
+            <li class="row-container">
+                <Cooking />
+                <p>
+                    Kan ook gebruikt worden om al uw sauzen op smaak te brengen.
+                </p>
+            </li>
+            <li class="row-container">
+                <Medicine />
+                <p>De ideale drank bij verkoudheden en andere kwaaltjes.</p>
+            </li>
+        </ul>
+    </main>
+
+    <style>
+        main {
+            padding: var(--standard-padding) calc(var(--standard-padding) * 3);
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .brouwers-image-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .brouwers {
+            width: 90%;
+        }
+
+        .intro-text {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .row-container {
+            display: grid;
+            grid-template-columns: 1.5rem auto;
+            align-items: center;
+            gap: calc(1rem / 2);
+        }
+
+        .row-container > p {
+            font-size: 1rem;
+        }
+    </style>
+</Layout>
