@@ -6,8 +6,10 @@ import Medicine from "../svgs/Medicine.astro";
 import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
 import Cooking from "../svgs/Cooking.astro";
+import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 
 const title = "Krambambouli";
+const formActive = true;
 ---
 
 <Layout title={title}>
@@ -56,40 +58,42 @@ const title = "Krambambouli";
                 <p>De ideale drank bij verkoudheden en andere kwaaltjes.</p>
             </li>
         </ul>
+        {formActive && <KrambambouliForm />}
+
+        <style>
+            main {
+                padding: var(--standard-padding)
+                    calc(var(--standard-padding) * 3);
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .brouwers-image-container {
+                display: flex;
+                justify-content: center;
+            }
+
+            .brouwers {
+                width: 90%;
+            }
+
+            .intro-text {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .row-container {
+                display: grid;
+                grid-template-columns: 1.5rem auto;
+                align-items: center;
+                gap: calc(1rem / 2);
+            }
+
+            .row-container > p {
+                font-size: 1rem;
+            }
+        </style>
     </main>
-
-    <style>
-        main {
-            padding: var(--standard-padding) calc(var(--standard-padding) * 3);
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .brouwers-image-container {
-            display: flex;
-            justify-content: center;
-        }
-
-        .brouwers {
-            width: 90%;
-        }
-
-        .intro-text {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .row-container {
-            display: grid;
-            grid-template-columns: 1.5rem auto;
-            align-items: center;
-            gap: calc(1rem / 2);
-        }
-
-        .row-container > p {
-            font-size: 1rem;
-        }
-    </style>
 </Layout>
