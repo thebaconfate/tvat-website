@@ -10,6 +10,11 @@ import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 
 const title = "Krambambouli";
 const formActive = true;
+const classic = { volume: 75, price: { euros: 15 } };
+const minus = {
+    volume: 35,
+    price: { euros: 8 },
+};
 ---
 
 <Layout title={title}>
@@ -58,7 +63,15 @@ const formActive = true;
                 <p>De ideale drank bij verkoudheden en andere kwaaltjes.</p>
             </li>
         </ul>
-        {formActive && <KrambambouliForm />}
+        {
+            formActive && (
+                <KrambambouliForm
+                    classic={classic}
+                    minus={minus}
+                    client:visible
+                />
+            )
+        }
 
         <style>
             main {
