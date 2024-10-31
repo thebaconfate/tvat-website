@@ -2,6 +2,7 @@ import mysql from "mysql2/promise";
 import * as dotenv from "dotenv";
 import type { ProductInterface } from "./store";
 import { table } from "console";
+import { create } from "domain";
 
 dotenv.config();
 
@@ -27,6 +28,8 @@ class Database {
       products: "products",
       pickupLocations: "pickup_locations",
       deliveryLocations: "delivery_locations",
+      locationCodes: "location_codes",
+      activities: "activities",
     };
     const createTable = (tableName: string, values: string[]) =>
       `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
@@ -57,7 +60,25 @@ class Database {
     await connectionPool.query(
       createTable(tableNames.deliveryLocations, [
         "id INT PRIMARY KEY AUTO_INCREMENT",
-        "area VARCHAR(255) NOT NULL",
+        "area VARCHAR(255) NOT NULL UNIQUE",
+      ]),
+    );
+
+    await connectionPool.query(
+      createTable(tableNames.locationCodes, [
+        "location_id INT NOT NULL",
+        "lower INT",
+        "upper INT",
+        "CHECK (lower <= upper)",
+        `FOREIGN KEY (location_id) REFERENCES ${tableNames.deliveryLocations}(id) ON DELETE CASCADE`,
+      ]),
+    );
+    await connectionPool.query(
+      createTable(tableNames.activities, [
+        "id INT PRIMARY KEY",
+        "name VARCHAR(255) NOT NULL",
+        "location VARCHAR(255) NOT NULL",
+        "date DATETIME NOT NULL",
       ]),
     );
     return new Database(tableNames);
@@ -83,9 +104,42 @@ class Database {
       ])} , "cents", ${this.createColumnNames(priceTable, ["cents"])}) AS price
 FROM ${productTable} INNER JOIN ${priceTable} ON ${priceTable}.id = ${productTable}.price_id WHERE LOWER(name) LIKE '%krambambouli%'`,
     );
-    const products = rows as ProductInterface[];
-    console.log(products);
-    return products;
+    return rows;
+  }
+
+  /* KRAMBAMBOULI */
+
+  /* AFHAAL LOCATIES*/
+  async getPickUpLocation() {
+    const table = this.tableNames.pickupLocations;
+    const [rows] = await this.pool.query(
+      `SELECT ${this.createColumnNames(table, ["name", "area"])} FROM ${table};`,
+    );
+    return rows;
+  }
+
+  async getDeliveryLocations() {
+    const deliverTable = this.tableNames.deliveryLocations;
+    const codesTable = this.tableNames.locationCodes;
+    const [rows] = await this.pool.query(
+      `SELECT ${this.createColumnNames(deliverTable, [
+        "area",
+      ])}, JSON_ARRAYAGG(JSON_OBJECT('lower', ${codesTable}.lower, 'upper', ${
+        codesTable
+      }.upper)) AS ranges FROM ${deliverTable} JOIN ${
+        codesTable
+      } ON ${deliverTable}.id = ${codesTable}.location_id GROUP BY ${
+        deliverTable
+      }.area`,
+    );
+    return rows;
+  }
+  async getKrambambouliCantus() {
+    const activitiesTable = this.tableNames.activities;
+    const [rows] = await this.pool.query(
+      `SELECT * from ${activitiesTable} WHERE lower(${activitiesTable}.name) LIKE '%krambambouli%' AND lower(${activitiesTable}.name) LIKE '%cantus%' ORDER BY ${activitiesTable}.date DESC LIMIT 1; `,
+    );
+    return rows;
   }
 }
 

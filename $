@@ -70,19 +70,19 @@ export class PickUpLocation {
 }
 
 export class Range {
-  lower: number;
-  upper: number;
-  constructor(lower: number, upper: number) {
-    this.lower = lower;
-    this.upper = upper;
-  }
+    lower: number;
+    upper: number;
+    constructor(lower: number, upper: number){
+        this.lower = lower:
+        this.upper = upper;
+    }
 }
 
 export class DeliveryLocation {
   area: string;
   range: Range[];
 
-  constructor(area: string, range: Range[]) {
+  constructor(area: string, range: Range) {
     this.area = area;
     this.range = range;
   }
