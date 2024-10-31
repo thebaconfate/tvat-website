@@ -13,4 +13,17 @@ const websiteRoutes = {
   login: { url: "/login" },
 };
 
-export { websiteRoutes };
+const baseApiUrl = "/api";
+
+const apiRoutes = {
+  krambambouli: {
+    url: `${baseApiUrl}/krambambouli`,
+    pickup: { url: "/pickup" },
+    delivery: { url: "/delivery" },
+  },
+  store: {
+    url: `${baseApiUrl}/store`,
+    products: { url: "/products", krambambouli: { url: "krambambouli" } },
+  },
+};
+export { websiteRoutes, apiRoutes };
