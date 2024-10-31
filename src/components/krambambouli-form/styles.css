@@ -1,8 +1,6 @@
 form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
+    margin: 1rem auto;
+    margin-bottom: 3rem;
 }
 
 form>h1 {
@@ -72,38 +70,22 @@ form>h1 {
 }
 
 .form-fields {
-    display: flex;
+    display: grid;
     flex-direction: column;
     gap: 0.5rem;
     margin-top: 2rem;
+    justify-content: center;
 }
 
 .field-row {
-    display: grid;
-    margin: 0 35%;
-    gap: 20%;
-    grid-template-columns: repeat(2, 1fr);
-}
-
-.krambambouli-description {
     display: flex;
+    gap: 2rem;
     justify-content: center;
-    flex-direction: column;
-    align-items: center;
 }
 
-.krambambouli-description>* {
+.field-row>* {
     display: flex;
-    flex-direction: column;
-}
-
-.krambambouli-description>*>* {
-    display: flex;
-}
-
-.field-row> :first-child,
-.field-row> :last-child {
-    display: flex;
+    width: clamp(10rem, 30%, 13rem);
 }
 
 .field-row> :first-child {
@@ -111,15 +93,36 @@ form>h1 {
 }
 
 .field-row> :last-child {
-    justify-content: flex-end;
+    margin-left: 5%
 }
 
 input,
-label {
+label,
+button,
+select {
     font-size: 1rem;
 }
 
-input[type="checkbox"] {
-    width: 1rem;
-    height: 1rem;
+.radio-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.radio-container>label>input {
+    margin-right: 3px;
+}
+
+.information-row {
+    display: flex;
+    flex-direction: column;
+    place-self: center;
+    width: clamp(calc(2 * 10rem), calc(60% + 5%), calc(13rem * 2 + 5% + 2rem));
+    gap: 1rem;
+}
+
+button[type='submit'] {
+    margin-left: auto;
+    padding: 0.3rem 1rem;
+    margin-top: 1rem;
+
 }
