@@ -15,6 +15,46 @@ const minus = {
     volume: 35,
     price: { euros: 8 },
 };
+
+const deliveryLocations = [
+    {
+        location: "Brussels Hoofdstedelijk Gewest",
+        range: [{ lower: 1000, upper: 1299 }],
+        price: { euros: 5 },
+    },
+    {
+        location: "Vlaams Brabant",
+        range: [
+            { lower: 1500, upper: 1999 },
+            { lower: 3000, upper: 3499 },
+        ],
+        price: { euros: 7 },
+    },
+    { location: "Rest van België", price: { euros: 10 } },
+];
+
+const pickUpLocations: { area: string; name: string }[] = [
+    {
+        area: "Ouderghem",
+        name: "Gérard",
+    },
+    {
+        area: "Schepdaal",
+        name: "Jarni & Kiana",
+    },
+    {
+        area: "Campus Jette",
+        name: "Vic",
+    },
+    {
+        area: "Campus Etterbeek",
+        name: "Sam",
+    },
+    {
+        area: "Asse",
+        name: "Keanu",
+    },
+];
 ---
 
 <Layout title={title}>
@@ -68,6 +108,8 @@ const minus = {
                 <KrambambouliForm
                     classic={classic}
                     minus={minus}
+                    deliveryLocations={deliveryLocations}
+                    pickUpLocations={pickUpLocations}
                     client:visible
                 />
             )
