@@ -7,24 +7,45 @@ import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
 import Cooking from "../svgs/Cooking.astro";
 import { apiRoutes } from "../lib/routes";
-import type { Product } from "../lib/store";
+import type { Product, PickUpLocation, DeliveryLocation } from "../lib/store";
 
 const title = "Krambambouli";
 const formActive = false;
 const handleResponse = (response: Response) =>
     response.ok ? response.json() : [];
-const [products]: [Product[]] = await Promise.all([
+const origin = Astro.url.origin;
+const [products, pickupLocations, deliveryLocations]: [
+    Product[],
+    PickUpLocation[],
+    DeliveryLocation[],
+] = await Promise.all([
     fetch(
         [
-            Astro.url.origin,
+            origin,
             apiRoutes.store.url,
             apiRoutes.store.products.url,
             apiRoutes.store.products.krambambouli.url,
         ].join(""),
     ).then((response) => handleResponse(response)),
+    fetch(
+        [
+            origin,
+            apiRoutes.krambambouli.url,
+            apiRoutes.krambambouli.pickup.url,
+        ].join(""),
+    ).then((response) => handleResponse(response)),
+    fetch(
+        [
+            origin,
+            apiRoutes.krambambouli.url,
+            apiRoutes.krambambouli.delivery.url,
+        ].join(""),
+    ).then((response) => handleResponse(response)),
 ]);
 
 console.log(products);
+console.log(pickupLocations);
+console.log(deliveryLocations);
 ---
 
 <Layout title={title}>

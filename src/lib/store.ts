@@ -58,3 +58,32 @@ export class Product {
     this.imageUrl = imageUrl;
   }
 }
+
+export class PickUpLocation {
+  name: string;
+  area: string;
+
+  constructor(name: string, area: string) {
+    this.name = name;
+    this.area = area;
+  }
+}
+
+export class Range {
+  lower: number;
+  upper: number;
+  constructor(lower: number, upper: number) {
+    this.lower = lower;
+    this.upper = upper;
+  }
+}
+
+export class DeliveryLocation {
+  area: string;
+  range: Range[];
+
+  constructor(area: string, range: Range[]) {
+    this.area = area;
+    this.range = range;
+  }
+}
