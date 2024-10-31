@@ -23,6 +23,10 @@ export class Price {
   static fromObj(price: PriceInterface) {
     return new Price(price.euros, price.cents);
   }
+
+  toString() {
+    return `€${this.euros},${this.cents === 0 ? "-" : this.cents}`;
+  }
 }
 
 export interface ProductInterface {
@@ -30,8 +34,7 @@ export interface ProductInterface {
   name: string;
   description: string | null;
   imageUrl: string | null;
-  euros: number;
-  cents: number;
+  price: PriceInterface;
 }
 
 export class Product {

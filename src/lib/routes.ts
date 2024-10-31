@@ -23,7 +23,7 @@ const apiRoutes = {
   },
   store: {
     url: `${baseApiUrl}/store`,
-    products: { url: "/products", krambambouli: { url: "krambambouli" } },
+    products: { url: "/products", krambambouli: { url: "/krambambouli" } },
   },
 };
 export { websiteRoutes, apiRoutes };
