@@ -1,6 +1,7 @@
 import mysql from "mysql2/promise";
 import * as dotenv from "dotenv";
 import type { ProductInterface } from "./store";
+import { table } from "console";
 
 dotenv.config();
 
@@ -31,14 +32,14 @@ class Database {
       `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
     await connectionPool.query(
       createTable(tableNames.prices, [
-        "id INT PRIMARY KEY AUTO INCREMENT",
+        "id INT PRIMARY KEY AUTO_INCREMENT",
         "euros INT DEFAULT 0",
         "cents INT DEFAULT 0",
       ]),
     );
     await connectionPool.query(
       createTable(tableNames.products, [
-        "id INT PRIMARY KEY AUTO INCREMENT",
+        "id INT PRIMARY KEY AUTO_INCREMENT",
         "name VARCHAR(255) NOT NULL UNIQUE",
         "description VARCHAR(255)",
         "image_url VARCHAR(255)",
@@ -55,20 +56,35 @@ class Database {
 
     await connectionPool.query(
       createTable(tableNames.deliveryLocations, [
-        "id INT PRIMARY KEY AUTO INCREMENT",
+        "id INT PRIMARY KEY AUTO_INCREMENT",
         "area VARCHAR(255) NOT NULL",
       ]),
     );
     return new Database(tableNames);
   }
 
+  private createColumnNames(tableName: string, values: string[]) {
+    return values.map((val) => `${tableName}.${val}`).join(", ");
+  }
+
   /* PRODUCTS */
 
   async getKrambambouliProducts() {
+    const productTable = this.tableNames.products;
+    const priceTable = this.tableNames.prices;
     const [rows] = await this.pool.query(
-      "SELECT * FROM products WHERE LOWER(name) LIKE '%krambambouli%'",
+      `SELECT ${this.createColumnNames(productTable, [
+        "id",
+        "name",
+        "description",
+        "image_url as imageUrl",
+      ])}, JSON_OBJECT("euros", ${this.createColumnNames(priceTable, [
+        "euros",
+      ])} , "cents", ${this.createColumnNames(priceTable, ["cents"])}) AS price
+FROM ${productTable} INNER JOIN ${priceTable} ON ${priceTable}.id = ${productTable}.price_id WHERE LOWER(name) LIKE '%krambambouli%'`,
     );
     const products = rows as ProductInterface[];
+    console.log(products);
     return products;
   }
 }

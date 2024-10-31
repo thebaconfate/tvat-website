@@ -7,19 +7,24 @@ import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
 import Cooking from "../svgs/Cooking.astro";
 import { apiRoutes } from "../lib/routes";
+import type { Product } from "../lib/store";
 
 const title = "Krambambouli";
 const formActive = false;
-
-const [products] = await Promise.all([
+const handleResponse = (response: Response) =>
+    response.ok ? response.json() : [];
+const [products]: [Product[]] = await Promise.all([
     fetch(
         [
             Astro.url.origin,
             apiRoutes.store.url,
             apiRoutes.store.products.url,
+            apiRoutes.store.products.krambambouli.url,
         ].join(""),
-    ),
+    ).then((response) => handleResponse(response)),
 ]);
+
+console.log(products);
 ---
 
 <Layout title={title}>
