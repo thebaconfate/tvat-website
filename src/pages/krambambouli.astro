@@ -6,55 +6,20 @@ import Medicine from "../svgs/Medicine.astro";
 import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
 import Cooking from "../svgs/Cooking.astro";
-import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
+import { apiRoutes } from "../lib/routes";
 
 const title = "Krambambouli";
-const formActive = true;
-const classic = { volume: 75, price: { euros: 15 } };
-const minus = {
-    volume: 35,
-    price: { euros: 8 },
-};
+const formActive = false;
 
-const deliveryLocations = [
-    {
-        location: "Brussels Hoofdstedelijk Gewest",
-        range: [{ lower: 1000, upper: 1299 }],
-        price: { euros: 5 },
-    },
-    {
-        location: "Vlaams Brabant",
-        range: [
-            { lower: 1500, upper: 1999 },
-            { lower: 3000, upper: 3499 },
-        ],
-        price: { euros: 7 },
-    },
-    { location: "Rest van België", price: { euros: 10 } },
-];
-
-const pickUpLocations: { area: string; name: string }[] = [
-    {
-        area: "Ouderghem",
-        name: "Gérard",
-    },
-    {
-        area: "Schepdaal",
-        name: "Jarni & Kiana",
-    },
-    {
-        area: "Campus Jette",
-        name: "Vic",
-    },
-    {
-        area: "Campus Etterbeek",
-        name: "Sam",
-    },
-    {
-        area: "Asse",
-        name: "Keanu",
-    },
-];
+const [products] = await Promise.all([
+    fetch(
+        [
+            Astro.url.origin,
+            apiRoutes.store.url,
+            apiRoutes.store.products.url,
+        ].join(""),
+    ),
+]);
 ---
 
 <Layout title={title}>
@@ -103,17 +68,7 @@ const pickUpLocations: { area: string; name: string }[] = [
                 <p>De ideale drank bij verkoudheden en andere kwaaltjes.</p>
             </li>
         </ul>
-        {
-            formActive && (
-                <KrambambouliForm
-                    classic={classic}
-                    minus={minus}
-                    deliveryLocations={deliveryLocations}
-                    pickUpLocations={pickUpLocations}
-                    client:visible
-                />
-            )
-        }
+        {formActive && "test"}
 
         <style>
             main {
