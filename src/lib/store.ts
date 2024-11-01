@@ -81,9 +81,11 @@ export class Range {
 export class DeliveryLocation {
   area: string;
   range: Range[];
+  price: Price;
 
-  constructor(area: string, range: Range[]) {
+  constructor(area: string, range: Range[], price: Price) {
     this.area = area;
     this.range = range;
+    this.price = price;
   }
 }

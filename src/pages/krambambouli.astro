@@ -9,11 +9,12 @@ import Cooking from "../svgs/Cooking.astro";
 import { apiRoutes } from "../lib/routes";
 import type { Product, PickUpLocation, DeliveryLocation } from "../lib/store";
 import type { Activity } from "../lib/activity";
+import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 
 const title = "Krambambouli";
-const formActive = false;
-const handleResponse = (response: Response) =>
-    response.ok ? response.json() : [];
+const formActive = true;
+const handleResponse = (response: Response, defaultValue = []) =>
+    response.ok ? response.json() : defaultValue;
 const origin = Astro.url.origin;
 const [products, pickupLocations, deliveryLocations, krambambouliCantus]: [
     Product[],
@@ -49,7 +50,7 @@ const [products, pickupLocations, deliveryLocations, krambambouliCantus]: [
             apiRoutes.krambambouli.url,
             apiRoutes.krambambouli.cantus.url,
         ].join(""),
-    ).then((response) => handleResponse(response)),
+    ).then((response) => handleResponse(response, undefined)),
 ]);
 ---
 
@@ -99,7 +100,17 @@ const [products, pickupLocations, deliveryLocations, krambambouliCantus]: [
                 <p>De ideale drank bij verkoudheden en andere kwaaltjes.</p>
             </li>
         </ul>
-        {formActive && "test"}
+        {
+            formActive && (
+                <KrambambouliForm
+                    client:visible
+                    products={products}
+                    deliveryLocations={deliveryLocations}
+                    pickUpLocations={pickupLocations}
+                    krambambouliCantus={krambambouliCantus}
+                />
+            )
+        }
 
         <style>
             main {
