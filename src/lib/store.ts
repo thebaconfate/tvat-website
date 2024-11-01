@@ -24,8 +24,9 @@ export class Price {
     return new Price(price.euros, price.cents);
   }
 
-  toString() {
-    return `€${this.euros},${this.cents === 0 ? "-" : this.cents}`;
+  toString(): string {
+    const result = `€${this.euros},${this.cents === 0 ? "-" : this.cents}`;
+    return result;
   }
 }
 

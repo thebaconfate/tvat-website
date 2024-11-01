@@ -7,14 +7,17 @@ import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
 import Cooking from "../svgs/Cooking.astro";
 import { apiRoutes } from "../lib/routes";
-import type { Product, PickUpLocation, DeliveryLocation } from "../lib/store";
+import type {
+    PickUpLocation,
+    DeliveryLocation,
+    ProductInterface,
+} from "../lib/store";
+import { Product, Price } from "../lib/store";
 import type { Activity } from "../lib/activity";
 import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 
 const title = "Krambambouli";
 const formActive = true;
-const handleResponse = (response: Response, defaultValue = []) =>
-    response.ok ? response.json() : defaultValue;
 const origin = Astro.url.origin;
 const [products, pickupLocations, deliveryLocations, krambambouliCantus]: [
     Product[],
@@ -29,29 +32,50 @@ const [products, pickupLocations, deliveryLocations, krambambouliCantus]: [
             apiRoutes.store.products.url,
             apiRoutes.store.products.krambambouli.url,
         ].join(""),
-    ).then((response) => handleResponse(response)),
+    )
+        .then((response) => {
+            if (response.ok) {
+                return response.json();
+            } else throw Error();
+        })
+        .then((data: ProductInterface[]) => {
+            return data.map(
+                (el: ProductInterface) =>
+                    new Product(
+                        el.id,
+                        el.name,
+                        new Price(el.price.euros, el.price.cents),
+                        el.description ? el.description : undefined,
+                        el.imageUrl,
+                    ),
+            );
+        }),
     fetch(
         [
             origin,
             apiRoutes.krambambouli.url,
             apiRoutes.krambambouli.pickup.url,
         ].join(""),
-    ).then((response) => handleResponse(response)),
+    ).then((response) => response),
     fetch(
         [
             origin,
             apiRoutes.krambambouli.url,
             apiRoutes.krambambouli.delivery.url,
         ].join(""),
-    ).then((response) => handleResponse(response)),
+    ).then((response) => response),
     fetch(
         [
             origin,
             apiRoutes.krambambouli.url,
             apiRoutes.krambambouli.cantus.url,
         ].join(""),
-    ).then((response) => handleResponse(response, undefined)),
+    ).then((response) => response),
 ]);
+
+products.map((p) => {
+    console.log(p.price.toString());
+});
 ---
 
 <Layout title={title}>
