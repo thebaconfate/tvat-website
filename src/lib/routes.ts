@@ -20,6 +20,7 @@ const apiRoutes = {
     url: `${baseApiUrl}/krambambouli`,
     pickup: { url: "/pickup" },
     delivery: { url: "/delivery" },
+    cantus: { url: "/cantus" },
   },
   store: {
     url: `${baseApiUrl}/store`,
