@@ -43,7 +43,7 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
                                     </div>
                                     <div className="product-button-container">
                                         <button>-</button>
-                                        <input type="number" />
+                                        <input type="number" defaultValue={amount.find((el) => el.id === product.id)?.amount} />
                                         <button>+</button>
                                     </div>
                                 </div>
