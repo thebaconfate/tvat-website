@@ -15,67 +15,104 @@ import type {
 import { Product, Price } from "../lib/store";
 import type { Activity } from "../lib/activity";
 import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
+import { createUrl } from "../lib/utils";
 
+export const prerender = false;
 const title = "Krambambouli";
 const formActive = true;
 const origin = Astro.url.origin;
-const [products, pickupLocations, deliveryLocations, krambambouliCantus]: [
-    Product[],
-    PickUpLocation[],
-    DeliveryLocation[],
-    Activity,
-] = await Promise.all([
-    fetch(
-        [
-            origin,
-            apiRoutes.store.url,
-            apiRoutes.store.products.url,
-            apiRoutes.store.products.krambambouli.url,
-        ].join(""),
-    )
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            } else throw Error();
-        })
-        .then((data: ProductInterface[]) => {
-            return data.map(
-                (el: ProductInterface) =>
-                    new Product(
-                        el.id,
-                        el.name,
-                        new Price(el.price.euros, el.price.cents),
-                        el.description ? el.description : undefined,
-                        el.imageUrl,
-                    ),
-            );
-        }),
-    fetch(
-        [
-            origin,
-            apiRoutes.krambambouli.url,
-            apiRoutes.krambambouli.pickup.url,
-        ].join(""),
-    ).then((response) => response),
-    fetch(
-        [
-            origin,
-            apiRoutes.krambambouli.url,
-            apiRoutes.krambambouli.delivery.url,
-        ].join(""),
-    ).then((response) => response),
-    fetch(
-        [
-            origin,
-            apiRoutes.krambambouli.url,
-            apiRoutes.krambambouli.cantus.url,
-        ].join(""),
-    ).then((response) => response),
-]);
+function throwHttpError(response: Response) {
+    throw new Error(`HTTP error: ${response.status}`);
+}
 
-products.map((p) => {
-    console.log(p.price.toString());
+let [
+    products,
+    deliveryLocations,
+    pickupLocations,
+    krambambouliCantus,
+    errors,
+]: [
+    null | ProductInterface[],
+    null | DeliveryLocation[],
+    null | PickUpLocation[],
+    null | Activity,
+    null | any,
+] = Array(4).fill(null) as [
+    Product[] | null,
+    DeliveryLocation[] | null,
+    PickUpLocation[] | null,
+    Activity | null,
+    any | null,
+];
+const productsPromise = fetch(
+    createUrl([
+        origin,
+        apiRoutes.store.url,
+        apiRoutes.store.products.url,
+        apiRoutes.store.products.krambambouli.url,
+    ]),
+).then((response) => {
+    if (response.ok) {
+        return response.json();
+    } else throwHttpError(response);
 });
+
+const pickupLocationsPromise = fetch(
+    createUrl([
+        origin,
+        apiRoutes.krambambouli.url,
+        apiRoutes.krambambouli.pickup.url,
+    ]),
+)
+    .then((response) => {
+        if (response.ok) {
+            return response.json();
+        } else throwHttpError(response);
+    })
+    .then((data: PickUpLocation[]) => {
+        return data;
+    });
+const deliverlyLocationsPromise = fetch(
+    [
+        origin,
+        apiRoutes.krambambouli.url,
+        apiRoutes.krambambouli.delivery.url,
+    ].join(""),
+)
+    .then((response) => {
+        if (response.ok) {
+            return response.json();
+        } else throwHttpError(response);
+    })
+    .then((data: DeliveryLocation[]) => {
+        return data;
+    });
+
+const krambambouliCantusPromise = fetch(
+    [
+        origin,
+        apiRoutes.krambambouli.url,
+        apiRoutes.krambambouli.cantus.url,
+    ].join(""),
+)
+    .then((response) => {
+        if (response.ok) {
+            return response.json();
+        } else throwHttpError(response);
+    })
+    .then((data: Activity) => data);
+try {
+    [products, pickupLocations, deliveryLocations, krambambouliCantus] =
+        await Promise.all([
+            productsPromise,
+            pickupLocationsPromise,
+            deliverlyLocationsPromise,
+            krambambouliCantusPromise,
+        ]);
+} catch (e) {
+    errors = e;
+    console.error(e);
+}
 ---
 
 <Layout title={title}>
@@ -125,15 +162,21 @@ products.map((p) => {
             </li>
         </ul>
         {
-            formActive && (
-                <KrambambouliForm
-                    client:visible
-                    products={products}
-                    deliveryLocations={deliveryLocations}
-                    pickUpLocations={pickupLocations}
-                    krambambouliCantus={krambambouliCantus}
-                />
-            )
+            errors
+                ? "Something went wrong...."
+                : products &&
+                  deliveryLocations &&
+                  pickupLocations &&
+                  krambambouliCantus &&
+                  formActive && (
+                      <KrambambouliForm
+                          client:visible
+                          products={products}
+                          deliveryLocations={deliveryLocations}
+                          pickUpLocations={pickupLocations}
+                          krambambouliCantus={krambambouliCantus}
+                      />
+                  )
         }
 
         <style>

@@ -1,3 +1,60 @@
 .form-container {
     margin: 2rem auto;
 }
+
+.products-container {
+    display: flex;
+    justify-content: center;
+    gap: 5rem;
+    flex-wrap: wrap;
+}
+
+.product {
+    display: flex;
+    flex-direction: column;
+    width: calc(35%);
+}
+
+.product-title {
+    display: flex;
+}
+
+.product>picture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+picture>img {
+    width: 100%;
+}
+
+.product-details {
+    display: flex;
+    justify-content: space-between;
+}
+
+.product-details> :first-child {
+    font-weight: 500;
+}
+
+.product-button-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+button,
+input {
+    font-size: 1rem;
+}
+
+.product-button-container>button {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.product-button-container>input {
+    width: clamp(3rem, 20%, 6rem);
+}
