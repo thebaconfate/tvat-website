@@ -25,7 +25,8 @@ export class Price {
   }
 
   toString(): string {
-    const result = `€${this.euros},${this.cents === 0 ? "-" : this.cents}`;
+    const postComma = this.cents === 0 ? "-" : `${this.cents}`;
+    const result = `€${this.euros},` + postComma;
     return result;
   }
 }
@@ -49,7 +50,7 @@ export class Product {
     id: number,
     name: string,
     price: Price,
-    description: string = "",
+    description: string | null = null,
     imageUrl: string | null = null,
   ) {
     this.id = id;
