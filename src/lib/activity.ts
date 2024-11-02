@@ -1,3 +1,11 @@
+export interface ActivityInterface {
+  id?: number;
+  name: string;
+  description?: string;
+  location: string;
+  date: string;
+}
+
 export class Activity {
   id?: number;
   name: string;
@@ -17,5 +25,9 @@ export class Activity {
     this.date = date;
     this.description = description;
     this.id = id;
+  }
+
+  fmtDate() {
+    return `${this.date.getDate()}/${this.date.getMonth() + 1}`;
   }
 }

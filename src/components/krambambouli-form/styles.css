@@ -1,5 +1,5 @@
 .form-container {
-    margin: 2rem 0;
+    margin-bottom: 2rem;
 }
 
 .products-container {
@@ -48,6 +48,7 @@ picture>img {
 }
 
 button,
+select,
 input {
     font-size: 1rem;
 }
@@ -101,6 +102,7 @@ form {
 
 .fields-container {
     display: grid;
+    gap: 1rem;
 }
 
 .fields-container>* {
@@ -108,7 +110,7 @@ form {
 }
 
 .fields-container> :first-child {
-    gap: 3rem;
+    gap: 2%;
     grid-template-columns: repeat(2, 1fr);
 }
 
@@ -118,4 +120,52 @@ form {
 
 }
 
-/*462*/
+input[type="radio"] {
+    margin-right: 5px;
+}
+
+.delivery-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.delivery-row>* {
+    display: flex;
+}
+
+.address-row>:first-child {
+    display: grid;
+    grid-template-areas: "address-label address-label housenumber-label bus-label"
+        "address-input address-input housenumber-input bus-input";
+    gap: 2%;
+}
+
+.address-row>:first-child>:first-child {
+    grid-area: address-label;
+}
+
+.address-row>:first-child>:nth-child(2) {
+    grid-area: address-input;
+}
+
+.address-row:first-child>:nth-child(3) {
+    grid-area: housenumber-label;
+}
+
+.address-row>:first-child>:nth-child(4) {
+    grid-area: housenumber-input;
+}
+
+.address-row>:first-child>:nth-child(5) {
+    grid-area: bus-label;
+}
+
+.address-row>:first-child>:nth-child(6) {
+    grid-area: bus-input;
+}
+
+.address-row>:last-child {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
