@@ -21,13 +21,13 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
         ),
         product.description,
         product.imageUrl));
-    const [amount, setAmount] = useState(products.map(product => { return { id: product.id, amount: 0 } }));
+    const [amountList, setAmountList] = useState(products.map(product => { return { id: product.id, amount: 0 } }));
     return (
         <div className="form-container">
             <form>
                 <div className="products-container">
                     {
-                        products.map((product) => {
+                        products.map((product, index) => {
                             return (
                                 <div key={product.id} className="product">
                                     {
@@ -43,13 +43,29 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
                                     </div>
                                     <div className="product-button-container">
                                         <button>-</button>
-                                        <input type="number" defaultValue={amount.find((el) => el.id === product.id)?.amount} />
+                                        <input type="number" defaultValue={amountList[index].amount} />
                                         <button>+</button>
                                     </div>
                                 </div>
                             )
                         })
                     }
+                </div>
+                <div className="fields-container">
+                    <div className="field-row">
+                        <div className="field-col">
+                            <label>Voornaam</label>
+                            <input type="text" />
+                        </div>
+                        <div className="field-col">
+                            <label>Achternaam</label>
+                            <input type="text" />
+                        </div>
+                    </div>
+                    <div className="field-row">
+                        <label>E-mail</label>
+                        <input type="email" />
+                    </div>
                 </div>
             </form>
         </div>

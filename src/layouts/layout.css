@@ -42,3 +42,10 @@ header> :last-child {
 main {
     padding: var(--standard-padding);
 }
+
+@media screen and (max-width: 767px) {
+    body {
+        width: 95%;
+        --standard-padding: 0.5rem;
+    }
+}
