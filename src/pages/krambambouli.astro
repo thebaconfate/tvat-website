@@ -13,7 +13,7 @@ import type {
     ProductInterface,
 } from "../lib/store";
 import { Product, Price } from "../lib/store";
-import type { Activity } from "../lib/activity";
+import type { ActivityInterface } from "../lib/activity";
 import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 import { createUrl } from "../lib/utils";
 
@@ -35,13 +35,13 @@ let [
     null | ProductInterface[],
     null | DeliveryLocation[],
     null | PickUpLocation[],
-    null | Activity,
+    null | ActivityInterface,
     null | any,
 ] = Array(4).fill(null) as [
     Product[] | null,
     DeliveryLocation[] | null,
     PickUpLocation[] | null,
-    Activity | null,
+    ActivityInterface | null,
     any | null,
 ];
 const productsPromise = fetch(
@@ -100,7 +100,7 @@ const krambambouliCantusPromise = fetch(
             return response.json();
         } else throwHttpError(response);
     })
-    .then((data: Activity) => data);
+    .then((data: ActivityInterface) => data);
 try {
     [products, pickupLocations, deliveryLocations, krambambouliCantus] =
         await Promise.all([
@@ -185,7 +185,7 @@ try {
                     calc(var(--standard-padding) * 3);
                 display: flex;
                 flex-direction: column;
-                gap: 2rem;
+                gap: 1rem;
             }
 
             .brouwers-image-container {
