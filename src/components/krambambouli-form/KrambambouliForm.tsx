@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, type ChangeEvent } from "react"
 import "./styles.css"
 import { DeliveryLocation, Price, Product, type PickUpLocation, type ProductInterface } from "../../lib/store"
 import { Activity, type ActivityInterface } from "../../lib/activity"
@@ -7,17 +7,28 @@ interface Props {
     products: ProductInterface[],
     pickUpLocations: PickUpLocation[],
     deliveryLocations: DeliveryLocation[],
-    krambambouliCantus: ActivityInterface | Activity;
+    krambambouliCantus: ActivityInterface;
 }
 
 enum DeliveryOption {
-    Delivery,
-    PickUp
+    Delivery = "delivery",
+    PickUp = "pick up"
+}
+
+interface Form {
+    firstName: string,
+    lastName: string,
+    email: string,
+    streetName: null | string,
+    streetNumber: null | string,
+    bus: null | string,
+    post: null | number,
+    city: null | string
 }
 
 
-export default function KrambambouliForm({ products, pickUpLocations, deliveryLocations, krambambouliCantus }: Props) {
-    products = products.map(product => new Product(
+export default function KrambambouliForm({ products: productObjs, pickUpLocations, deliveryLocations, krambambouliCantus: krambambouliCantusObj }: Props) {
+    const products = productObjs.map(product => new Product(
         product.id,
         product.name,
         new Price(
@@ -26,21 +37,39 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
         ),
         product.description,
         product.imageUrl));
-    krambambouliCantus = new Activity(krambambouliCantus.name, krambambouliCantus.location, new Date(krambambouliCantus.date), krambambouliCantus.description, krambambouliCantus.id)
-    console.log(deliveryLocations)
+    const krambambouliCantus = new Activity(krambambouliCantusObj.name, krambambouliCantusObj.location, new Date(krambambouliCantusObj.date), krambambouliCantusObj.description, krambambouliCantusObj.id)
     deliveryLocations = deliveryLocations.map(loc => new DeliveryLocation(loc.area, loc.range, new Price(loc.price.euros, loc.price.cents)))
 
     const deliveryStartDate = new Date(krambambouliCantus.date)
     deliveryStartDate.setDate(deliveryStartDate.getDate() + 1)
+
     const pickUpStartDate = new Date(deliveryStartDate)
+    const pickUpEndDate = new Date(pickUpStartDate)
+    pickUpEndDate.setFullYear(pickUpEndDate.getFullYear() + 1)
+    pickUpEndDate.setDate(1)
+    pickUpEndDate.setMonth(2)
+    pickUpEndDate.setDate(pickUpEndDate.getDate() - 1)
+
     const deliveryEndDate = new Date(deliveryStartDate);
     deliveryEndDate.setDate(deliveryEndDate.getDate() + 10);
+
     const [amountList, setAmountList] = useState(products.map(_ => 0));
     const [selectedOption, setSelectedOption] = useState<null | DeliveryOption>(null)
     const [selectedPickUpOption, setSelectedPickUpOption] = useState<null | number>(null)
+    const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<null | number>(null)
+    const [form, setForm] = useState<Form>({
+        firstName: "",
+        lastName: "",
+        email: "",
+        streetName: null,
+        streetNumber: null,
+        bus: null,
+        post: null,
+        city: null
+    })
 
     function handleChangeOption(e: React.ChangeEvent<HTMLInputElement>) {
-        const value = parseInt(e.target.value)
+        const value = e.target.value
         setSelectedOption(value as DeliveryOption)
     }
 
@@ -48,9 +77,72 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
         setSelectedPickUpOption(parseInt(e.target.value))
     }
 
+
+    function makeHandleChangeAmount(idx: number) {
+        return (e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = parseInt(e.target.value)
+            const copy = [...amountList];
+            copy[idx] = value <= 0 ? 0 : value;
+            setAmountList(copy);
+        }
+    }
+
+    function makeHandlePressAmount(func: (x: number) => number) {
+        return (idx: number) => {
+            return (_: React.MouseEvent<HTMLButtonElement>) => {
+                const value = func(amountList[idx])
+                const copy = [...amountList];
+                copy[idx] = value <= 0 ? 0 : value;
+                setAmountList(copy)
+            }
+        }
+    }
+
+    const handlePressAmountDec = makeHandlePressAmount((x: number) => x <= 0 ? 0 : x - 1);
+    const handlePressAmountInc = makeHandlePressAmount((x: number) => x + 1);
+
+
+    function makeHandleChangeDeliveryOption(idx: number) {
+        return (_: React.ChangeEvent<HTMLInputElement>) =>
+            setSelectedDeliveryOption(idx)
+    }
+
+
+    function calcTotalAmount() {
+        const total = amountList.reduce((acc: Price, amount: number, index: number) =>
+            acc.add(products[index].price.mult(amount)), new Price(0))
+        if (selectedOption === DeliveryOption.Delivery)
+            if (selectedDeliveryOption != null)
+                return total.add(deliveryLocations[selectedDeliveryOption].price)
+        return total;
+    }
+
+    function handleTextInput(e: React.ChangeEvent<HTMLInputElement>) {
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value })
+    }
+
+    function handleNumberInput(e: React.ChangeEvent<HTMLInputElement>) {
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: parseInt(value) })
+    }
+
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        const data = new FormData();
+        const personDetaims = {
+            firstName: form.firstName,
+            lastName: form.lastName,
+            email: form.email,
+            deliveryOption: selectedOption
+        }
+        let deliveryDetails = {}
+        if (selectedOption === DeliveryOption.PickUp && selectedPickUpOption != null)
+            deliveryDetails = { ...deliveryDetails, name: pickUpLocations[selectedPickUpOption].name }
+        else if (selectedOption === DeliveryOption.Delivery && selectedDeliveryOption != null)
+            deliveryDetails = { ...deliveryDetails, }
     }
+
     return (
         <div className="form-container">
             <form onSubmit={handleSubmit}>
@@ -59,21 +151,25 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
                         products.map((product, index) => {
                             return (
                                 <div key={product.id} className="product">
-                                    {
-                                        product.imageUrl ?
-                                            <picture>
-                                                <img src={product.imageUrl} />
-                                            </picture> : ""
-                                    }
+                                    <picture>
+                                        {
+                                            product.imageUrl ?
+                                                <img src={product.imageUrl} alt={product.name + "image"} />
+                                                : <img alt={product.name + "image"} />
+                                        }
+                                    </picture>
                                     <h3 className="product-title">{product.name}</h3>
                                     <div className="product-details">
                                         <p>{product.description}</p>
                                         <p>{product.price.toString()}</p>
                                     </div>
                                     <div className="product-button-container">
-                                        <button>-</button>
-                                        <input type="number" defaultValue={amountList[index]} />
-                                        <button>+</button>
+                                        <button type="button" onClick={handlePressAmountDec(index)} >-</button>
+                                        <input
+                                            type="number"
+                                            value={amountList[index]}
+                                            onChange={makeHandleChangeAmount(index)} />
+                                        <button type="button" onClick={handlePressAmountInc(index)}>+</button>
                                     </div>
                                 </div>
                             )
@@ -83,17 +179,39 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
                 <div className="fields-container">
                     <div className="field-row">
                         <div className="field-col">
-                            <label>Voornaam</label>
-                            <input type="text" />
+                            <label htmlFor="firstName">Voornaam</label>
+                            <input
+                                id="firstName"
+                                type="text"
+                                placeholder="John"
+                                name="firstName"
+                                required
+                                value={form.firstName}
+                                onChange={handleTextInput}
+                            />
                         </div>
                         <div className="field-col">
-                            <label>Achternaam</label>
-                            <input type="text" />
+                            <label form="lastName">Achternaam</label>
+                            <input
+                                id="lastName"
+                                type="text"
+                                placeholder="Doe"
+                                name="lastName"
+                                required
+                                value={form.lastName}
+                                onChange={handleTextInput} />
                         </div>
                     </div>
                     <div className="field-row">
-                        <label>E-mail</label>
-                        <input type="email" />
+                        <label form="email">E-mail</label>
+                        <input
+                            id="email"
+                            type="email"
+                            required
+                            placeholder="john.doe@hotmail.com"
+                            value={form.email}
+                            onChange={handleTextInput}
+                            name="email" />
                     </div>
                     <div className="field-row radio-options-container">
                         <label>Leveringsopties</label>
@@ -105,7 +223,9 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
                                 value={DeliveryOption.PickUp}
                                 checked={selectedOption === DeliveryOption.PickUp}
                                 onChange={handleChangeOption} />
-                            {`Afhalen vanaf ${krambambouliCantus.fmtDate()}`}
+                            {
+                                `Afhalen tussen ${krambambouliCantus.fmtDate()} en ${pickUpEndDate.getDate()}/${pickUpEndDate.getMonth() + 1}/${pickUpEndDate.getFullYear()}`
+                            }
                         </label>
                         <label>
                             <input
@@ -129,22 +249,26 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
                                     type="radio"
                                     name="pick-up-option"
                                     value={0}
+                                    required
                                     checked={0 == selectedPickUpOption}
                                     onChange={handleChangePickUpOption} />
-                                {`${krambambouliCantus.name} (${krambambouliCantus.fmtDate()})`}
+                                {
+                                    `${krambambouliCantus.name} (${krambambouliCantus.fmtDate()})`
+                                }
                             </label>
                             {
                                 pickUpLocations.map((loc, index) => {
                                     return (
-                                        <label>
+                                        <label key={index}>
                                             <input
                                                 type="radio"
                                                 name="pick-up-option"
                                                 value={index + 1}
+                                                required
                                                 checked={(index + 1) == selectedPickUpOption}
                                                 onChange={handleChangePickUpOption} />
                                             {
-                                                `Bij ${loc.name} (${loc.area}) vanaf (${pickUpStartDate.getDate()}/${pickUpStartDate.getMonth() + 1})`
+                                                `Bij ${loc.name} (${loc.area}) (vanaf ${pickUpStartDate.getDate()}/${pickUpStartDate.getMonth() + 1})`
                                             }
                                         </label>
                                     )
@@ -154,21 +278,27 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
                         </div>
                         ||
                         selectedOption === DeliveryOption.Delivery && <>
-
                             <div className="field-row">
-                                <label>
+                                <label form="delivery-option">
                                     Leveroptie
                                 </label>
                                 {
                                     deliveryLocations.map((loc, idx) => {
                                         return (
-                                            <span className="delivery-row">
-                                                <label>
-                                                    <input type="radio"
+                                            <span key={idx} className="delivery-row">
+                                                <label htmlFor={`delivery-option-${idx}`}>
+                                                    <input
+                                                        id={`delivery-option-${idx}`}
+                                                        type="radio"
                                                         name="delivery-option"
                                                         value={idx}
+                                                        required
+                                                        checked={idx === selectedDeliveryOption}
+                                                        onChange={makeHandleChangeDeliveryOption(idx)}
                                                     />
-                                                    {`Levering ${loc.area}`}
+                                                    {
+                                                        `Levering ${loc.area}`
+                                                    }
                                                 </label>
                                                 <p>{loc.price.toString()}</p>
                                             </span>
@@ -179,21 +309,57 @@ export default function KrambambouliForm({ products, pickUpLocations, deliveryLo
                             </div>
                             <div className="address-row">
                                 <div className="field-row">
-                                    <label>Straatnaam</label>
-                                    <input type="text" />
-                                    <label>Nummer</label>
-                                    <input type="number" />
+                                    <label htmlFor="streetName">Straatnaam</label>
+                                    <input
+                                        id="streetName"
+                                        type="text"
+                                        value={form.streetName ?? ""}
+                                        name="streetName"
+                                        required
+                                        onChange={handleTextInput} />
+                                    <label htmlFor="bus">Nummer</label>
+                                    <input
+                                        id="bus"
+                                        type="text"
+                                        name="bus"
+                                        value={form.bus ?? ""}
+                                        onChange={handleTextInput}
+                                        required />
                                     <label>Bus</label>
-                                    <input type="number" />
+                                    <input type="text" />
                                 </div>
                                 <div className="field-row">
-                                    <label>Postcode</label>
-                                    <input type="number" />
-                                    <label>Stad</label>
-                                    <input type="number" />
+                                    <label htmlFor="post">Postcode</label>
+                                    <input
+                                        id="post"
+                                        type="number"
+                                        name="post"
+                                        value={form.post ?? ""}
+                                        onChange={handleNumberInput}
+                                        required
+                                    />
+                                    <label htmlFor="city">Stad</label>
+                                    <input
+                                        id="city"
+                                        type="text"
+                                        required
+                                        value={form.city ?? ""}
+                                        name="city"
+                                        onChange={handleTextInput} />
                                 </div >
                             </div>
                         </>
+                    }
+                    <div className="information-container">
+                        <p>Totaalbedrag <b>{calcTotalAmount().toString()}</b></p>
+                        <p>Over te schrijven naar de VATrekening: <b>BE60 7310 1732 4070</b></p>
+                        <p>Met mededeling: <b>krambambouli + {form.firstName} {form.lastName}</b></p>
+                    </div>
+                    {
+                        selectedOption !== null &&
+                        <div className="submit-button-container">
+                            <button type="submit">Bestellen</button>
+                        </div>
                     }
                 </div>
             </form>

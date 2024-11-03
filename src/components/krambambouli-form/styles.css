@@ -4,7 +4,7 @@
 
 .products-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 2rem;
 }
@@ -98,6 +98,7 @@ input {
 form {
     display: grid;
     gap: 3rem;
+    margin: 0 10%
 }
 
 .fields-container {
@@ -134,6 +135,10 @@ input[type="radio"] {
     display: flex;
 }
 
+.address-row {
+    gap: 1rem;
+}
+
 .address-row>:first-child {
     display: grid;
     grid-template-areas: "address-label address-label housenumber-label bus-label"
@@ -167,5 +172,42 @@ input[type="radio"] {
 
 .address-row>:last-child {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "postcode-label city-label"
+        "postcode-input city-input";
+    gap: 2%;
+}
+
+.address-row>:last-child>:first-child {
+    grid-area: postcode-label;
+}
+
+.address-row>:last-child>:nth-child(2) {
+    grid-area: postcode-input;
+}
+
+.submit-button-container {
+    margin-left: auto;
+}
+
+.submit-button-container>* {
+    padding: 0.5rem 1rem;
+    background-color: rgb(104, 41, 154);
+    color: white;
+    font-weight: 500;
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#post::-webkit-outer-spin-button,
+#post::-webkit-inner-spin-button,
+#post {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+#post {
+    -moz-appearance: textfield;
+    appearance: textfield;
 }
