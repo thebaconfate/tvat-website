@@ -130,7 +130,7 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const data = new FormData();
-        const personDetaims = {
+        const personDetails = {
             firstName: form.firstName,
             lastName: form.lastName,
             email: form.email,
@@ -138,9 +138,26 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
         }
         let deliveryDetails = {}
         if (selectedOption === DeliveryOption.PickUp && selectedPickUpOption != null)
-            deliveryDetails = { ...deliveryDetails, name: pickUpLocations[selectedPickUpOption].name }
+            deliveryDetails = {
+                ...deliveryDetails,
+                name: pickUpLocations[selectedPickUpOption].name
+            }
         else if (selectedOption === DeliveryOption.Delivery && selectedDeliveryOption != null)
-            deliveryDetails = { ...deliveryDetails, }
+            deliveryDetails = {
+                ...deliveryDetails,
+                streetName: form.streetName,
+                streetNumber: form.streetNumber,
+                bus: form.bus,
+                post: form.post,
+                city: form.city
+            }
+        const orderDetails = []
+        for (let i = 0; i < products.length; i++)
+            orderDetails.push({
+                id: products[i].id,
+                amount: amountList[i]
+            })
+
     }
 
     return (
