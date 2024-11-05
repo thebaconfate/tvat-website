@@ -1,8 +1,5 @@
 import mysql from "mysql2/promise";
 import * as dotenv from "dotenv";
-import type { ProductInterface } from "./store";
-import { table } from "console";
-import { create } from "domain";
 
 dotenv.config();
 
@@ -29,6 +26,9 @@ class Database {
       deliveryLocations: "delivery_locations",
       locationCodes: "location_codes",
       activities: "activities",
+      krambambouliCustomers: "krambambouli_customers",
+      deliverAddress: "deliver_address",
+      krambambouliOrders: "krambambouli_orders",
     };
     const createTable = (tableName: string, values: string[]) =>
       `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
@@ -76,6 +76,7 @@ class Database {
         "date DATETIME NOT NULL",
       ]),
     );
+    await connectionPool.query(createTable(tableNames.krambambouliOrders, []));
     return new Database(tableNames);
   }
 

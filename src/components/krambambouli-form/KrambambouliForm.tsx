@@ -1,7 +1,10 @@
-import React, { useState, type ChangeEvent } from "react"
+import React, { useEffect, useState, type ChangeEvent } from "react"
 import "./styles.css"
 import { DeliveryLocation, Price, Product, type PickUpLocation, type ProductInterface } from "../../lib/store"
 import { Activity, type ActivityInterface } from "../../lib/activity"
+import DOMPurify from 'dompurify'
+import { apiRoutes } from "../../lib/routes"
+import { createUrl } from "../../lib/utils"
 
 interface Props {
     products: ProductInterface[],
@@ -126,38 +129,54 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
         const { name, value } = e.target;
         setForm({ ...form, [name]: parseInt(value) })
     }
-
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const data = new FormData();
-        const personDetails = {
-            firstName: form.firstName,
-            lastName: form.lastName,
-            email: form.email,
-            deliveryOption: selectedOption
-        }
-        let deliveryDetails = {}
-        if (selectedOption === DeliveryOption.PickUp && selectedPickUpOption != null)
-            deliveryDetails = {
-                ...deliveryDetails,
-                name: pickUpLocations[selectedPickUpOption].name
-            }
-        else if (selectedOption === DeliveryOption.Delivery && selectedDeliveryOption != null)
-            deliveryDetails = {
-                ...deliveryDetails,
-                streetName: form.streetName,
-                streetNumber: form.streetNumber,
-                bus: form.bus,
-                post: form.post,
-                city: form.city
-            }
-        const orderDetails = []
-        for (let i = 0; i < products.length; i++)
-            orderDetails.push({
-                id: products[i].id,
-                amount: amountList[i]
+    useEffect(() => {
+        if (window)
+            DOMPurify.setConfig({
+                ALLOWED_TAGS: [],
+                ALLOWED_ATTR: []
             })
+    }, [])
 
+    function sanitize(input: any) {
+        return DOMPurify.sanitize(input)
+    }
+
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append("firstName", sanitize(form.firstName));
+        formData.append("lastName", sanitize(form.lastName))
+        formData.append("email", sanitize(form.email))
+        formData.append("deliveryOption", sanitize(selectedOption))
+        const total = calcTotalAmount()
+        formData.append("OwedAmount", JSON.stringify({
+            euros: sanitize(total.euros),
+            cents: sanitize(total.cents)
+        }))
+        if (selectedOption === DeliveryOption.PickUp && selectedPickUpOption != null) {
+            if (selectedPickUpOption > 0)
+                formData.append("pickUpLocation", sanitize(pickUpLocations[selectedPickUpOption].name))
+            else
+                formData.append("pickUpLocation", sanitize(krambambouliCantus.name))
+        }
+        else if (selectedOption === DeliveryOption.Delivery && selectedDeliveryOption != null) {
+            formData.append("deliveryStreetName", sanitize(form.streetName))
+            formData.append("deliveryStreetNumber", sanitize(form.streetNumber))
+            formData.append("deliveryBus", sanitize(form.bus))
+            formData.append("deliveryPost", sanitize(form.post))
+            formData.append("deliveryCity", sanitize(form.city))
+        }
+        for (let i = 0; i < products.length; i++) {
+            if (amountList[i] > 0)
+                formData.append("order", JSON.stringify({
+                    id: sanitize(products[i].id),
+                    amount: sanitize(amountList[i])
+                }))
+        }
+        await fetch(createUrl([window.location.origin, apiRoutes.krambambouli.url, apiRoutes.krambambouli.order.url]), {
+            method: "POST",
+            body: formData
+        })
     }
 
     return (
@@ -265,9 +284,9 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
                                 <input
                                     type="radio"
                                     name="pick-up-option"
-                                    value={0}
+                                    value={-1}
                                     required
-                                    checked={0 == selectedPickUpOption}
+                                    checked={-1 == selectedPickUpOption}
                                     onChange={handleChangePickUpOption} />
                                 {
                                     `${krambambouliCantus.name} (${krambambouliCantus.fmtDate()})`
@@ -280,9 +299,9 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
                                             <input
                                                 type="radio"
                                                 name="pick-up-option"
-                                                value={index + 1}
+                                                value={index}
                                                 required
-                                                checked={(index + 1) == selectedPickUpOption}
+                                                checked={(index) == selectedPickUpOption}
                                                 onChange={handleChangePickUpOption} />
                                             {
                                                 `Bij ${loc.name} (${loc.area}) (vanaf ${pickUpStartDate.getDate()}/${pickUpStartDate.getMonth() + 1})`

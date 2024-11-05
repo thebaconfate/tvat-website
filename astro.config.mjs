@@ -8,7 +8,6 @@ export default defineConfig({
   redirects: {
     "/home": "/",
   },
-
+  output: "hybrid",
   integrations: [react()],
 });
-
