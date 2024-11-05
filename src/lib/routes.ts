@@ -21,6 +21,7 @@ const apiRoutes = {
     pickup: { url: "/pickup" },
     delivery: { url: "/delivery" },
     cantus: { url: "/cantus" },
+    order: { url: "/order" },
   },
   store: {
     url: `${baseApiUrl}/store`,
