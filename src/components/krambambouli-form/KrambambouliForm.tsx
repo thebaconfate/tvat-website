@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type ChangeEvent } from "react"
+import React, { useEffect, useState } from "react"
 import "./styles.css"
 import { DeliveryLocation, Price, Product, type PickUpLocation, type ProductInterface } from "../../lib/store"
 import { Activity, type ActivityInterface } from "../../lib/activity"

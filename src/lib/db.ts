@@ -1,6 +1,5 @@
-import mysql, { type QueryResult, type ResultSetHeader } from "mysql2/promise";
+import mysql from "mysql2/promise";
 import * as dotenv from "dotenv";
-import type { Price } from "./store";
 
 dotenv.config();
 
