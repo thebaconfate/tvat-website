@@ -24,8 +24,7 @@ RUN npm install --production
 COPY --from=build /app ./
 
 # Expose the app's port
-EXPOSE 3000
+EXPOSE 4321
 
-# Start the SSR server using Node.js (Astro's built-in SSR server)
-CMD ["npm", "run", "preview"]
-
+# Start the server
+ENTRYPOINT ["node", "./dist/server/entry.mjs"]
