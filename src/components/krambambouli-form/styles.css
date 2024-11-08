@@ -12,7 +12,7 @@
 .product {
     display: flex;
     flex-direction: column;
-    width: max(17rem, 40%);
+    width: max(13rem, 40%);
 }
 
 .product-title {
@@ -210,4 +210,11 @@ input[type="radio"] {
 #post {
     -moz-appearance: textfield;
     appearance: textfield;
+}
+
+
+@media screen and (max-width: 912px) {
+    .product {
+        display: grid;
+    }
 }
