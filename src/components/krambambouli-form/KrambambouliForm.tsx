@@ -5,6 +5,8 @@ import { Activity, type ActivityInterface } from "../../lib/activity"
 import DOMPurify from 'dompurify'
 import { apiRoutes } from "../../lib/routes"
 import { createUrl } from "../../lib/utils"
+import { Popup } from "../popup/Popup"
+import { PopupEnum } from "../../lib/popup"
 
 interface Props {
     products: ProductInterface[],
@@ -42,6 +44,7 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
         product.imageUrl));
     const krambambouliCantus = new Activity(krambambouliCantusObj.name, krambambouliCantusObj.location, new Date(krambambouliCantusObj.date), krambambouliCantusObj.description, krambambouliCantusObj.id)
     deliveryLocations = deliveryLocations.map(loc => new DeliveryLocation(loc.area, loc.range, new Price(loc.price.euros, loc.price.cents)))
+    deliveryLocations.sort()
 
     const deliveryStartDate = new Date(krambambouliCantus.date)
     deliveryStartDate.setDate(deliveryStartDate.getDate() + 1)
@@ -69,6 +72,11 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
         bus: null,
         post: null,
         city: null
+    })
+    const [showPopup, setShowPopup] = useState<boolean>(false)
+    const [popupContent, setPopupContent] = useState({
+        title: PopupEnum.SUCCESS,
+        text: ""
     })
 
     function handleChangeOption(e: React.ChangeEvent<HTMLInputElement>) {
@@ -141,6 +149,10 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
         return DOMPurify.sanitize(input)
     }
 
+    function closePopup() {
+        setShowPopup(false)
+    }
+
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = new FormData();
@@ -149,7 +161,7 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
         formData.append("email", sanitize(form.email))
         formData.append("deliveryOption", sanitize(selectedOption))
         const total = calcTotalAmount()
-        formData.append("OwedAmount", JSON.stringify({
+        formData.append("owedAmount", JSON.stringify({
             euros: sanitize(total.euros),
             cents: sanitize(total.cents)
         }))
@@ -162,7 +174,7 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
         else if (selectedOption === DeliveryOption.Delivery && selectedDeliveryOption != null) {
             formData.append("deliveryStreetName", sanitize(form.streetName))
             formData.append("deliveryStreetNumber", sanitize(form.streetNumber))
-            formData.append("deliveryBus", sanitize(form.bus))
+            formData.append("deliveryBus", sanitize(form.bus ?? ""))
             formData.append("deliveryPost", sanitize(form.post))
             formData.append("deliveryCity", sanitize(form.city))
         }
@@ -173,9 +185,24 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
                     amount: sanitize(amountList[i])
                 }))
         }
+        console.log(formData)
         await fetch(createUrl([window.location.origin, apiRoutes.krambambouli.url, apiRoutes.krambambouli.order.url]), {
             method: "POST",
             body: formData
+        }).then((response) => {
+            if (!response.ok) {
+                setPopupContent({
+                    title: PopupEnum.ERROR,
+                    text: "Er is iets misgegaan bij het opsturen van de gegevens, probeer het later op nieuw"
+                })
+                setShowPopup(true)
+            } else {
+                setPopupContent({
+                    title: PopupEnum.SUCCESS,
+                    text: "Dankje voor de bestelling, eenmaal dat we de betaling hehheb ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering"
+                })
+                setShowPopup(true)
+            }
         })
     }
 
@@ -355,14 +382,21 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
                                         onChange={handleTextInput} />
                                     <label htmlFor="bus">Nummer</label>
                                     <input
+                                        id="streetNumber"
+                                        type="text"
+                                        name="streetNumber"
+                                        required
+                                        value={form.streetNumber ?? ""}
+                                        onChange={handleTextInput}
+                                    />
+                                    <label>Bus</label>
+                                    <input
                                         id="bus"
                                         type="text"
                                         name="bus"
                                         value={form.bus ?? ""}
                                         onChange={handleTextInput}
-                                        required />
-                                    <label>Bus</label>
-                                    <input type="text" />
+                                    />
                                 </div>
                                 <div className="field-row">
                                     <label htmlFor="post">Postcode</label>
@@ -399,6 +433,9 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
                     }
                 </div>
             </form>
+            {
+                showPopup && <Popup title={popupContent.title} message={popupContent.text} onClose={closePopup}></Popup>
+            }
         </div>
     )
 }
