@@ -27,19 +27,16 @@ interface KrambambouliCustomerAddress {
   city: string;
 }
 
-console.log(`${process.env.DB_HOST}`);
-console.log(`${process.env.DB_PORT}`);
-console.log(`${process.env.DB_USER}`);
-console.log(`${process.env.DB_PASSWORD}`);
-console.log(`${process.env.DB_DATABASE}`);
-const connectionPool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-  connectionLimit: 10,
-});
+const connectionPool = process.env.IS_BUILD
+  ? undefined
+  : mysql.createPool({
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      connectionLimit: 10,
+    });
 
 class Database {
   private pool = connectionPool;
@@ -49,6 +46,7 @@ class Database {
   }
 
   static async init() {
+    if (!connectionPool) return;
     const tableNames = {
       products: "products",
       pickupLocations: "pickup_locations",
@@ -153,6 +151,7 @@ class Database {
   /* PRODUCTS */
 
   async getKrambambouliProducts() {
+    if (!this.pool) return [];
     const table = this.tableNames.products;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(table, [
@@ -172,6 +171,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
 
   /* AFHAAL LOCATIES*/
   async getPickUpLocation() {
+    if (!this.pool) return [];
     const table = this.tableNames.pickupLocations;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(table, ["name", "area"])} FROM ${table};`,
@@ -180,6 +180,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async getDeliveryLocations() {
+    if (!this.pool) return [];
     const deliverTable = this.tableNames.deliveryLocations;
     const codesTable = this.tableNames.locationCodes;
     const [rows] = await this.pool.query(
@@ -196,6 +197,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return rows;
   }
   async getKrambambouliCantus() {
+    if (!this.pool) return [];
     const activitiesTable = this.tableNames.activities;
     const [rows] = await this.pool.query(
       `SELECT * from ${activitiesTable} WHERE lower(${activitiesTable}.name) LIKE '%krambambouli%' AND lower(${activitiesTable}.name) LIKE '%cantus%' ORDER BY ${activitiesTable}.date DESC LIMIT 1; `,
@@ -271,7 +273,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     pickupLocation: string,
     products: Product[],
   ) {
-    console.log(userDetails);
+    if (!this.pool) return null;
     const conn = await this.pool.getConnection();
     try {
       await conn.beginTransaction();
@@ -316,6 +318,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     customerAddress: KrambambouliCustomerAddress,
     products: Product[],
   ) {
+    if (!this.pool) return null;
     const conn = await this.pool.getConnection();
     try {
       await conn.beginTransaction();
