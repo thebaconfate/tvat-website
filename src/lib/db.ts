@@ -46,7 +46,6 @@ class Database {
   }
 
   static async init() {
-    if (!connectionPool) return;
     const tableNames = {
       products: "products",
       pickupLocations: "pickup_locations",
@@ -58,6 +57,7 @@ class Database {
       krambambouliPickUpLocation: "krambambouli_pick_up_locations",
       krambambouliOrders: "krambambouli_orders",
     };
+    if (!connectionPool) return new Database(tableNames);
     const createTable = (tableName: string, values: string[]) =>
       `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
     await connectionPool.query(
