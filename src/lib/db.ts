@@ -216,7 +216,6 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async getDeliveryLocations() {
-    if (!this.pool) return [];
     const deliverTable = this.tableNames.deliveryLocations;
     const codesTable = this.tableNames.locationCodes;
     const [rows] = await this.pool.query(
@@ -233,7 +232,6 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return rows;
   }
   async getKrambambouliCantus() {
-    if (!this.pool) return [];
     const activitiesTable = this.tableNames.activities;
     const [rows] = await this.pool.query(
       `SELECT * from ${activitiesTable} WHERE lower(${activitiesTable}.name) LIKE '%krambambouli%' AND lower(${activitiesTable}.name) LIKE '%cantus%' ORDER BY ${activitiesTable}.date DESC LIMIT 1; `,
