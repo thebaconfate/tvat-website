@@ -38,7 +38,7 @@ RUN npm install --omit=dev
 COPY --from=build /app ./
 
 # Expose the app's port
-EXPOSE 4321
+EXPOSE 8080
 
 # Start the server
 ENTRYPOINT ["node", "./dist/server/entry.mjs"]
