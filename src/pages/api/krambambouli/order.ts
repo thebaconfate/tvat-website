@@ -1,5 +1,5 @@
 import { z } from "zod";
-import database from "../../../lib/db";
+import Database from "../../../lib/db";
 
 export const prerender = false;
 const userDetailsSchema = z
@@ -121,10 +121,12 @@ export async function POST({ request }: { request: Request }) {
       if (!containsOrder(formData)) return badResponse;
       const rawOrders = formData.getAll("order");
       const orders = orderSchema.parse(rawOrders);
-      const result = await database.createKrambambuliPickUpOrder(
-        userDetails,
-        pickUpLocation,
-        orders,
+      const result = await Database.getInstance().then((database) =>
+        database.createKrambambuliPickUpOrder(
+          userDetails,
+          pickUpLocation,
+          orders,
+        ),
       );
       if (result) return successResponse;
       else return internalServerError;
@@ -143,10 +145,12 @@ export async function POST({ request }: { request: Request }) {
       if (!containsOrder(formData)) return badResponse;
       const rawOrders = formData.getAll("order");
       const orders = orderSchema.parse(rawOrders);
-      const result = await database.createKrambambouliDeliveryOrder(
-        userDetails,
-        deliveryDetails,
-        orders,
+      const result = await Database.getInstance().then((database) =>
+        database.createKrambambouliDeliveryOrder(
+          userDetails,
+          deliveryDetails,
+          orders,
+        ),
       );
       if (result) return successResponse;
       else return internalServerError;
