@@ -199,7 +199,7 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
             } else {
                 setPopupContent({
                     title: PopupEnum.SUCCESS,
-                    text: "Dankje voor de bestelling, eenmaal dat we de betaling hehheb ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering"
+                    text: "Dankje voor de bestelling, eenmaal dat we de betaling hebben ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering"
                 })
                 setShowPopup(true)
             }
