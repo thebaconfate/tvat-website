@@ -1,8 +1,11 @@
 import type { Activity } from "../../../lib/activity";
-import database from "../../../lib/db";
+import Database from "../../../lib/db";
 
+export const prerender = false;
 export async function GET() {
-  const result = await database.getKrambambouliCantus();
+  const result = await Database.getInstance().then((database) =>
+    database.getKrambambouliCantus(),
+  );
   if (result) {
     const castedResult = result as Activity[];
     if (castedResult.length > 0)

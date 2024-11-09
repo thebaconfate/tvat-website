@@ -27,37 +27,53 @@ interface KrambambouliCustomerAddress {
   city: string;
 }
 
+interface DbConfigInterface {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+  connectionLimit: number;
+}
+
+interface Tables {
+  products: "products";
+  pickupLocations: "pickup_locations";
+  deliveryLocations: "delivery_locations";
+  locationCodes: "location_codes";
+  activities: "activities";
+  krambambouliCustomers: "krambambouli_customers";
+  krambambouliDeliveryAddresses: "krambambouli_delivery_adresses";
+  krambambouliPickUpLocation: "krambambouli_pick_up_locations";
+  krambambouliOrders: "krambambouli_orders";
+}
+
+const dbConfig: DbConfigInterface = {
+  host: process.env.DB_HOST ?? "",
+  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 0,
+  user: process.env.DB_USER ?? "",
+  password: process.env.DB_PASSWORD ?? "",
+  database: process.env.DB_DATABASE ?? "",
+  connectionLimit: 10,
+};
+
 const connectionPool = process.env.IS_BUILD
   ? undefined
   : mysql.createPool({
       host: process.env.DB_HOST,
       port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      connectionLimit: 10,
     });
 
 class Database {
-  private pool = connectionPool;
-  private tableNames: { [key: string]: string };
-  constructor(tableNames: { [key: string]: string }) {
+  private static instance: Database | null = null;
+  private tableNames: Tables;
+  private pool: mysql.Pool;
+  constructor(tableNames: Tables, pool: mysql.Pool) {
     this.tableNames = tableNames;
+    this.pool = pool;
   }
 
-  static async init() {
-    const tableNames = {
-      products: "products",
-      pickupLocations: "pickup_locations",
-      deliveryLocations: "delivery_locations",
-      locationCodes: "location_codes",
-      activities: "activities",
-      krambambouliCustomers: "krambambouli_customers",
-      krambambouliDeliveryAddresses: "krambambouli_delivery_adresses",
-      krambambouliPickUpLocation: "krambambouli_pick_up_locations",
-      krambambouliOrders: "krambambouli_orders",
-    };
-    if (!connectionPool) return new Database(tableNames);
+  private static async init(tableNames: Tables, connectionPool: mysql.Pool) {
     const createTable = (tableName: string, values: string[]) =>
       `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
     await connectionPool.query(
@@ -141,7 +157,28 @@ class Database {
         "location VARCHAR(255)",
       ]),
     );
-    return new Database(tableNames);
+  }
+
+  static async getInstance() {
+    if (Database.instance) return Database.instance;
+    else {
+      const tableNames: Tables = {
+        products: "products",
+        pickupLocations: "pickup_locations",
+        deliveryLocations: "delivery_locations",
+        locationCodes: "location_codes",
+        activities: "activities",
+        krambambouliCustomers: "krambambouli_customers",
+        krambambouliDeliveryAddresses: "krambambouli_delivery_adresses",
+        krambambouliPickUpLocation: "krambambouli_pick_up_locations",
+        krambambouliOrders: "krambambouli_orders",
+      };
+      const connectionPool = mysql.createPool(dbConfig);
+      Database.init(tableNames, connectionPool);
+      const newInstance = new Database(tableNames, connectionPool);
+      Database.instance = newInstance;
+      return newInstance;
+    }
   }
 
   private createColumnNames(tableName: string, values: string[]) {
@@ -151,7 +188,6 @@ class Database {
   /* PRODUCTS */
 
   async getKrambambouliProducts() {
-    if (!this.pool) return [];
     const table = this.tableNames.products;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(table, [
@@ -363,5 +399,4 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 }
 
-const database = await Database.init();
-export default database;
+export default Database;
