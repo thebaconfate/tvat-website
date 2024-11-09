@@ -214,25 +214,27 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
                         products.map((product, index) => {
                             return (
                                 <div key={product.id} className="product">
-                                    <picture>
+                                    <picture className="product-image">
                                         {
                                             product.imageUrl ?
                                                 <img src={product.imageUrl} alt={product.name + "image"} />
                                                 : <img alt={product.name + "image"} />
                                         }
                                     </picture>
-                                    <h3 className="product-title">{product.name}</h3>
-                                    <div className="product-details">
-                                        <p>{product.description}</p>
-                                        <p>{product.price.toString()}</p>
-                                    </div>
-                                    <div className="product-button-container">
-                                        <button type="button" onClick={handlePressAmountDec(index)} >-</button>
-                                        <input
-                                            type="number"
-                                            value={amountList[index]}
-                                            onChange={makeHandleChangeAmount(index)} />
-                                        <button type="button" onClick={handlePressAmountInc(index)}>+</button>
+                                    <div className="product-info">
+                                        <h3 className="product-title">{product.name}</h3>
+                                        <div className="product-details">
+                                            <p>{product.description}</p>
+                                            <p>{product.price.toString()}</p>
+                                        </div>
+                                        <div className="product-button-container">
+                                            <button type="button" onClick={handlePressAmountDec(index)} >-</button>
+                                            <input
+                                                type="number"
+                                                value={amountList[index]}
+                                                onChange={makeHandleChangeAmount(index)} />
+                                            <button type="button" onClick={handlePressAmountInc(index)}>+</button>
+                                        </div>
                                     </div>
                                 </div>
                             )
