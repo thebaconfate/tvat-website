@@ -170,6 +170,16 @@ input[type="radio"] {
     grid-area: bus-input;
 }
 
+.address-row>:first-child>* {
+    display: flex;
+    width: 100%;
+}
+
+.address-row>:last-child>* {
+    display: flex;
+    width: 100%;
+}
+
 .address-row>:last-child {
     display: grid;
     grid-template-areas: "postcode-label city-label"
@@ -246,16 +256,6 @@ input[type="radio"] {
         grid-template-areas: "address-label housenumber-label bus-label"
             "address-input housenumber-input bus-input";
         gap: 2%;
-    }
-
-    .address-row>:first-child>* {
-        display: flex;
-        width: 100%;
-    }
-
-    .address-row>:last-child>* {
-        display: flex;
-        width: 100%;
     }
 
     .information-container>:nth-child(2)>b {
