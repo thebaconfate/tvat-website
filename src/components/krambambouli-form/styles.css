@@ -212,9 +212,61 @@ input[type="radio"] {
     appearance: textfield;
 }
 
+@media screen and (max-width: 767px) {
+    form {
+        margin: 0;
+    }
 
-@media screen and (max-width: 912px) {
-    .product {
+    .products-container {
         display: grid;
     }
+
+    .product {
+        display: grid;
+        grid-template-columns: 33% 66%;
+        width: 100%;
+    }
+
+    .product-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-details {
+        margin-top: 0;
+        margin-bottom: auto;
+    }
+
+    .delivery-row {
+        grid-template-columns: 1fr auto;
+    }
+
+    .address-row>:first-child {
+        display: grid;
+        grid-template-areas: "address-label housenumber-label bus-label"
+            "address-input housenumber-input bus-input";
+        gap: 2%;
+    }
+
+    .address-row>:first-child>* {
+        display: flex;
+        width: 100%;
+    }
+
+    .address-row>:last-child>* {
+        display: flex;
+        width: 100%;
+    }
+
+    .information-container>:nth-child(2)>b {
+        display: block;
+    }
+
+    .fields-container>:first-child>*>* {
+        display: flex;
+        width: 100%;
+    }
+
+
+
 }
