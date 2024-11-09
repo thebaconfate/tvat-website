@@ -44,7 +44,7 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
         product.imageUrl));
     const krambambouliCantus = new Activity(krambambouliCantusObj.name, krambambouliCantusObj.location, new Date(krambambouliCantusObj.date), krambambouliCantusObj.description, krambambouliCantusObj.id)
     deliveryLocations = deliveryLocations.map(loc => new DeliveryLocation(loc.area, loc.range, new Price(loc.price.euros, loc.price.cents)))
-    deliveryLocations.sort()
+    deliveryLocations.sort((loc1, loc2) => loc1.price.euros === loc2.price.euros ? loc1.price.cents - loc2.price.cents : loc1.price.euros - loc2.price.euros)
 
     const deliveryStartDate = new Date(krambambouliCantus.date)
     deliveryStartDate.setDate(deliveryStartDate.getDate() + 1)
