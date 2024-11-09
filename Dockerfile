@@ -7,6 +7,18 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 
+ARG DB_USER
+ARG DB_PASSWORD
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_DATABASE
+
+ENV DB_USER=$DB_USER
+ENV DB_PASSWORD=$DB_PASSWORD
+ENV DB_HOST=$DB_HOST
+ENV DB_PORT=$DB_PORT
+ENV DB_DATABASE=$DB_DATABASE
+
 # Copy project files and build the app
 COPY . .
 RUN npm run build
@@ -18,7 +30,7 @@ WORKDIR /app
 
 # Install production dependencies
 COPY package.json package-lock.json* ./
-RUN npm install --production
+RUN npm install --omit=dev
 
 # Copy build files from the build stage
 COPY --from=build /app ./

@@ -27,11 +27,11 @@ interface KrambambouliCustomerAddress {
   city: string;
 }
 
-console.log(`${process.env.DB_HOST}`)
-console.log(`${process.env.DB_PORT}`)
-console.log(`${process.env.DB_USER}`)
-console.log(`${process.env.DB_PASSWORD}`)
-console.log(`${process.env.DB_DATABASE}`)
+console.log(`${process.env.DB_HOST}`);
+console.log(`${process.env.DB_PORT}`);
+console.log(`${process.env.DB_USER}`);
+console.log(`${process.env.DB_PASSWORD}`);
+console.log(`${process.env.DB_DATABASE}`);
 const connectionPool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
