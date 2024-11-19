@@ -1,31 +1,32 @@
 import { useEffect, useRef, useState } from 'react'
 import './saint-ve-countdown.css'
 
-function stripDate(date: Date) {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate())
-}
-
 function createStVDate(today: Date) {
     const year = today.getFullYear();
     const november = 11 - 1; // months are indexed from 0
-    const thisYearNormalDate = new Date(year, november, 20)
-    const strippedToday = stripDate(today)
-    const normalDate = strippedToday <= thisYearNormalDate ? thisYearNormalDate : new Date(year + 1, november, 20);
+    const day = 20;
+    const beginHour = 12
+    const endHour = beginHour + 6
+    const thisYearNormalStartDate = new Date(year, november, day, beginHour)
+    const thisYearNormalEndDate: Date = new Date(thisYearNormalStartDate)
+    thisYearNormalEndDate.setHours(endHour)
+    const normalDate = today.getTime() > thisYearNormalEndDate.getTime() ? new Date(year + 1, november, day, beginHour) : thisYearNormalStartDate
     const saturday = 0;
     const sunday = 6;
-    if (normalDate.getDay() === saturday) return new Date(year, november, 18);
-    if (normalDate.getDay() === sunday) return new Date(year, november, 19);
-    return normalDate;
+    if (normalDate.getDay() === saturday) normalDate.setDate(day - 2)
+    else if (normalDate.getDay() === sunday) normalDate.setDate(day - 1)
+    const endDate = new Date(normalDate)
+    endDate.setHours(endHour)
+    return { startDate: normalDate, endDate: endDate }
 }
 
-function calculateInvertedPercentage(current: number, goal: number) {
+
+function calcPercentage(current: number, goal: number) {
     return (1 - current / goal);
 }
 
 function calcDifferenceInDates(date1: Date, date2: Date) {
-    const strippedDate1 = stripDate(date1);
-    const strippedDate2 = stripDate(date2);
-    if (strippedDate1.getTime() === strippedDate2.getTime()) return {
+    if (date1.getTime() >= date2.getTime()) return {
         days: 0,
         hours: 0,
         minutes: 0,
@@ -47,7 +48,7 @@ function calcDifferenceInDates(date1: Date, date2: Date) {
 export default function SaintVeCountdown() {
     const now = new Date();
     const nextSaintV = createStVDate(now)
-    const diff = calcDifferenceInDates(now, nextSaintV)
+    const diff = now.getTime() >= nextSaintV.startDate.getTime() && now.getTime() <= nextSaintV.endDate.getTime() ? { days: 0, hours: 0, minutes: 0, seconds: 0 } : calcDifferenceInDates(now, nextSaintV.startDate)
     const lowerCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const upperCanvasRef = useRef<HTMLCanvasElement | null>(null);
     const [remainders, setRemainders] = useState({
@@ -89,7 +90,7 @@ export default function SaintVeCountdown() {
             context.lineWidth = 1;
             context.stroke();
 
-            const percent = calculateInvertedPercentage(counter, goal);
+            const percent = calcPercentage(counter, goal);
             const endAngle = 2 * Math.PI * percent;
 
             context.beginPath();
@@ -124,7 +125,12 @@ export default function SaintVeCountdown() {
                 setRemainders((prev) => {
                     const now = new Date();
                     const newStV = createStVDate(now);
-                    const diff = calcDifferenceInDates(now, newStV);
+                    const diff = now.getTime() >= newStV.startDate.getTime() && now.getTime() <= newStV.endDate.getTime() ? {
+                        days: 0,
+                        hours: 0,
+                        minutes: 0,
+                        seconds: 0
+                    } : calcDifferenceInDates(now, newStV.startDate);
                     if (Object.values(diff).every(value => value <= 0)) {
                         clearInterval(interval);
                         return { ...prev, seconds: 0 };
