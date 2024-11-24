@@ -12,8 +12,9 @@ export async function GET({}) {
   })) as Order[];
   const orders = result.reduce(
     (prev, current) => {
-      if (current.productId === 1) return { ...prev, classic: prev.classic++ };
-      else return { ...prev, minus: prev.minus++ };
+      if (current.productId === 1)
+        return { ...prev, classic: prev.classic + current.amount };
+      else return { ...prev, minus: prev.minus + current.amount };
     },
     { classic: 0, minus: 0 },
   );
