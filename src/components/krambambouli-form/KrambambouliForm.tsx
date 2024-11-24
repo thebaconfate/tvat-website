@@ -31,6 +31,16 @@ interface Form {
     city: null | string
 }
 
+const initialForm = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    streetName: null,
+    streetNumber: null,
+    bus: null,
+    post: null,
+    city: null
+}
 
 export default function KrambambouliForm({ products: productObjs, pickUpLocations, deliveryLocations, krambambouliCantus: krambambouliCantusObj }: Props) {
     const products = productObjs.map(product => new Product(
@@ -63,16 +73,7 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
     const [selectedOption, setSelectedOption] = useState<null | DeliveryOption>(null)
     const [selectedPickUpOption, setSelectedPickUpOption] = useState<null | number>(null)
     const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<null | number>(null)
-    const [form, setForm] = useState<Form>({
-        firstName: "",
-        lastName: "",
-        email: "",
-        streetName: null,
-        streetNumber: null,
-        bus: null,
-        post: null,
-        city: null
-    })
+    const [form, setForm] = useState<Form>(initialForm)
     const [showPopup, setShowPopup] = useState<boolean>(false)
     const [popupContent, setPopupContent] = useState({
         title: PopupEnum.SUCCESS,
@@ -202,6 +203,11 @@ export default function KrambambouliForm({ products: productObjs, pickUpLocation
                     text: "Dankje voor de bestelling, eenmaal dat we de betaling hebben ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering"
                 })
                 setShowPopup(true)
+                setAmountList(products.map(_ => 0))
+                setSelectedPickUpOption(null)
+                setSelectedDeliveryOption(null)
+                setSelectedOption(null)
+                setForm(initialForm)
             }
         })
     }
