@@ -397,7 +397,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async getKrambambouliOrders() {
-    const query = `SELECT * FROM ${this.tableNames.krambambouliOrders}`;
+    const query = `SELECT product_id as productID, amount FROM ${this.tableNames.krambambouliOrders}`;
     const [rows] = await this.pool.query<mysql.ResultSetHeader>(query);
     return rows;
   }

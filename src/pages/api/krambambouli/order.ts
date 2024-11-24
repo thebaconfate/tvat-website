@@ -101,7 +101,6 @@ const internalServerError = new Response(null, {
   status: 500,
 });
 export async function POST({ request }: { request: Request }) {
-  console.log(request);
   const formData = await request.formData();
   if (!containsUserDetails(formData)) return badResponse;
   const rawUserDetails = {
