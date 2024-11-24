@@ -395,6 +395,12 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
       conn.release();
     }
   }
+
+  async getKrambambouliOrders() {
+    const query = `SELECT * FROM ${this.tableNames.krambambouliOrders}`;
+    const [rows] = await this.pool.query<mysql.ResultSetHeader>(query);
+    return rows;
+  }
 }
 
 export default Database;
