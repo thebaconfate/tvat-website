@@ -2,7 +2,6 @@ import Database from "../../../lib/db";
 export const prerender = false;
 
 interface Order {
-  customerId: number;
   productId: number;
   amount: number;
 }
