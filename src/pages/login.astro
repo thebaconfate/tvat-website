@@ -1,7 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import LoginForm from "../components/login-form/LoginForm";
 
 const title = "Inloggen";
 ---
 
-<Layout title={title}> Work in progress </Layout>
+<Layout title={title}>
+    <LoginForm client:visible />
+</Layout>
