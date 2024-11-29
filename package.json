@@ -16,8 +16,10 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "astro": "^4.16.7",
+    "bcrypt": "^5.1.1",
     "dompurify": "^3.1.7",
     "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1",
     "mysql2": "^3.11.3",
     "react": "^18.3.1",
@@ -28,7 +30,9 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/dompurify": "^3.0.5",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.8.5",
     "prettier": "^3.3.3",
     "prettier-plugin-astro": "^0.14.1"
