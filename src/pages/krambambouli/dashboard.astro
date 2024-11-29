@@ -55,14 +55,14 @@ function fmtPrice(euros: number, cents: number) {
                         <td>
                             {order.orders.reduce(
                                 (prev, next) =>
-                                    next.productId === 1 ? prev + 1 : prev,
+                                    next.productId === 1 ? prev + next.amount : prev,
                                 0,
                             )}
                         </td>
                         <td>
                             {order.orders.reduce(
                                 (prev, next) =>
-                                    next.productId === 2 ? prev + 1 : prev,
+                                    next.productId === 2 ? prev + next.amount : prev,
                                 0,
                             )}
                         </td>
