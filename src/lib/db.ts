@@ -46,6 +46,7 @@ interface Tables {
   krambambouliDeliveryAddresses: "krambambouli_delivery_adresses";
   krambambouliPickUpLocation: "krambambouli_pick_up_locations";
   krambambouliOrders: "krambambouli_orders";
+  users: "users";
 }
 
 const dbConfig: DbConfigInterface = {
@@ -129,6 +130,7 @@ class Database {
         "delivery_option VARCHAR(255) NOT NULL",
         "owed_euros INT NOT NULL",
         "owed_cents INT NOT NULL",
+        "paid BOOLEAN NOT NULL DEFAULT FALSE",
       ]),
     );
     await connectionPool.query(
@@ -157,6 +159,13 @@ class Database {
         "location VARCHAR(255)",
       ]),
     );
+    await connectionPool.query(
+      createTable(tableNames.users, [
+        "id INT PRIMARY KEY AUTO_INCREMENT",
+        "email VARCHAR(255) NOT NULL UNIQUE",
+        "password VARCHAR(255) NOT NULL",
+      ]),
+    );
   }
 
   static async getInstance() {
@@ -172,6 +181,7 @@ class Database {
         krambambouliDeliveryAddresses: "krambambouli_delivery_adresses",
         krambambouliPickUpLocation: "krambambouli_pick_up_locations",
         krambambouliOrders: "krambambouli_orders",
+        users: "users",
       };
       const connectionPool = mysql.createPool(dbConfig);
       Database.init(tableNames, connectionPool);
@@ -400,6 +410,41 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     const query = `SELECT product_id as productId, amount FROM ${this.tableNames.krambambouliOrders}`;
     const [rows] = await this.pool.query<mysql.ResultSetHeader>(query);
     return rows;
+  }
+
+  async getKrambambouliOrdersByCustomer() {
+    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) as orders FROM ${this.tableNames.krambambouliCustomers} c LEFT JOIN ${this.tableNames.krambambouliOrders} o ON c.id = o.customer_id GROUP BY c.id`;
+    const [rows] = await this.pool.query(query);
+    return rows;
+  }
+
+  async getUser(email: string) {
+    const query = `SELECT * FROM ${this.tableNames.users} WHERE email = ?`;
+    const [rows] = await this.pool.query<mysql.QueryResult>(query, [email]);
+    const result = rows as { id?: number; email: string; password: string }[];
+    return result[0];
+  }
+
+  async saveUser(email: string, password: string) {
+    const query = `INSERT INTO ${this.tableNames.users} (email, password)  VALUES (?, ?)`;
+    await this.pool.execute(query, [email, password]);
+  }
+
+  async countUsers() {
+    interface Count {
+      count: number;
+    }
+    const query = `SELECT COUNT(*) AS count FROM ${this.tableNames.users}`;
+    const [rows] = await this.pool.query(query);
+    const result = rows as Count[];
+    console.log(result);
+    return result[0].count;
+  }
+
+  async updateKrambambouliPayment(customerId: number, paid: boolean) {
+    const query = `UPDATE ${this.tableNames.krambambouliCustomers} SET paid = ? WHERE id = ?`;
+    await this.pool.query(query, [paid, customerId]);
+    return;
   }
 }
 
