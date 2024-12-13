@@ -16,7 +16,7 @@ import { createUrl } from "../lib/utils";
 
 export const prerender = false;
 const title = "Krambambouli";
-const formActive = true;
+const formActive = false;
 const origin = Astro.url.origin;
 function throwHttpError(response: Response) {
     throw new Error(`HTTP error: ${response.status}`);
@@ -141,21 +141,23 @@ try {
             </li>
         </ul>
         {
-            errors
-                ? "Something went wrong...."
-                : products &&
-                  deliveryLocations &&
-                  pickupLocations &&
-                  krambambouliCantus &&
-                  formActive && (
-                      <KrambambouliForm
-                          client:visible
-                          products={products}
-                          deliveryLocations={deliveryLocations}
-                          pickUpLocations={pickupLocations}
-                          krambambouliCantus={krambambouliCantus}
-                      />
-                  )
+            errors ? (
+                "Something went wrong...."
+            ) : products &&
+              deliveryLocations &&
+              pickupLocations &&
+              krambambouliCantus &&
+              formActive ? (
+                <KrambambouliForm
+                    client:visible
+                    products={products}
+                    deliveryLocations={deliveryLocations}
+                    pickUpLocations={pickupLocations}
+                    krambambouliCantus={krambambouliCantus}
+                />
+            ) : (
+                "De form is niet langer beschikbaar. Indien u een bestelling heeft geplaatst zal er contact opgenomen worden"
+            )
         }
 
         <style>
