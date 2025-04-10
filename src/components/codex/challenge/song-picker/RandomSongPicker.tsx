@@ -7,7 +7,6 @@ interface Props {
 }
 
 export default function RandomSongPicker({ songs }: Props) {
-    console.log(songs)
     const [song, setSong] = useState<Song | null>(null)
     const dutchSongs = songs.filter((song) => song.language == Language.DUTCH)
     const frenchSongs = songs.filter((song) => song.language == Language.FRENCH)
