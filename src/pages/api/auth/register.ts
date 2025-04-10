@@ -1,6 +1,5 @@
 import { Auth } from "../../../lib/auth";
 import Database from "../../../lib/db";
-import bcrypt from "bcrypt";
 
 export const prerender = false;
 

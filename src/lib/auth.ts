@@ -23,8 +23,7 @@ export class Auth {
 
   async generateToken(email: string) {
     const payload = { email: email };
-    const options = { expiresIn: "1h" };
-    const token = jwt.sign(payload, this.secretKey, options);
+    const token = jwt.sign(payload, this.secretKey, { expiresIn: "1h" });
     return token;
   }
 
