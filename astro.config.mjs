@@ -11,10 +11,11 @@ export default defineConfig({
     "/home": "/",
   },
 
-  output: "hybrid",
+  output: "server",
   integrations: [react()],
 
   adapter: node({
     mode: "standalone",
   }),
 });
+
