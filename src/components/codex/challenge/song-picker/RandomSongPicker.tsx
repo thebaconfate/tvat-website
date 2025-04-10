@@ -6,10 +6,6 @@ interface Props {
     songs: Song[]
 }
 
-function fmt(song: Song) {
-    return `Titel: ${song.title}\nPagina: ${song.page}` + (song.description ? song.description : "")
-}
-
 export default function RandomSongPicker({ songs }: Props) {
     console.log(songs)
     const [song, setSong] = useState<Song | null>(null)
@@ -18,7 +14,6 @@ export default function RandomSongPicker({ songs }: Props) {
     const germanSongs = songs.filter((song) => song.language == Language.GERMAN)
     const otherSongs = songs.filter((song) => (song.language.includes(Language.ENGLISH)) || (song.language.includes(Language.OTHER)))
 
-    console.log(germanSongs)
 
     function makeRandomFunction(langlist: Song[]) {
         return (_: React.MouseEvent<HTMLButtonElement>) => {
