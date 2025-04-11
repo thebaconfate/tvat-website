@@ -1,7 +1,16 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import RandomSongPicker from "../../components/codex/challenge/song-picker/RandomSongPicker";
+import { readFileSync } from "fs";
+import type { Song } from "../../lib/codex-challenge";
 
+export const prerender = true;
 const title = "Codex Challenge";
+const data = readFileSync("public/songs.json", "utf-8")
+const songs: Song[] = JSON.parse(data)
+
 ---
 
-<Layout title={title}> Work in progress </Layout>
+<Layout title={title}>
+    <RandomSongPicker songs={songs} client:load/>
+</Layout>
