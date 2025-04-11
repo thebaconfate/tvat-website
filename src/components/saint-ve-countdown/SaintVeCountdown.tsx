@@ -149,7 +149,6 @@ export default function SaintVeCountdown() {
     })
     return <>
         <canvas ref={upperCanvasRef}>
-
         </canvas>
         <canvas ref={lowerCanvasRef}>
         </canvas>
