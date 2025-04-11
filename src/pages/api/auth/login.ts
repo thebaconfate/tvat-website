@@ -1,8 +1,6 @@
 import { Auth } from "../../../lib/auth";
 import Database from "../../../lib/db";
 
-export const prerender = false;
-
 interface User {
   id?: number;
   email: string;
@@ -31,9 +29,9 @@ export async function POST({ request }: { request: Request }) {
   const authorized = await auth
     .compare(credentials.password, user.password)
     .catch((e: any) => {
-            console.error(e);
-            return false;
-        });
+      console.error(e);
+      return false;
+    });
   if (!authorized) return unAuthorizedResponse;
   const token = await auth.generateToken(user.email);
   const tokenExp = 3600;
