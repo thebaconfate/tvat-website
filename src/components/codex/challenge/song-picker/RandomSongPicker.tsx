@@ -15,8 +15,12 @@ export default function RandomSongPicker({ songs }: Props) {
 
 
     function makeRandomFunction(langlist: Song[]) {
-        return (_: React.MouseEvent<HTMLButtonElement>) => {
-            const randIdx = Math.floor(Math.random() * langlist.length)
+        return (_: React.MouseEvent<HTMLImageElement>) => {
+            let randIdx;
+            do {
+                randIdx = Math.floor(Math.random() * langlist.length)
+            }
+            while (song !== null && (langlist[randIdx].title == song.title));
             setSong(langlist[randIdx])
         }
     }
@@ -24,10 +28,10 @@ export default function RandomSongPicker({ songs }: Props) {
 
     return <div className="picker">
         <div className="buttons">
-            <button className="lang" onClick={makeRandomFunction(dutchSongs)}>Nederlands</button>
-            <button className="lang" onClick={makeRandomFunction(frenchSongs)}>Frans</button>
-            <button className="lang" onClick={makeRandomFunction(germanSongs)}>Duits</button>
-            <button className="lang" onClick={makeRandomFunction(otherSongs)}>Engels en anderstalig</button>
+            <img className="lang" src="/vlaamse-leeuw.jpg" onClick={makeRandomFunction(dutchSongs)} alt="vlaamse leeuw"></img>
+            <img className="lang" src="/waalse-haan.png" onClick={makeRandomFunction(frenchSongs)} alt="waalse haan"></img>
+            <img className="lang" src="/duitse-dinges.png" onClick={makeRandomFunction(germanSongs)} alt="duitse gemeenschap logo"></img>
+            <img className="lang" src="/internationaal.png" onClick={makeRandomFunction(otherSongs)} alt="anders"></img>
         </div>
         <div className="result">
             {
