@@ -1,16 +1,30 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import RandomSongPicker from "../../components/codex/challenge/song-picker/RandomSongPicker";
+import CodexChallenge from "../../components/codex/challenge/codex-challenge/CodexChallenge"
 import { readFileSync } from "fs";
-import type { Song } from "../../lib/codex-challenge";
+import { Language, type Song } from "../../lib/codex-challenge";
 
 export const prerender = true;
 const title = "Codex Challenge";
-const data = readFileSync("public/songs.json", "utf-8")
-const songs: Song[] = JSON.parse(data)
+const data = readFileSync("public/songs.json", "utf-8");
+const songs: Song[] = JSON.parse(data);
 
+const dutchSongs = songs.filter((song) => song.language == Language.DUTCH);
+const frenchSongs = songs.filter((song) => song.language == Language.FRENCH);
+const germanSongs = songs.filter((song) => song.language == Language.GERMAN);
+const otherSongs = songs.filter(
+  (song) =>
+    song.language.includes(Language.ENGLISH) ||
+    song.language.includes(Language.OTHER),
+);
 ---
 
 <Layout title={title}>
-    <RandomSongPicker songs={songs} client:load/>
+    <CodexChallenge
+        dutchSongs={dutchSongs}
+        frenchSongs={frenchSongs}
+        germanSongs={germanSongs}
+        otherSongs={otherSongs}
+        client:load/>
 </Layout>
