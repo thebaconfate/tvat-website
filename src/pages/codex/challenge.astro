@@ -1,7 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import RandomSongPicker from "../../components/codex/challenge/song-picker/RandomSongPicker";
-import CodexChallenge from "../../components/codex/challenge/codex-challenge/CodexChallenge"
+import CodexChallenge from "../../components/codex/challenge/codex-challenge/CodexChallenge";
 import { readFileSync } from "fs";
 import { Language, type Song } from "../../lib/codex-challenge";
 
@@ -21,10 +20,11 @@ const otherSongs = songs.filter(
 ---
 
 <Layout title={title}>
-    <CodexChallenge
-        dutchSongs={dutchSongs}
-        frenchSongs={frenchSongs}
-        germanSongs={germanSongs}
-        otherSongs={otherSongs}
-        client:load/>
+  <CodexChallenge
+    dutchSongs={dutchSongs}
+    frenchSongs={frenchSongs}
+    germanSongs={germanSongs}
+    otherSongs={otherSongs}
+    client:load
+  />
 </Layout>

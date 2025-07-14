@@ -2,18 +2,16 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
-  gap: 2rem;
+    margin: 2rem;
+    gap: 2rem;
 }
 
 .information-container > * {
   text-align: center;
-  margin-left: 2rem;
-  margin-right: 2rem;
 }
 
 .title {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  text-align: center;
 }
 
 .button-container {
@@ -22,16 +20,16 @@
   gap: 2rem;
 }
 
-.button-container > button {
+.button-container > button, .return-button {
   padding: 1rem;
   font-size: 1.2rem;
   border-radius: 10px;
   border-width: 0px;
-    transition: all 0.2s ease;
+  transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.button-container >:hover {
+.button-container > button:hover, .return-button:hover {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -42,4 +40,31 @@
 
 .randomizer-button {
   background-color: rgb(255, 239, 0);
+}
+
+.return-button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.return-button {
+    background-color:rgb(178, 31, 31) ;
+    color: black;
+}
+
+.score-button-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.score-button-container > button {
+    padding: 0.5rem;
+}
+
+
+.challenge-container> :first-child {
+    text-align: center;
+    margin-bottom: 0.5rem;
 }
