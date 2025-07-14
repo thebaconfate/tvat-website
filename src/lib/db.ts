@@ -1,4 +1,8 @@
 import mysql from "mysql2/promise";
+import {
+  Database as DatabaseConstants,
+  type Tables,
+} from "./constants/database";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -36,19 +40,6 @@ interface DbConfigInterface {
   connectionLimit: number;
 }
 
-interface Tables {
-  products: "products";
-  pickupLocations: "pickup_locations";
-  deliveryLocations: "delivery_locations";
-  locationCodes: "location_codes";
-  activities: "activities";
-  krambambouliCustomers: "krambambouli_customers";
-  krambambouliDeliveryAddresses: "krambambouli_delivery_adresses";
-  krambambouliPickUpLocation: "krambambouli_pick_up_locations";
-  krambambouliOrders: "krambambouli_orders";
-  users: "users";
-}
-
 const dbConfig: DbConfigInterface = {
   host: process.env.DB_HOST ?? "",
   port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 0,
@@ -67,18 +58,24 @@ const connectionPool = process.env.IS_BUILD
 
 class Database {
   private static instance: Database | null = null;
-  private tableNames: Tables;
+  private tables: Tables;
   private pool: mysql.Pool;
-  constructor(tableNames: Tables, pool: mysql.Pool) {
-    this.tableNames = tableNames;
+
+  constructor(tables: Tables, pool: mysql.Pool) {
+    this.tables = tables;
     this.pool = pool;
   }
 
-  private static async init(tableNames: Tables, connectionPool: mysql.Pool) {
-    const createTable = (tableName: string, values: string[]) =>
-      `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
+  private static async init(
+    tables: Tables = DatabaseConstants.TABLES,
+    connectionPool: mysql.Pool,
+  ) {
+    function createTableIfNotExists(tableName: string, values: string[]) {
+      return `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
+    }
+
     await connectionPool.query(
-      createTable(tableNames.products, [
+      createTableIfNotExists(tables.PRODUCTS, [
         "id INT PRIMARY KEY AUTO_INCREMENT",
         "name VARCHAR(255) NOT NULL UNIQUE",
         "description VARCHAR(255)",
@@ -88,14 +85,14 @@ class Database {
       ]),
     );
     await connectionPool.query(
-      createTable(tableNames.pickupLocations, [
+      createTableIfNotExists(tables.PICKUP_LOCATIONS, [
         "name VARCHAR(255) PRIMARY KEY",
         "area VARCHAR(255) NOT NULL",
       ]),
     );
 
     await connectionPool.query(
-      createTable(tableNames.deliveryLocations, [
+      createTableIfNotExists(tables.DELIVERY_LOCATIONS, [
         "id INT PRIMARY KEY AUTO_INCREMENT",
         "area VARCHAR(255) NOT NULL UNIQUE",
         "euros INT DEFAULT 0",
@@ -104,16 +101,16 @@ class Database {
     );
 
     await connectionPool.query(
-      createTable(tableNames.locationCodes, [
+      createTableIfNotExists(tables.LOCATION_CODES, [
         "location_id INT NOT NULL",
         "lower INT",
         "upper INT",
         "CHECK (lower <= upper)",
-        `FOREIGN KEY (location_id) REFERENCES ${tableNames.deliveryLocations}(id) ON DELETE CASCADE`,
+        `FOREIGN KEY (location_id) REFERENCES ${tables.DELIVERY_LOCATIONS}(id) ON DELETE CASCADE`,
       ]),
     );
     await connectionPool.query(
-      createTable(tableNames.activities, [
+      createTableIfNotExists(tables.ACTIVITIES, [
         "id INT PRIMARY KEY AUTO_INCREMENT",
         "name VARCHAR(255) NOT NULL",
         "location VARCHAR(255) NOT NULL",
@@ -122,7 +119,7 @@ class Database {
       ]),
     );
     await connectionPool.query(
-      createTable(tableNames.krambambouliCustomers, [
+      createTableIfNotExists(tables.KRAMBAMBOULI_CUSTOMERS, [
         "id INT PRIMARY KEY AUTO_INCREMENT",
         "first_name VARCHAR(255) NOT NULL",
         "last_name VARCHAR(255) NOT NULL",
@@ -134,33 +131,33 @@ class Database {
       ]),
     );
     await connectionPool.query(
-      createTable(tableNames.krambambouliOrders, [
+      createTableIfNotExists(tables.KRAMBAMBOULI_ORDERS, [
         "customer_id INT NOT NULL",
         "product_id INT NOT NULL",
         "amount INT NOT NULL",
-        `FOREIGN KEY (customer_id) REFERENCES ${tableNames.krambambouliCustomers}(id) ON DELETE CASCADE`,
-        `FOREIGN KEY (product_id) REFERENCES ${tableNames.products}(id) ON DELETE CASCADE`,
+        `FOREIGN KEY (customer_id) REFERENCES ${tables.KRAMBAMBOULI_CUSTOMERS}(id) ON DELETE CASCADE`,
+        `FOREIGN KEY (product_id) REFERENCES ${tables.PRODUCTS}(id) ON DELETE CASCADE`,
       ]),
     );
     await connectionPool.query(
-      createTable(tableNames.krambambouliDeliveryAddresses, [
+      createTableIfNotExists(tables.KRAMBAMBOULI_DELIVERY_ADDRESS, [
         "customer_id INT NOT NULL",
         "street_name VARCHAR(255) NOT NULL",
         "house_number VARCHAR(255) NOT NULL",
         "bus VARCHAR(255) NOT NULL",
         "post INT NOT NULL",
         "city VARCHAR(255)",
-        `FOREIGN KEY (customer_id) REFERENCES ${tableNames.krambambouliCustomers}(id) ON DELETE CASCADE`,
+        `FOREIGN KEY (customer_id) REFERENCES ${tables.KRAMBAMBOULI_CUSTOMERS}(id) ON DELETE CASCADE`,
       ]),
     );
     await connectionPool.query(
-      createTable(tableNames.krambambouliPickUpLocation, [
+      createTableIfNotExists(tables.KRAMBAMBOULI_PICK_UP_LOCATION, [
         "customer_id INT NOT NULL",
         "location VARCHAR(255)",
       ]),
     );
     await connectionPool.query(
-      createTable(tableNames.users, [
+      createTableIfNotExists(tables.USERS, [
         "id INT PRIMARY KEY AUTO_INCREMENT",
         "email VARCHAR(255) NOT NULL UNIQUE",
         "password VARCHAR(255) NOT NULL",
@@ -171,21 +168,12 @@ class Database {
   static async getInstance() {
     if (Database.instance) return Database.instance;
     else {
-      const tableNames: Tables = {
-        products: "products",
-        pickupLocations: "pickup_locations",
-        deliveryLocations: "delivery_locations",
-        locationCodes: "location_codes",
-        activities: "activities",
-        krambambouliCustomers: "krambambouli_customers",
-        krambambouliDeliveryAddresses: "krambambouli_delivery_adresses",
-        krambambouliPickUpLocation: "krambambouli_pick_up_locations",
-        krambambouliOrders: "krambambouli_orders",
-        users: "users",
-      };
       const connectionPool = mysql.createPool(dbConfig);
-      Database.init(tableNames, connectionPool);
-      const newInstance = new Database(tableNames, connectionPool);
+      Database.init(DatabaseConstants.TABLES, connectionPool);
+      const newInstance = new Database(
+        DatabaseConstants.TABLES,
+        connectionPool,
+      );
       Database.instance = newInstance;
       return newInstance;
     }
@@ -198,7 +186,7 @@ class Database {
   /* PRODUCTS */
 
   async getKrambambouliProducts() {
-    const table = this.tableNames.products;
+    const table = this.tables.PRODUCTS;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(table, [
         "id",
@@ -218,7 +206,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   /* AFHAAL LOCATIES*/
   async getPickUpLocation() {
     if (!this.pool) return [];
-    const table = this.tableNames.pickupLocations;
+    const table = this.tables.PICKUP_LOCATIONS;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(table, ["name", "area"])} FROM ${table};`,
     );
@@ -226,8 +214,8 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async getDeliveryLocations() {
-    const deliverTable = this.tableNames.deliveryLocations;
-    const codesTable = this.tableNames.locationCodes;
+    const deliverTable = this.tables.DELIVERY_LOCATIONS;
+    const codesTable = this.tables.LOCATION_CODES;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(deliverTable, [
         "area",
@@ -242,7 +230,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return rows;
   }
   async getKrambambouliCantus() {
-    const activitiesTable = this.tableNames.activities;
+    const activitiesTable = this.tables.ACTIVITIES;
     const [rows] = await this.pool.query(
       `SELECT * from ${activitiesTable} WHERE lower(${activitiesTable}.name) LIKE '%krambambouli%' AND lower(${activitiesTable}.name) LIKE '%cantus%' ORDER BY ${activitiesTable}.date DESC LIMIT 1; `,
     );
@@ -258,7 +246,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     euros: number,
     cents: number,
   ) {
-    const query = `INSERT INTO ${this.tableNames.krambambouliCustomers} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO ${this.tables.KRAMBAMBOULI_CUSTOMERS} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
     const [insertResult] = await connection.execute<mysql.ResultSetHeader>(
       query,
       [
@@ -278,7 +266,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     customer_id: number,
     pickupLocation: string,
   ) {
-    const query = `INSERT INTO ${this.tableNames.krambambouliPickUpLocation} (customer_id, location) values (?, ?)`;
+    const query = `INSERT INTO ${this.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, location) values (?, ?)`;
     await connection.execute(query, [customer_id, pickupLocation]);
   }
 
@@ -291,7 +279,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     post: number,
     city: string,
   ) {
-    const query = `INSERT INTO ${this.tableNames.krambambouliDeliveryAddresses} (customer_id, street_name, house_number, bus, post, city) values (?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO ${this.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} (customer_id, street_name, house_number, bus, post, city) values (?, ?, ?, ?, ?, ?)`;
     await connection.execute(query, [
       customer_id,
       streetName,
@@ -308,7 +296,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     product_id: number,
     amount: number,
   ) {
-    const query = `INSERT INTO ${this.tableNames.krambambouliOrders} (customer_id, product_id, amount) values (?, ?, ?)`;
+    const query = `INSERT INTO ${this.tables.KRAMBAMBOULI_ORDERS} (customer_id, product_id, amount) values (?, ?, ?)`;
     return connection.execute(query, [customer_id, product_id, amount]);
   }
 
@@ -407,26 +395,26 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async getKrambambouliOrders() {
-    const query = `SELECT product_id as productId, amount FROM ${this.tableNames.krambambouliOrders}`;
+    const query = `SELECT product_id as productId, amount FROM ${this.tables.KRAMBAMBOULI_ORDERS}`;
     const [rows] = await this.pool.query<mysql.ResultSetHeader>(query);
     return rows;
   }
 
   async getKrambambouliOrdersByCustomer() {
-    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) as orders FROM ${this.tableNames.krambambouliCustomers} c LEFT JOIN ${this.tableNames.krambambouliOrders} o ON c.id = o.customer_id GROUP BY c.id`;
+    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) as orders FROM ${this.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${this.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id GROUP BY c.id`;
     const [rows] = await this.pool.query(query);
     return rows;
   }
 
   async getUser(email: string) {
-    const query = `SELECT * FROM ${this.tableNames.users} WHERE email = ?`;
+    const query = `SELECT * FROM ${this.tables.USERS} WHERE email = ?`;
     const [rows] = await this.pool.query<mysql.QueryResult>(query, [email]);
     const result = rows as { id?: number; email: string; password: string }[];
     return result[0];
   }
 
   async saveUser(email: string, password: string) {
-    const query = `INSERT INTO ${this.tableNames.users} (email, password)  VALUES (?, ?)`;
+    const query = `INSERT INTO ${this.tables.USERS} (email, password)  VALUES (?, ?)`;
     await this.pool.execute(query, [email, password]);
   }
 
@@ -434,7 +422,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     interface Count {
       count: number;
     }
-    const query = `SELECT COUNT(*) AS count FROM ${this.tableNames.users}`;
+    const query = `SELECT COUNT(*) AS count FROM ${this.tables.USERS}`;
     const [rows] = await this.pool.query(query);
     const result = rows as Count[];
     console.log(result);
@@ -442,7 +430,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async updateKrambambouliPayment(customerId: number, paid: boolean) {
-    const query = `UPDATE ${this.tableNames.krambambouliCustomers} SET paid = ? WHERE id = ?`;
+    const query = `UPDATE ${this.tables.KRAMBAMBOULI_CUSTOMERS} SET paid = ? WHERE id = ?`;
     await this.pool.query(query, [paid, customerId]);
     return;
   }
