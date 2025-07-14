@@ -1,0 +1,45 @@
+.content-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.information-container > * {
+  text-align: center;
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+
+.title {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.button-container > button {
+  padding: 1rem;
+  font-size: 1.2rem;
+  border-radius: 10px;
+  border-width: 0px;
+    transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.button-container >:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.challenge-button {
+  background-color: rgb(101, 49, 153);
+  color: rgb(255, 239, 0);
+}
+
+.randomizer-button {
+  background-color: rgb(255, 239, 0);
+}
