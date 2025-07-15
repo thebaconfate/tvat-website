@@ -11,9 +11,22 @@ export const Tables = Object.freeze({
   USERS: "users",
 });
 
-export const Database = Object.freeze({
-  TABLES: Tables,
+export type Tables = typeof Tables;
+
+export const DatabaseConfig = Object.freeze({
+  host: process.env.DB_HOST ?? "",
+  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 0,
+  user: process.env.DB_USER ?? "",
+  password: process.env.DB_PASSWORD ?? "",
+  database: process.env.DB_DATABASE ?? "",
+  connectionLimit: 10,
 });
 
-export type Tables = typeof Tables;
+export type DatabaseConfig = typeof DatabaseConfig;
+
+export const Database = Object.freeze({
+  TABLES: Tables,
+  CONFIG: DatabaseConfig,
+});
+
 export type Database = typeof Database;

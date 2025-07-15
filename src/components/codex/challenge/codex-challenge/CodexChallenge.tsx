@@ -25,12 +25,12 @@ const initScores: Score = {
 };
 
 export default function CodexChallenge({
-  dutchSongs,
+        dutchSongs,
   frenchSongs,
   germanSongs,
   otherSongs,
 }: Props) {
-  const [mode, setMode] = useState<Mode | undefined>(Mode.CodexChallenge);
+  const [mode, setMode] = useState<Mode | undefined>();
   const [totalScore, setTotalScore] = useState<Score>(initScores);
   const [song, setSong] = useState<Song | undefined>(undefined);
   const [songSet, setSongSet] = useState<Set<Song>>(new Set<Song>());

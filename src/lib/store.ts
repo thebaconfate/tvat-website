@@ -20,7 +20,7 @@ export class Price {
     return new Price(this.euros * scalar, this.cents * scalar);
   }
 
-  static fromObj(price: PriceInterface) {
+  static from(price: PriceInterface) {
     return new Price(price.euros, price.cents);
   }
 
@@ -34,30 +34,40 @@ export class Price {
 export interface ProductInterface {
   id: number;
   name: string;
-  description: string | null;
-  imageUrl: string | null;
+  description?: string;
+  imageUrl?: string;
   price: PriceInterface;
 }
 
 export class Product {
   id: number;
   name: string;
-  description: string | null;
-  imageUrl: string | null;
+  description?: string;
+  imageUrl?: string;
   price: Price;
 
   constructor(
     id: number,
     name: string,
     price: Price,
-    description: string | null = null,
-    imageUrl: string | null = null,
+    description?: string,
+    imageUrl?: string,
   ) {
     this.id = id;
     this.name = name;
     this.description = description;
     this.price = price;
     this.imageUrl = imageUrl;
+  }
+
+  static from(product: ProductInterface) {
+    return new Product(
+      product.id,
+      product.name,
+      Price.from(product.price),
+      product.description,
+      product.imageUrl,
+    );
   }
 }
 

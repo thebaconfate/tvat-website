@@ -3,58 +3,12 @@ import {
   Database as DatabaseConstants,
   type Tables,
 } from "./constants/database";
-import * as dotenv from "dotenv";
+import type { KrambambouliCustomer, KrambambouliCustomerAddress, KrambambouliProduct } from "./krambambouli";
+//import * as dotenv from "dotenv";
 
-dotenv.config();
+//dotenv.config();
 
-interface KrambambouliCustomer {
-  firstName: string;
-  lastName: string;
-  email: string;
-  deliveryOption: string;
-  owedAmount: {
-    euros: number;
-    cents: number;
-  };
-}
 
-interface Product {
-  id: number;
-  amount: number;
-}
-
-interface KrambambouliCustomerAddress {
-  streetName: string;
-  houseNumber: string;
-  bus: string;
-  post: number;
-  city: string;
-}
-
-interface DbConfigInterface {
-  host: string;
-  port: number;
-  user: string;
-  password: string;
-  database: string;
-  connectionLimit: number;
-}
-
-const dbConfig: DbConfigInterface = {
-  host: process.env.DB_HOST ?? "",
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 0,
-  user: process.env.DB_USER ?? "",
-  password: process.env.DB_PASSWORD ?? "",
-  database: process.env.DB_DATABASE ?? "",
-  connectionLimit: 10,
-};
-
-const connectionPool = process.env.IS_BUILD
-  ? undefined
-  : mysql.createPool({
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : undefined,
-    });
 
 class Database {
   private static instance: Database | null = null;
@@ -168,7 +122,7 @@ class Database {
   static async getInstance() {
     if (Database.instance) return Database.instance;
     else {
-      const connectionPool = mysql.createPool(dbConfig);
+      const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
       Database.init(DatabaseConstants.TABLES, connectionPool);
       const newInstance = new Database(
         DatabaseConstants.TABLES,
@@ -303,7 +257,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   async createKrambambuliPickUpOrder(
     userDetails: KrambambouliCustomer,
     pickupLocation: string,
-    products: Product[],
+    products: KrambambouliProduct[],
   ) {
     if (!this.pool) return null;
     const conn = await this.pool.getConnection();
@@ -348,7 +302,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   async createKrambambouliDeliveryOrder(
     userDetails: KrambambouliCustomer,
     customerAddress: KrambambouliCustomerAddress,
-    products: Product[],
+    products: KrambambouliProduct[],
   ) {
     if (!this.pool) return null;
     const conn = await this.pool.getConnection();
