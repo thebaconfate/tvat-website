@@ -1,12 +1,6 @@
 import { Auth } from "../../../lib/auth";
 import Database from "../../../lib/db";
 
-interface User {
-  id?: number;
-  email: string;
-  password: string;
-}
-
 const unAuthorizedResponse = new Response(null, {
   status: 402,
 });
