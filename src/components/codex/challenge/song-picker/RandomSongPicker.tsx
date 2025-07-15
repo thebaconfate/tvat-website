@@ -12,11 +12,6 @@ interface Props {
   setSong: (s: Song) => void;
 }
 
-function alreadySelected(newSong: Song, currentSong?: Song) {
-  if (currentSong === undefined) return false;
-  return currentSong.title === newSong.title;
-}
-
 const limit: { [key in Language]: number } = {
   [Language.DUTCH]: 4,
   [Language.FRENCH]: 3,
