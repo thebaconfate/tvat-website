@@ -101,7 +101,7 @@ function formatActivityDate(activity: Activity) {
     </div>
     <div class="side-content-container">
       <div class="activities-container">
-        <h2>ACTIVITEITEN</h2>
+        <h2>Activiteiten</h2>
         <iframe
           name="f7cd28a6a6c7e0617"
           width="500px"
@@ -135,7 +135,7 @@ function formatActivityDate(activity: Activity) {
         </ul>
       </div>
       <div class="saint-ve-countdown-container">
-        <h2>SAINT-VÉ</h2>
+        <h2>Saint-Vé</h2>
         <SaintVeCountdown client:visible />
       </div>
     </div>
@@ -166,6 +166,11 @@ function formatActivityDate(activity: Activity) {
     .main-content-container > :first-child,
     .main-content-container > p {
       color: var(--text-colour);
+    }
+    .side-content-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
     }
   </style>
 </Layout>
