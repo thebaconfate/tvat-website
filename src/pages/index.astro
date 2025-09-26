@@ -90,14 +90,14 @@ const filteredActivitiesList = activitiesList.filter(
           {
             filteredActivitiesList.map((activity) => (
               <li class="activity-container">
-                <h3 class="activity-title">{activity.title}</h3>
+                <h3 class="activity-title">{activity.name}</h3>
                 <p class="activity-date">
                   Datum:
                   {activity.date.toString()}
                 </p>
                 <p class="activity-location">
                   Plaats:
-                  {activity.address}
+                  {activity.location}
                 </p>
               </li>
             ))
