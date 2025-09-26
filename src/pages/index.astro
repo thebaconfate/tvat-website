@@ -14,12 +14,42 @@ const activitiesList = rawActivities.map(
     new Activity(a.name, a.location, new Date(a.date), undefined, undefined),
 );
 
-console.log(activitiesList);
 const now = new Date();
 const strippedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 const filteredActivitiesList = activitiesList.filter(
   (activity) => activity.date.getTime() > strippedDate.getTime(),
 );
+
+function formatActivityDate(activity: Activity) {
+  // TODO: Refactor this shit, integrate it with the activity class or
+  // something idk
+  const date = activity.date;
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const dayName = days[date.getDay()];
+  const dayNumber = date.getDate(); // no leading zero
+  const monthName = months[date.getMonth()];
+  const year = date.getFullYear();
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+
+  return `${dayName} ${dayNumber} ${monthName} ${year} ${hours}:${minutes}`;
+}
 ---
 
 <Layout title="Home">
@@ -93,7 +123,7 @@ const filteredActivitiesList = activitiesList.filter(
                 <h3 class="activity-title">{activity.name}</h3>
                 <p class="activity-date">
                   Datum:
-                  {activity.date.toString()}
+                  {formatActivityDate(activity)}
                 </p>
                 <p class="activity-location">
                   Plaats:
