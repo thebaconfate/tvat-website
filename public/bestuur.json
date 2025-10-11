@@ -1,0 +1,59 @@
+[
+  {
+    "year": "2025-2026",
+    "boardMembers": [
+      { "function": "Praeses", "name": "Vic Arteel", "stars": [] },
+      {
+        "function": "Vice-Praeses",
+        "name": "Lucas Miserez",
+        "stars": ["G", "G", "G"]
+      },
+      {
+        "function": "Cantor",
+        "name": "Sam Van de Velde",
+        "boulons": ["Z", "Z", "Z", "Z", "Z"]
+      },
+      {
+        "function": "Quaestor",
+        "name": "Maika Felix",
+        "stars": ["G", "G", "G", "G"]
+      },
+      { "function": "Temmer", "name": "Lucas Stroobant", "stars": [] },
+      { "function": "Temmer", "name": "Brent Van Langendonck", "stars": [] },
+      { "function": "Temmer", "name": "Rias Smismans", "stars": [] },
+      {
+        "function": "Magister Krambambouli",
+        "name": "Kyo Schelfhout",
+        "stars": ["G", "G", "G", "Z", "G"]
+      },
+      { "function": "Zangfeest", "name": "Kyo Schelfhout", "stars": [] },
+      {
+        "function": "Webmaster",
+        "name": "Gérard Lichtert",
+        "stars": ["G", "Z", "Z", "G", "Z", "Z", "G", "Z"]
+      },
+      { "function": "Spocul", "name": "Jean Parent", "stars": [] },
+      {
+        "function": "Medewerker",
+        "name": "Mathieu Dumoulin",
+        "stars": ["G", "Z"]
+      },
+      { "function": "Medewerker", "name": "Joppe Van Belle", "stars": [] },
+      { "function": "Medewerker", "name": "Yngwie Derycker", "stars": [] },
+      { "function": "Medewerker", "name": "Artur Delclef", "stars": [] },
+      { "function": "Medewerker", "name": "Seth De Vleeschouwer", "stars": [] },
+      {
+        "function": "Medewerker",
+        "name": "Lionel Vanderhelstraete",
+        "stars": []
+      },
+      { "function": "Medewerker", "name": "Zoë Debo", "stars": [] },
+      { "function": "Medewerker", "name": "Jishi Vandoorne", "stars": [] },
+      { "function": "Medewerker", "name": "Zander Deriemaeker", "stars": [] },
+      { "function": "Medewerker", "name": "Staf Bosmans", "stars": [] },
+      { "function": "Medewerker", "name": "Stef De Neubourg", "stars": [] },
+      { "function": "Medeweker", "name": "Charlotte Van Riet", "stars": [] },
+      { "function": "Medewerker", "name": "Lucie Madou", "stars": [] }
+    ]
+  }
+]

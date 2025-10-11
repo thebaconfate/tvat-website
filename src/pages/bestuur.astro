@@ -1,8 +1,33 @@
 ---
-export const prerender = true
+export const prerender = true;
 import Layout from "../layouts/Layout.astro";
 
+enum Function {
+  PRESIDENT = "Praeses",
+  VICE_PRESIDENT = "Vice-Praeses",
+  TREASURER = "Penningmeester",
+  SECRETARY = "Secretaris",
+  TAMER = "TEMMER",
+  IT_RESPONSIBLE = "IT Verantwoordelijke",
+}
+
+enum Star {
+  SILVER,
+  GOLD,
+}
+
+enum Boulon {
+  SILVER,
+  GOLD,
+}
+
+interface Bestuurslid {
+  name: string;
+  function: Function;
+  stars: Star[] | Boulon[];
+}
 const title = "Bestuur";
+const bestuursleden = [{}];
 ---
 
 <Layout title={title}> Work in progress </Layout>
