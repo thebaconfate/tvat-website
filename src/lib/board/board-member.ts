@@ -14,6 +14,7 @@ export class BoardMember {
   boardRole: BoardRole;
   stars?: (Star | undefined)[];
   boulons?: (Boulon | undefined)[];
+
   constructor(boardMemberInterface: BoardMemberInterface) {
     this.name = boardMemberInterface.name;
     this.boardRole = stringToBoardRole(boardMemberInterface.boardRole);
