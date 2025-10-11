@@ -1,5 +1,5 @@
 export enum Star {
-  Silver = "S",
+  Silver = "Z",
   Gold = "G",
 }
 

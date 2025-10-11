@@ -2,58 +2,58 @@
   {
     "term": "2025-2026",
     "boardMembers": [
-      { "function": "Praeses", "name": "Vic Arteel", "stars": [] },
+      { "boardRole": "Praeses", "name": "Vic Arteel", "stars": [] },
       {
-        "function": "Vice-Praeses",
+        "boardRole": "Vice-Praeses",
         "name": "Lucas Miserez",
         "stars": ["G", "G", "G"]
       },
       {
-        "function": "Cantor",
+        "boardRole": "Cantor",
         "name": "Sam Van de Velde",
         "boulons": ["Z", "Z", "Z", "Z", "Z"]
       },
       {
-        "function": "Quaestor",
+        "boardRole": "Quaestor",
         "name": "Maika Felix",
         "stars": ["G", "G", "G", "G"]
       },
-      { "function": "Temmer", "name": "Lucas Stroobant", "stars": [] },
-      { "function": "Temmer", "name": "Brent Van Langendonck", "stars": [] },
-      { "function": "Temmer", "name": "Rias Smismans", "stars": [] },
+      { "boardRole": "Temmer", "name": "Lucas Stroobant", "stars": [] },
+      { "boardRole": "Temmer", "name": "Brent Van Langendonck", "stars": [] },
+      { "boardRole": "Temmer", "name": "Rias Smismans", "stars": [] },
       {
-        "function": "Magister Krambambouli",
+        "boardRole": "Magister Krambambouli",
         "name": "Kyo Schelfhout",
         "stars": ["G", "G", "G", "Z", "G"]
       },
-      { "function": "Zangfeest", "name": "Kyo Schelfhout", "stars": [] },
+      { "boardRole": "Zangfeest", "name": "Kyo Schelfhout", "stars": [] },
       {
-        "function": "Webmaster",
+        "boardRole": "Webmaster",
         "name": "Gérard Lichtert",
         "stars": ["G", "Z", "Z", "G", "Z", "Z", "G", "Z"]
       },
-      { "function": "Spocul", "name": "Jean Parent", "stars": [] },
+      { "boardRole": "Spocul", "name": "Jean Parent", "stars": [] },
       {
-        "function": "Medewerker",
+        "boardRole": "Medewerker",
         "name": "Mathieu Dumoulin",
         "stars": ["G", "Z"]
       },
-      { "function": "Medewerker", "name": "Joppe Van Belle", "stars": [] },
-      { "function": "Medewerker", "name": "Yngwie Derycker", "stars": [] },
-      { "function": "Medewerker", "name": "Artur Delclef", "stars": [] },
-      { "function": "Medewerker", "name": "Seth De Vleeschouwer", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Joppe Van Belle", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Yngwie Derycker", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Artur Delclef", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Seth De Vleeschouwer", "stars": [] },
       {
-        "function": "Medewerker",
+        "boardRole": "Medewerker",
         "name": "Lionel Vanderhelstraete",
         "stars": []
       },
-      { "function": "Medewerker", "name": "Zoë Debo", "stars": [] },
-      { "function": "Medewerker", "name": "Jishi Vandoorne", "stars": [] },
-      { "function": "Medewerker", "name": "Zander Deriemaeker", "stars": [] },
-      { "function": "Medewerker", "name": "Staf Bosmans", "stars": [] },
-      { "function": "Medewerker", "name": "Stef De Neubourg", "stars": [] },
-      { "function": "Medewerker", "name": "Charlotte Van Riet", "stars": [] },
-      { "function": "Medewerker", "name": "Lucie Madou", "stars": [] }
+      { "boardRole": "Medewerker", "name": "Zoë Debo", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Jishi Vandoorne", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Zander Deriemaeker", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Staf Bosmans", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Stef De Neubourg", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Charlotte Van Riet", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Lucie Madou", "stars": [] }
     ]
   }
 ]

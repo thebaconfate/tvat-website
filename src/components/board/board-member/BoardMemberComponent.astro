@@ -1,0 +1,31 @@
+---
+import { existsSync } from "fs";
+import type { BoardMember } from "../../../lib/board/board-member";
+import "./board-member.css";
+
+interface Props {
+  boardMember: BoardMember;
+  term: string;
+}
+export function removeAccents(str: string): string {
+  return str
+    .normalize("NFD") // Split letters and diacritics (e.g. "é" → "é")
+    .replace(/[\u0300-\u036f]/g, ""); // Remove all combining marks
+}
+const { boardMember, term } = Astro.props;
+const src = `/board/${term}/${removeAccents(boardMember.name.toLowerCase()).replaceAll(" ", "-")}`;
+const pngPath = `./public${src}.png`;
+const pngExists = existsSync(pngPath);
+---
+
+<div class="board-member">
+  <h2>{boardMember.boardRole}</h2>
+  <picture>
+    {pngExists && <source srcset={src + ".png"} type="image/png" />}
+    <img
+      src={src + ".jpg"}
+      alt={"Gebrek aan " + boardMember.name + "'s foto"}
+    />
+  </picture>
+  <p>{boardMember.name}</p>
+</div>
