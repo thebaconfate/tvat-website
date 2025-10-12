@@ -5,9 +5,10 @@ import {
   sortByTerm,
   type BoardYearInterface,
 } from "../lib/board/board-year";
+import { websiteRoutes } from "../lib/routes";
 export const prerender = true;
 const jsonString = await readFile("./public/boards.json", "utf-8");
 const data: BoardYearInterface[] = JSON.parse(jsonString);
 data.sort((a, b) => sortByTerm(new BoardYear(a), new BoardYear(b)));
-return Astro.redirect(Astro.url.pathname + `${data[0].term}`);
+return Astro.redirect(websiteRoutes.board.url + `/${data[0].term}`);
 ---
