@@ -6,79 +6,80 @@ const establishedYear = 1969;
 const establishedMonth = 2; //March
 const establishedDay = 15;
 const establishedDate = new Date(
-    establishedYear,
-    establishedMonth,
-    establishedDay,
+  establishedYear,
+  establishedMonth,
+  establishedDay,
 );
 const formActive = false;
 function fmtDateDiff() {
-    const now = new Date();
-    const strippedNow = new Date(now.getFullYear(), now.getMonth());
-    const nextLustrum = new Date(
-        establishedDate.getFullYear(),
-        establishedDate.getMonth(),
-    );
-    for (; nextLustrum.getTime() < strippedNow.getTime(); ) {
-        nextLustrum.setFullYear(nextLustrum.getFullYear() + 5);
-    }
-    for (
-        var monthsDiff = 0;
-        nextLustrum.getMonth() != (strippedNow.getMonth() + monthsDiff) % 12;
-        monthsDiff++
-    );
-    const yearsDiff = nextLustrum.getFullYear() - strippedNow.getFullYear();
-    const monthTreshold = 4;
-    return yearsDiff > 1
-        ? `over ${yearsDiff} jaar`
-        : monthsDiff > monthTreshold
-          ? `over ${Math.abs(monthsDiff)} maanden`
-          : "binnenkort";
+  const now = new Date();
+  const strippedNow = new Date(now.getFullYear(), now.getMonth());
+  const nextLustrum = new Date(
+    establishedDate.getFullYear(),
+    establishedDate.getMonth(),
+  );
+  for (; nextLustrum.getTime() < strippedNow.getTime(); ) {
+    nextLustrum.setFullYear(nextLustrum.getFullYear() + 5);
+  }
+  for (
+    var monthsDiff = 0;
+    nextLustrum.getMonth() != (strippedNow.getMonth() + monthsDiff) % 12;
+    monthsDiff++
+  );
+  console.log(nextLustrum);
+  const yearsDiff = nextLustrum.getFullYear() - strippedNow.getFullYear();
+  const monthTreshold = 4;
+  return yearsDiff > 1
+    ? `over ${yearsDiff} jaar`
+    : monthsDiff > monthTreshold
+      ? `over ${Math.abs(monthsDiff)} maanden`
+      : "binnenkort";
 }
 ---
 
 <Layout title={title}>
-    <main>
-        <picture class="banner-container">
-            <img class="banner" src="/bannerforms.png" alt="" />
-        </picture>
-        <div class="form-container">
-            <h1>Inschrijven voor het Lustrumgalabal</h1>
-            {
-                (formActive && <p>the form is active </p>) || (
-                    <p>
-                        De form is momenteel niet beschikbaar, kom
-                        {` ${fmtDateDiff()} terug`}
-                    </p>
-                )
-            }
-        </div>
-    </main>
+  <main>
+    <picture class="banner-container">
+      <img class="banner" src="/bannerforms.png" alt="" />
+    </picture>
+    <div class="form-container">
+      <h1>Inschrijven voor het Lustrumgalabal</h1>
+      {
+        (formActive && <p>the form is active </p>) || (
+          <p>
+            De form is momenteel niet beschikbaar, kom
+            {` ${fmtDateDiff()} terug`}
+          </p>
+        )
+      }
+    </div>
+  </main>
 </Layout>
 
 <style>
-    .banner-container {
-        display: flex;
-        justify-content: center;
-    }
+  .banner-container {
+    display: flex;
+    justify-content: center;
+  }
 
-    .banner {
-        width: 80%;
-    }
-    .form-container {
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-        gap: 1rem;
-    }
+  .banner {
+    width: 80%;
+  }
+  .form-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-    .form-container > h1,
-    .form-container > p {
-        text-align: center;
-    }
+  .form-container > h1,
+  .form-container > p {
+    text-align: center;
+  }
 
-    main {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
 </style>
