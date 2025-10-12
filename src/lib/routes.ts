@@ -1,7 +1,15 @@
+import { readFile } from "fs/promises";
+import { sortByTerm, type BoardYearInterface } from "./board/board-year";
+
+const jsonString = await readFile("./public/boards.json", "utf-8");
+const data: BoardYearInterface[] = JSON.parse(jsonString);
+const boardYears = data.map((d) => d.term).toSorted(sortByTerm);
+const latestTerm = boardYears[0];
+
 const websiteRoutes = {
   home: { url: "/" },
   lustrumGala: { url: "/lustrumgalabal" },
-  board: { url: "/bestuur" },
+  board: { url: `/bestuur/${latestTerm}` },
   clubsong: { url: "/clublied" },
   history: { url: "/history" },
   krambambouli: { url: "/krambambouli" },

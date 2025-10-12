@@ -4,19 +4,25 @@ import { readFile } from "fs/promises";
 import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
 import { boardRoleOrder } from "../../lib/board/board-role";
 import BoardMemberComponent from "../../components/board/board-member/BoardMemberComponent.astro";
+import { sortByTerm } from "../../lib/board/board-year";
 
 export const prerender = true;
 export async function getStaticPaths() {
   const jsonString = await readFile("./public/boards.json", "utf-8");
   const data: BoardYearInterface[] = JSON.parse(jsonString);
+  const terms = data.map((d) => d.term).toSorted(sortByTerm);
   return data.map((d) => {
-    return { params: { term: d.term }, props: new BoardYear(d) };
+    return {
+      params: { term: d.term },
+      props: { boardYear: new BoardYear(d), terms: terms },
+    };
   });
 }
 const title = "Bestuur";
 
 const { term } = Astro.params;
-const boardMembers = Astro.props.boardMembers.toSorted((a, b) => {
+const { boardYear, terms } = Astro.props;
+boardYear.boardMembers.sort((a, b) => {
   const r =
     boardRoleOrder.indexOf(a.boardRole) - boardRoleOrder.indexOf(b.boardRole);
   if (r === 0) return a.name.localeCompare(b.name);
@@ -25,9 +31,10 @@ const boardMembers = Astro.props.boardMembers.toSorted((a, b) => {
 ---
 
 <Layout title={title}>
+  <h1 class="term">{term}</h1>
   <div class="board-container">
     {
-      boardMembers.map((m) => (
+      boardYear.boardMembers.map((m) => (
         <BoardMemberComponent boardMember={m} term={term} />
       ))
     }
@@ -42,6 +49,12 @@ const boardMembers = Astro.props.boardMembers.toSorted((a, b) => {
       row-gap: 2rem;
     }
 
+    .term {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
     @media (min-width: 768px) {
       .board-container {
         column-gap: 5rem;
@@ -54,4 +67,7 @@ const boardMembers = Astro.props.boardMembers.toSorted((a, b) => {
       }
     }
   </style>
+  <script is:inline>
+    window.location.replace(`${boardMembers}`);
+  </script>
 </Layout>

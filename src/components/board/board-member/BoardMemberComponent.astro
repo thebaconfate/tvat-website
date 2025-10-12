@@ -6,6 +6,7 @@ import { access } from "fs/promises";
 interface Props {
   boardMember: BoardMember;
   term: string;
+  last?: boolean;
 }
 export function removeAccents(str: string): string {
   return str
