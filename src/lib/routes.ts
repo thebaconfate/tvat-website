@@ -1,8 +1,7 @@
-import { readFile } from "fs/promises";
 import { sortByTerm, type BoardYearInterface } from "./board/board-year";
+import rawData from "../../public/boards.json";
 
-const jsonString = await readFile("./public/boards.json", "utf-8");
-const data: BoardYearInterface[] = JSON.parse(jsonString);
+const data = rawData as BoardYearInterface[];
 const boardYears = data.map((d) => d.term).toSorted(sortByTerm);
 const latestTerm = boardYears[0];
 
