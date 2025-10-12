@@ -26,7 +26,6 @@ function fmtDateDiff() {
     nextLustrum.getMonth() != (strippedNow.getMonth() + monthsDiff) % 12;
     monthsDiff++
   );
-  console.log(nextLustrum);
   const yearsDiff = nextLustrum.getFullYear() - strippedNow.getFullYear();
   const monthTreshold = 4;
   return yearsDiff > 1

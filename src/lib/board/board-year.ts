@@ -16,8 +16,12 @@ export class BoardYear {
   }
 }
 
-export function sortByTerm(a: BoardYear, b: BoardYear) {
+export function sortBoardYearByTerm(a: BoardYear, b: BoardYear) {
   const startA = parseInt(a.term.split("-")[0]);
   const startB = parseInt(b.term.split("-")[0]);
   return startA - startB;
+}
+
+export function sortByTerm(a: string, b: string) {
+  return parseInt(a.split("-")[0]) - parseInt(b.split("-")[0]);
 }

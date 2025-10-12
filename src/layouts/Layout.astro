@@ -3,54 +3,55 @@ import Monogrampaars from "../svgs/Monogrampaars.astro";
 import Navigation from "../components/navigation/Navigation.astro";
 import "./layout.css";
 interface Props {
-    title: string;
+  title: string;
 }
+import { websiteRoutes } from "../lib/routes.ts";
 
 const { title } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="nl">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="author" content="Gérard Lichtert" />
-        <meta name="description" content="Astro description" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <meta name="generator" content={Astro.generator} />
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>{title}</title>
-    </head>
-    <body>
-        <header>
-            <span class="logo-container">
-                <Monogrampaars />
-                <a href="/">'t VAT Brussel!</a>
-            </span>
-            <Navigation />
-        </header>
-        <slot />
-        <footer></footer>
-    </body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="author" content="Gérard Lichtert" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header>
+      <span class="logo-container">
+        <Monogrampaars />
+        <a href={websiteRoutes.home.url}>'t VAT Brussel!</a>
+      </span>
+      <Navigation />
+    </header>
+    <slot />
+    <footer></footer>
+  </body>
 </html>
 
 <style is:global>
-    * {
-        font-family:
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            "Open Sans",
-            "Helvetica Neue",
-            sans-serif;
-    }
-    svg {
-        width: 100%;
-        height: auto;
-    }
+  * {
+    font-family:
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Oxygen,
+      Ubuntu,
+      Cantarell,
+      "Open Sans",
+      "Helvetica Neue",
+      sans-serif;
+  }
+  svg {
+    width: 100%;
+    height: auto;
+  }
 </style>
