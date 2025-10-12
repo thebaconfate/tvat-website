@@ -1,5 +1,7 @@
 ---
 import type { BoardMember } from "../../../lib/board/board-member";
+import { Boulon } from "../../../lib/board/boulon";
+import { Star } from "../../../lib/board/star";
 import "./board-member.css";
 import { access } from "fs/promises";
 
@@ -33,14 +35,39 @@ const [pngExists, jpgExists] = await Promise.all([
 
 <div class="board-member">
   <h2 class="board-role">{boardMember.boardRole}</h2>
-  <picture>
-    {pngExists && <source srcset={src + ".png"} type="image/png" />}
-    <img
-      src={src + ".jpg"}
-      alt={jpgExists
-        ? boardMember.name + "'s foto"
-        : "Gebrek aan " + boardMember.name + "'s foto"}
-    />
-  </picture>
+  <div class="board-member-picture-container">
+    <picture class="board-member-picture">
+      {pngExists && <source srcset={src + ".png"} type="image/png" />}
+      <img
+        class="board-member-picture"
+        src={src + ".jpg"}
+        alt={jpgExists
+          ? boardMember.name + "'s foto"
+          : "Gebrek aan " + boardMember.name + "'s foto"}
+      />
+    </picture>
+    <div class="board-member-overlay">
+      {/* TODO: Finisht the stars on hover*/}
+      {
+        boardMember.stars
+          ? boardMember.stars.map((s) =>
+              s === Star.Gold ? (
+                <img src="/star-g.png" alt="Gouden ster" />
+              ) : (
+                <img src="/star-s.png" alt="Zilvere ster" />
+              ),
+            )
+          : boardMember.boulons
+            ? boardMember.boulons.map((b) =>
+                b === Boulon.Silver ? (
+                  <img src="/boulon-s.png" alt="Zilvere boulon" />
+                ) : (
+                  <img src="/boulon-g" alt="Gouden boulon" />
+                ),
+              )
+            : "nein"
+      }
+    </div>
+  </div>
   <p>{boardMember.name}</p>
 </div>
