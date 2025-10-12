@@ -16,7 +16,7 @@ export function removeAccents(str: string): string {
 const { boardMember, term } = Astro.props;
 const src = `/board/${term}/${removeAccents(boardMember.name.toLowerCase()).replaceAll(" ", "-")}`;
 const pngPath = `./public${src}.png`;
-const jpgPath = `/public${src}.jpg`;
+const jpgPath = `./public${src}.jpg`;
 async function fileExists(path: string): Promise<boolean> {
   try {
     await access(path);
