@@ -1,8 +1,11 @@
 .board-role {
   text-align: center;
 }
-.board-member img,
-.board-member picture {
+.board-member {
+  position: relative;
+}
+
+.board-member-picture {
   width: 100%;
   aspect-ratio: 1 /1;
   object-fit: cover;
@@ -11,7 +14,7 @@
   max-width: 100px;
 }
 
-.board-member img {
+img.board-member-picture {
   border: solid purple 2px;
 }
 
@@ -41,4 +44,21 @@
   align-items: center;
   flex-direction: column;
   gap: 1rem;
+}
+.board-member-picture-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.board-member-overlay {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.board-member-overlay > img {
+  max-width: 1.5rem;
 }
