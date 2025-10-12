@@ -2,8 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { readFile } from "fs/promises";
 import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
-import { BoardMember } from "../../lib/board/board-member";
-import { boardRoleOrder, stringToBoardRole } from "../../lib/board/board-role";
+import { boardRoleOrder } from "../../lib/board/board-role";
 import BoardMemberComponent from "../../components/board/board-member/BoardMemberComponent.astro";
 
 export const prerender = true;
@@ -23,7 +22,6 @@ const boardMembers = Astro.props.boardMembers.toSorted((a, b) => {
   if (r === 0) return a.name.localeCompare(b.name);
   else return r;
 });
-console.log(boardMembers);
 ---
 
 <Layout title={title}>
