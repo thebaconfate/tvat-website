@@ -34,7 +34,7 @@
         "name": "Kyo Schelfhout",
         "stars": ["G", "G", "G", "Z", "G"]
       },
-      { "boardRole": "Zangfeest", "name": "Kyo Schelfhout", "stars": [] },
+      { "boardRole": "Zangfeest", "name": "Kyo Schelfhout", "stars": ["G", "G", "G", "Z", "G"] },
       {
         "boardRole": "Webmaster",
         "name": "Gérard Lichtert",
