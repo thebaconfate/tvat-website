@@ -18,8 +18,16 @@
         "name": "Maika Felix",
         "stars": ["G", "G", "G", "G"]
       },
-      { "boardRole": "Temmer", "name": "Lucas Stroobant", "stars": [] },
-      { "boardRole": "Temmer", "name": "Brent Van Langendonck", "stars": [] },
+      {
+        "boardRole": "Temmer",
+        "name": "Lucas Stroobant",
+        "stars": ["G", "Z", "Z", "G"]
+      },
+      {
+        "boardRole": "Temmer",
+        "name": "Brent Van Langendonck",
+        "stars": ["G", "G", "G", "G", "Z"]
+      },
       { "boardRole": "Temmer", "name": "Rias Smismans", "stars": [] },
       {
         "boardRole": "Magister Krambambouli",
@@ -38,22 +46,34 @@
         "name": "Mathieu Dumoulin",
         "stars": ["G", "Z"]
       },
-      { "boardRole": "Medewerker", "name": "Joppe Van Belle", "stars": [] },
+      {
+        "boardRole": "Medewerker",
+        "name": "Joppe Van Belle",
+        "stars": ["G", "Z"]
+      },
       { "boardRole": "Medewerker", "name": "Yngwie Derycker", "stars": [] },
       { "boardRole": "Medewerker", "name": "Artur Delclef", "stars": [] },
-      { "boardRole": "Medewerker", "name": "Seth De Vleeschouwer", "stars": [] },
+      {
+        "boardRole": "Medewerker",
+        "name": "Seth De Vleeschouwer",
+        "stars": []
+      },
       {
         "boardRole": "Medewerker",
         "name": "Lionel Vanderhelstraete",
-        "stars": []
+        "stars": ["G", "G"]
       },
-      { "boardRole": "Medewerker", "name": "Zoë Debo", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Zoë Debo", "stars": ["G", "Z"] },
       { "boardRole": "Medewerker", "name": "Jishi Vandoorne", "stars": [] },
       { "boardRole": "Medewerker", "name": "Zander Deriemaeker", "stars": [] },
       { "boardRole": "Medewerker", "name": "Staf Bosmans", "stars": [] },
       { "boardRole": "Medewerker", "name": "Stef De Neubourg", "stars": [] },
       { "boardRole": "Medewerker", "name": "Charlotte Van Riet", "stars": [] },
-      { "boardRole": "Medewerker", "name": "Lucie Madou", "stars": [] }
+      {
+        "boardRole": "Medewerker",
+        "name": "Lucie Madou",
+        "stars": ["G", "G", "G"]
+      }
     ]
   }
 ]
