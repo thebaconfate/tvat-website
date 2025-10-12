@@ -2,6 +2,7 @@
 import { existsSync } from "fs";
 import type { BoardMember } from "../../../lib/board/board-member";
 import "./board-member.css";
+import { access } from "fs/promises";
 
 interface Props {
   boardMember: BoardMember;
@@ -15,7 +16,19 @@ export function removeAccents(str: string): string {
 const { boardMember, term } = Astro.props;
 const src = `/board/${term}/${removeAccents(boardMember.name.toLowerCase()).replaceAll(" ", "-")}`;
 const pngPath = `./public${src}.png`;
-const pngExists = existsSync(pngPath);
+const jpgPath = `/public${src}.jpg`;
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+const [pngExists, jpgExists] = await Promise.all([
+  fileExists(pngPath),
+  fileExists(jpgPath),
+]);
 ---
 
 <div class="board-member">
@@ -24,7 +37,9 @@ const pngExists = existsSync(pngPath);
     {pngExists && <source srcset={src + ".png"} type="image/png" />}
     <img
       src={src + ".jpg"}
-      alt={"Gebrek aan " + boardMember.name + "'s foto"}
+      alt={jpgExists
+        ? boardMember.name + "'s foto"
+        : "Gebrek aan " + boardMember.name + "'s foto"}
     />
   </picture>
   <p>{boardMember.name}</p>
