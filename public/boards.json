@@ -2,7 +2,9 @@
   {
     "term": "2025-2026",
     "boardMembers": [
-      { "boardRole": "Praeses", "name": "Vic Arteel", "stars": [] },
+      { "boardRole": "Praeses", "name": "Vic Arteel", "stars": [
+          "G", "G", "Z", "Z"
+      ] },
       {
         "boardRole": "Vice-Praeses",
         "name": "Lucas Miserez",
@@ -28,13 +30,13 @@
         "name": "Brent Van Langendonck",
         "stars": ["G", "G", "G", "G", "Z"]
       },
-      { "boardRole": "Temmer", "name": "Rias Smismans", "stars": [] },
+      { "boardRole": "Temmer", "name": "Rias Smismans", "stars": ["G", "G", "G", "G", "G", "G"] },
       {
         "boardRole": "Magister Krambambouli",
         "name": "Kyo Schelfhout",
         "stars": ["G", "G", "G", "Z", "G"]
       },
-      { "boardRole": "Zangfeest", "name": "Kyo Schelfhout", "stars": [] },
+      { "boardRole": "Zangfeest", "name": "Kyo Schelfhout", "stars": ["G", "G", "G", "Z", "G"] },
       {
         "boardRole": "Webmaster",
         "name": "Gérard Lichtert",
@@ -51,7 +53,7 @@
         "name": "Joppe Van Belle",
         "stars": ["G", "Z"]
       },
-      { "boardRole": "Medewerker", "name": "Yngwie Derycker", "stars": [] },
+      { "boardRole": "Medewerker", "name": "Yngwie Derycker", "stars": ["G", "G", "G", "G"] },
       { "boardRole": "Medewerker", "name": "Artur Delclef", "stars": [] },
       {
         "boardRole": "Medewerker",
