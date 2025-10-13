@@ -52,28 +52,82 @@ img.board-member-picture {
 
 .board-member-overlay {
   position: absolute;
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.2s;
 }
 
-.board-member-overlay > img {
+.board-member-stars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.board-member-stars > img {
   max-width: 1.5rem;
 }
 
 .board-member-picture-container:hover .board-member-picture,
 .board-member-picture-container:active .board-member-picture {
   opacity: 0.6;
+  transition: opacity 0.3s;
 }
 
 .board-member-picture-container:hover .board-member-overlay,
 .board-member-picture-container:active .board-member-overlay {
   opacity: 1;
-  background-color: rgba(128, 0, 128, 0.3);
+  background-color: rgba(128, 0, 128, 0.5);
+}
+
+.board-member-picture-container:hover .bar,
+.board-member-picture-container:active .bar {
+  transform: scaleX(1);
+}
+
+.bars-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bar {
+  position: absolute;
+  background-color: purple;
+  height: 0.7%;
+  width: 33%;
+  --distance: 10%;
+  border-radius: 2rem;
+  transform: scaleX(0);
+  transition: transform 0.5s ease-in-out;
+}
+
+.left-top-bar {
+  left: var(--distance);
+  top: var(--distance);
+  transform-origin: left top;
+  rotate: 45deg;
+}
+
+.right-top-bar {
+  right: var(--distance);
+  top: var(--distance);
+  transform-origin: right top;
+  rotate: -45deg;
+}
+
+.right-bottom-bar {
+  bottom: var(--distance);
+  right: var(--distance);
+  transform-origin: right bottom;
+  rotate: 45deg;
+}
+
+.left-bottom-bar {
+  left: var(--distance);
+  bottom: var(--distance);
+  transform-origin: left bottom;
+  rotate: -45deg;
 }

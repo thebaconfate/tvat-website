@@ -48,25 +48,33 @@ const [pngExists, jpgExists] = await Promise.all([
     </picture>
     <div class="board-member-overlay">
       {/* TODO: Finisht the stars on hover*/}
-      {
-        boardMember.stars
-          ? boardMember.stars.map((s) =>
-              s === Star.Gold ? (
-                <img src="/star-g.png" alt="Gouden ster" />
-              ) : (
-                <img src="/star-s.png" alt="Zilvere ster" />
-              ),
-            )
-          : boardMember.boulons
-            ? boardMember.boulons.map((b) =>
-                b === Boulon.Silver ? (
-                  <img src="/boulon-s.png" alt="Zilvere boulon" />
+      <div class="bars-container">
+        <div class="left-top-bar bar"></div>
+        <div class="right-top-bar bar"></div>
+        <div class="left-bottom-bar bar"></div>
+        <div class="right-bottom-bar bar"></div>
+      </div>
+      <div class="board-member-stars">
+        {
+          boardMember.stars
+            ? boardMember.stars.map((s) =>
+                s === Star.Gold ? (
+                  <img src="/star-g.png" alt="Gouden ster" />
                 ) : (
-                  <img src="/boulon-g" alt="Gouden boulon" />
+                  <img src="/star-s.png" alt="Zilvere ster" />
                 ),
               )
-            : "nein"
-      }
+            : boardMember.boulons
+              ? boardMember.boulons.map((b) =>
+                  b === Boulon.Silver ? (
+                    <img src="/boulon-s.png" alt="Zilvere boulon" />
+                  ) : (
+                    <img src="/boulon-g" alt="Gouden boulon" />
+                  ),
+                )
+              : "nein"
+        }
+      </div>
     </div>
   </div>
   <p>{boardMember.name}</p>
