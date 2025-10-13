@@ -16,10 +16,18 @@ img.board-member-picture {
   border: solid purple 2px;
 }
 
+.board-member-stars > img {
+  max-width: 0.6rem;
+}
+
 @media (min-width: 375px) {
   .board-member picture,
   .board-member img {
     max-width: 125px;
+  }
+
+  .board-member-stars > img {
+    max-width: 0.8rem;
   }
 }
 
@@ -28,12 +36,18 @@ img.board-member-picture {
   .board-member img {
     max-width: 250px;
   }
+  .board-member-stars > img {
+    max-width: 1.5rem;
+  }
 }
 
 @media (min-width: 1024px) {
   .board-member picture,
   .board-member img {
     max-width: 300px;
+  }
+  .board-member-stars > img {
+    max-width: 1.5rem;
   }
 }
 
@@ -64,10 +78,6 @@ img.board-member-picture {
   justify-content: center;
   align-items: center;
   height: 100%;
-}
-
-.board-member-stars > img {
-  max-width: 1.5rem;
 }
 
 .board-member-picture-container:hover .board-member-picture,
