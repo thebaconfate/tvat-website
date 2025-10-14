@@ -5,6 +5,7 @@ import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
 import { boardRoleOrder } from "../../lib/board/board-role";
 import BoardMemberComponent from "../../components/board/board-member/BoardMemberComponent.astro";
 import { sortByTerm } from "../../lib/board/board-year";
+import { websiteRoutes } from "../../lib/routes";
 
 export const prerender = true;
 export async function getStaticPaths() {
@@ -28,44 +29,72 @@ boardYear.boardMembers.sort((a, b) => {
   if (r === 0) return a.name.localeCompare(b.name);
   else return r;
 });
+const index = terms.indexOf(term);
+const isLast = index === terms.length - 1;
+const isFirst = index === 0;
+function createHref(term: string) {
+  const parts = websiteRoutes.board.url.split("/");
+  parts[parts.length - 1] = term;
+  return parts.join("/");
+}
 ---
 
 <Layout title={title}>
   <h1 class="term">{term}</h1>
-  <div class="board-container">
+  <div>
     {
-      boardYear.boardMembers.map((m) => (
-        <BoardMemberComponent boardMember={m} term={term} />
-      ))
+      !isFirst && (
+        <input
+          type="button"
+          onclick={`window.location.href='${createHref(terms[index - 1])}'`}
+          value={terms[index - 1]}
+        />
+      )
+    }
+    {
+      !isLast && (
+        <input
+          type="button"
+          onclick={`window.location.href='${createHref(terms[index + 1])}'`}
+          value={terms[index + 1]}
+        />
+      )
     }
   </div>
-  <style>
-    .board-container {
-      padding-top: 2rem;
-      padding-bottom: 2rem;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      margin: 0 auto;
-      row-gap: 2rem;
-      align-items: end;
-    }
-
-    .term {
-      margin-top: 2rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    @media (min-width: 768px) {
-      .board-container {
-        column-gap: 5rem;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .board-container {
-        column-gap: 7rem;
-      }
-    }
-  </style>
 </Layout>
+<div class="board-container">
+  {
+    boardYear.boardMembers.map((m, index) => (
+      <BoardMemberComponent boardMember={m} term={term} index={index} />
+    ))
+  }
+</div>
+<style>
+  .board-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin: 0 auto;
+    row-gap: 2rem;
+    align-items: end;
+  }
+
+  .term {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (min-width: 768px) {
+    .board-container {
+      column-gap: 5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .board-container {
+      column-gap: 7rem;
+    }
+  }
+</style>

@@ -22,6 +22,8 @@ export function sortBoardYearByTerm(a: BoardYear, b: BoardYear) {
   return startA - startB;
 }
 
-export function sortByTerm(a: string, b: string) {
-  return parseInt(a.split("-")[0]) - parseInt(b.split("-")[0]);
+export function sortByTerm(a: string, b: string, descending = true) {
+  return descending
+    ? parseInt(b.split("-")[0]) - parseInt(a.split("-")[0])
+    : parseInt(a.split("-")[0]) - parseInt(b.split("-")[0]);
 }
