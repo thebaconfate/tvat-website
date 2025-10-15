@@ -215,12 +215,20 @@
             {
                 "boardRole": "Vice-Praeses",
                 "name": "Keanu Robberechts",
-                "stars": []
+                "stars": [
+                    "G"
+                ]
             },
             {
                 "boardRole": "Quaestor",
                 "name": "Sam Van de Velde",
-                "boulons": []
+                "boulons": [
+                    "Z",
+                    "Z",
+                    "Z",
+                    "Z",
+                    "Z"
+                ]
             },
             {
                 "boardRole": "Ab-Actis",
@@ -240,7 +248,401 @@
             {
                 "boardRole": "Temmer",
                 "name": "Vic Arteel",
+                "stars": [
+                    "G",
+                    "G",
+                    "Z"
+                ]
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Herman Pauwels"
+            },
+            {
+                "boardRole": "Temmer",
+                "name": "Jean Parent",
                 "stars": []
+            },
+            {
+                "boardRole": "Spocul",
+                "name": "Jolien Salberter",
+                "stars": []
+            },
+            {
+                "boardRole": "Zangfeest",
+                "name": "Julia Saalmink",
+                "stars": []
+            },
+            {
+                "boardRole": "EHBO",
+                "name": "Kiana Schamp",
+                "stars": []
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Lucas De Knibber",
+                "stars": []
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Yngwie Derycker",
+                "stars": []
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Trent De Smet",
+                "stars": []
+            }
+        ]
+    },
+    {
+        "term": "2023-2024",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Sam Van de Velde",
+                "boulons": [
+                    "Z",
+                    "Z",
+                    "Z",
+                    "Z",
+                    "Z"
+                ]
+            },
+            {
+                "boardRole": "Vice-Praeses",
+                "name": "Anke Deconinck",
+                "stars": []
+            },
+            {
+                "name": "Marie Van Gysegem",
+                "boardRole": "Quaestor"
+            },
+            {
+                "boardRole": "Temmer",
+                "name": "Gérard Lichtert",
+                "stars": [
+                    "G"
+                ]
+            },
+            {
+                "name": "Emilio Callies"
+            },
+            {
+                "name": "Evelien Awouters",
+                "boardRole": "Temmer"
+            },
+            {
+                "name": "Jarni Van Waesberge",
+                "boardRole": "Cantor"
+            },
+            {
+                "name": "Jean Gazeau"
+            },
+            {
+                "name": "Jean-Bosco André-Dumont"
+            },
+            {
+                "name": "Jolien Salberter"
+            },
+            {
+                "name": "Jonas Brüll"
+            },
+            {
+                "name": "Julia Saalmink",
+                "boardRole": "Temmer"
+            },
+            {
+                "name": "Kiana Schamp"
+            },
+            {
+                "name": "Kyo Schelfhout",
+                "boardRole": "Temmer"
+            },
+            {
+                "name": "Matteo Postiglione"
+            },
+            {
+                "name": "Maxym Desauvage"
+            },
+            {
+                "name": "Robin Voet"
+            },
+            {
+                "name": "Trent De Smet",
+                "boardRole": "Temmer"
+            }
+        ]
+    },
+    {
+        "term": "2022-2023",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Kyo Schelfhout",
+                "stars": []
+            },
+            {
+                "boardRole": "Temmer",
+                "name": "Evelien Awouters",
+                "stars": [
+                    "G",
+                    "G",
+                    "Z",
+                    "G"
+                ]
+            },
+            {
+                "boardRole": "Vice-Praeses",
+                "name": "Sam Van de Velde",
+                "boulons": []
+            }
+        ]
+    },
+    {
+        "term": "2021-2022",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Kyo Schelfhout",
+                "stars": []
+            },
+            {
+                "boardRole": "Vice-Praeses",
+                "name": "Kiana Schamp",
+                "stars": []
+            },
+            {
+                "boardRole": "Quaestor",
+                "name": "Joeri Van Goubergen",
+                "stars": []
+            },
+            {
+                "boardRole": "Cantor",
+                "name": "Jarni Van Waesberge",
+                "stars": []
+            },
+            {
+                "boardRole": "Temmer",
+                "name": "Jolien Salberter",
+                "stars": []
+            },
+            {
+                "boardRole": "Temmer",
+                "name": "Gérard Lichtert",
+                "stars": []
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Jannes Broigniez",
+                "stars": []
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Lien Smets",
+                "stars": []
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Matthias Willocx",
+                "stars": []
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Jean-Bosco André-Dumont",
+                "stars": []
+            }
+        ]
+    },
+    {
+        "term": "2020-2021",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Jarni Van Waesberge",
+                "stars": []
+            },
+            {
+                "boardRole": "Vice-Praeses",
+                "name": "Kyo Schelfhout",
+                "stars": []
+            }
+        ]
+    },
+    {
+        "term": "2019-2020",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Justine Paul",
+                "stars": []
+            },
+            {
+                "boardRole": "Vice-Praeses",
+                "name": "Julien Menten",
+                "stars": []
+            },
+            {
+                "boardRole": "Quaestor",
+                "name": "Joeri Van Goubergen",
+                "stars": []
+            },
+            {
+                "boardRole": "Beestenmeester",
+                "name": "Benoit vanhumbeck",
+                "stars": []
+            },
+            {
+                "boardRole": "Beestenmeester",
+                "name": "Jarni Van Waesberge",
+                "stars": []
+            },
+            {
+                "boardRole": "Beestenmeester",
+                "name": "Kiana Schamp",
+                "stars": []
+            },
+            {
+                "boardRole": "Beestenmeester",
+                "name": "Jasper Theuns",
+                "stars": []
+            },
+            {
+                "boardRole": "Sport meester",
+                "name": "Cédric Willems",
+                "stars": []
+            },
+            {
+                "boardRole": "Cultuur meester",
+                "name": "Noah Chatelain",
+                "stars": []
+            },
+            {
+                "boardRole": "Ab-Actis",
+                "name": "Gérard Lichtert",
+                "stars": []
+            },
+            {
+                "boardRole": "Medewerker",
+                "name": "Yorick Steenhoudt",
+                "stars": []
+            }
+        ]
+    },
+    {
+        "term": "1978-1979",
+        "boardMembers": [
+            {
+                "name": "Yves Deryck",
+                "boardRole": "Praeses"
+            }
+        ]
+    },
+    {
+        "term": "1981-1982",
+        "boardMembers": [
+            {
+                "name": "Jean de Grave",
+                "boardRole": "Praeses"
+            }
+        ]
+    },
+    {
+        "term": "1979-1980",
+        "boardMembers": [
+            {
+                "name": "Claus Chincariol",
+                "boardRole": "Praeses"
+            }
+        ]
+    },
+    {
+        "term": "1978-1979",
+        "boardMembers": [
+            {
+                "name": "Yves Deryck",
+                "boardRole": "Praeses"
+            }
+        ]
+    },
+    {
+        "term": "1977-1978",
+        "boardMembers": [
+            {
+                "name": "Yves Deryck",
+                "boardRole": "Praeses"
+            }
+        ]
+    },
+    {
+        "term": "1976-1977",
+        "boardMembers": [
+            {
+                "name": "Yves Deryck",
+                "boardRole": "Praeses"
+            }
+        ]
+    },
+    {
+        "term": "1974-1975",
+        "boardMembers": [
+            {
+                "name": "Renaat Saggaert",
+                "boardRole": "Praeses"
+            }
+        ]
+    },
+    {
+        "term": "1973-1974",
+        "boardMembers": [
+            {
+                "name": "Alain Leemans",
+                "boardRole": "Praeses"
+            }
+        ]
+    },
+    {
+        "term": "1972-1973",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Luc Panis"
+            }
+        ]
+    },
+    {
+        "term": "1971-1972",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Luc Panis"
+            }
+        ]
+    },
+    {
+        "term": "1970-1971",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Marcel Van Wezemaal"
+            }
+        ]
+    },
+    {
+        "term": "1969-1970",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Marcel Van Wezemaal"
+            }
+        ]
+    },
+    {
+        "term": "1968-1969",
+        "boardMembers": [
+            {
+                "boardRole": "Praeses",
+                "name": "Renaat Saggaert"
             }
         ]
     }
