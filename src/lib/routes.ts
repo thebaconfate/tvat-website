@@ -1,10 +1,10 @@
 import { sortByTerm } from "./board/board-year";
 
-const boardFiles = import.meta.glob("../../public/board/*.json", {
+const boardFiles = import.meta.glob("../../public/boards/*.json", {
   eager: true,
 });
 const terms = Object.keys(boardFiles)
-  .map((path) => path.match(/board\/(\d{4}-\d{4})\.json$/)?.[1])
+  .map((path) => path.match(/boards\/(\d{4}-\d{4})\.json$/)?.[1])
   .filter(Boolean) as string[];
 terms.sort(sortByTerm);
 const latestTerm = terms[0];

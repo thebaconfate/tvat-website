@@ -1,0 +1,60 @@
+{
+    "term": "2020-2021",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Jarni Van Waesberge",
+            "stars": []
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Kyo Schelfhout",
+            "stars": []
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Joeri Van Goubergen",
+            "stars": []
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Justine Paul",
+            "stars": []
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Kiana Schamp",
+            "stars": []
+        },
+        {
+            "boardRole": "Beestenmeester",
+            "name": "Kiana Schamp",
+            "stars": []
+        },
+        {
+            "boardRole": "Beestenmeester",
+            "name": "Gérard Lichtert",
+            "stars": []
+        },
+        {
+            "boardRole": "Beestenmeester",
+            "name": "Adam Brooking",
+            "boulons": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Matthias Willocx",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Rani Ackermans",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Lien Smets",
+            "stars": []
+        }
+    ]
+}

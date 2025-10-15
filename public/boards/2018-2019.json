@@ -1,0 +1,30 @@
+{
+    "term": "2018-2019",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Jarni Van Waesberge",
+            "stars": []
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Jasper Theuns",
+            "stars": []
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Joeri Van Goubergen",
+            "stars": []
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Lies Neyens",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Justine Paul",
+            "stars": []
+        }
+    ]
+}

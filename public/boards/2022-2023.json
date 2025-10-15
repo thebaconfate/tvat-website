@@ -1,0 +1,25 @@
+{
+    "term": "2022-2023",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Kyo Schelfhout",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Evelien Awouters",
+            "stars": [
+                "G",
+                "G",
+                "Z",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Sam Van de Velde",
+            "boulons": []
+        }
+    ]
+}

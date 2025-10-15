@@ -1,91 +1,79 @@
 {
-    "term": "2024-2025",
-    "boardMembers": [
-        {
-            "boardRole": "Praeses",
-            "name": "Gérard Lichtert",
-            "stars": []
-        },
-        {
-            "boardRole": "Vice-Praeses",
-            "name": "Keanu Robberechts",
-            "stars": [
-                "G"
-            ]
-        },
-        {
-            "boardRole": "Quaestor",
-            "name": "Sam Van de Velde",
-            "boulons": [
-                "Z",
-                "Z",
-                "Z",
-                "Z",
-                "Z"
-            ]
-        },
-        {
-            "boardRole": "Ab-Actis",
-            "name": "Jean Gazeau",
-            "boulons": []
-        },
-        {
-            "boardRole": "Cantor",
-            "name": "Jarni Van Waesberge",
-            "stars": []
-        },
-        {
-            "boardRole": "Temmer",
-            "name": "Kyo Schelfhout",
-            "stars": []
-        },
-        {
-            "boardRole": "Temmer",
-            "name": "Vic Arteel",
-            "stars": [
-                "G",
-                "G",
-                "Z"
-            ]
-        },
-        {
-            "boardRole": "Medewerker",
-            "name": "Herman Pauwels"
-        },
-        {
-            "boardRole": "Temmer",
-            "name": "Jean Parent",
-            "stars": []
-        },
-        {
-            "boardRole": "Spocul",
-            "name": "Jolien Salberter",
-            "stars": []
-        },
-        {
-            "boardRole": "Zangfeest",
-            "name": "Julia Saalmink",
-            "stars": []
-        },
-        {
-            "boardRole": "EHBO",
-            "name": "Kiana Schamp",
-            "stars": []
-        },
-        {
-            "boardRole": "Medewerker",
-            "name": "Lucas De Knibber",
-            "stars": []
-        },
-        {
-            "boardRole": "Medewerker",
-            "name": "Yngwie Derycker",
-            "stars": []
-        },
-        {
-            "boardRole": "Medewerker",
-            "name": "Trent De Smet",
-            "stars": []
-        }
-    ]
+  "term": "2024-2025",
+  "boardMembers": [
+    {
+      "boardRole": "Praeses",
+      "name": "Gérard Lichtert",
+      "stars": []
+    },
+    {
+      "boardRole": "Vice-Praeses",
+      "name": "Keanu Robberechts",
+      "stars": ["G"]
+    },
+    {
+      "boardRole": "Quaestor",
+      "name": "Sam Van de Velde",
+      "boulons": ["Z", "Z", "Z", "Z", "Z"]
+    },
+    {
+      "boardRole": "Ab-Actis",
+      "name": "Jean Gazeau",
+      "boulons": []
+    },
+    {
+      "boardRole": "Cantor",
+      "name": "Jarni Van Waesberge",
+      "stars": []
+    },
+    {
+      "boardRole": "Temmer",
+      "name": "Kyo Schelfhout",
+      "stars": []
+    },
+    {
+      "boardRole": "Temmer",
+      "name": "Vic Arteel",
+      "stars": ["G", "G", "Z"]
+    },
+    {
+      "boardRole": "Medewerker",
+      "name": "Herman Pauwels"
+    },
+    {
+      "boardRole": "Temmer",
+      "name": "Jean Parent",
+      "stars": []
+    },
+    {
+      "boardRole": "Spocul",
+      "name": "Jolien Salberter",
+      "stars": []
+    },
+    {
+      "boardRole": "Zangfeest",
+      "name": "Julia Saalmink",
+      "stars": []
+    },
+    {
+      "boardRole": "EHBO",
+      "name": "Kiana Schamp",
+      "stars": []
+    },
+    {
+      "boardRole": "Medewerker",
+      "name": "Lucas De Knibber",
+      "stars": []
+    },
+    {
+      "boardRole": "Medewerker",
+      "name": "Yngwie Derycker",
+      "stars": []
+    },
+    {
+      "boardRole": "Medewerker",
+      "name": "Trent De Smet",
+      "stars": []
+    }
+  ]
 }
