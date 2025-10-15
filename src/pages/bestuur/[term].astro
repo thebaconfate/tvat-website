@@ -1,18 +1,28 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { readFile } from "fs/promises";
+import { readdir, readFile } from "fs/promises";
 import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
 import { boardRoleOrder } from "../../lib/board/board-role";
 import BoardMemberComponent from "../../components/board/board-member/BoardMemberComponent.astro";
 import { sortByTerm } from "../../lib/board/board-year";
 import { websiteRoutes } from "../../lib/routes";
+import path from "path";
 
 export const prerender = true;
 export async function getStaticPaths() {
-  const jsonString = await readFile("./public/boards.json", "utf-8");
-  const data: BoardYearInterface[] = JSON.parse(jsonString);
-  const terms = data.map((d) => d.term).toSorted(sortByTerm);
-  return data.map((d) => {
+  const directoryPath = path.resolve("./public/boards");
+  const directory = await readdir(directoryPath);
+  const termRegex = /^\d{4}-\d{4}\.json$/;
+  const filenames = directory.filter((path) => termRegex.test(path));
+  const boardYears: BoardYearInterface[] = await Promise.all(
+    filenames.map(async (filename) => {
+      const filePath = path.join(directoryPath, filename);
+      const board = await readFile(filePath, "utf-8");
+      return JSON.parse(board);
+    }),
+  );
+  const terms = boardYears.map((d) => d.term).toSorted(sortByTerm);
+  return boardYears.map((d) => {
     return {
       params: { term: d.term },
       props: { boardYear: new BoardYear(d), terms: terms },
