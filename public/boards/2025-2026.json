@@ -1,0 +1,205 @@
+{
+    "term": "2025-2026",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Vic Arteel",
+            "stars": [
+                "G",
+                "G",
+                "Z",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Lucas Miserez",
+            "stars": [
+                "G",
+                "G",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Sam Van de Velde",
+            "boulons": [
+                "Z",
+                "Z",
+                "Z",
+                "Z",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Maika Felix",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Lucas Stroobant",
+            "stars": [
+                "G",
+                "Z",
+                "Z",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Brent Van Langendonck",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Rias Smismans",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G",
+                "G",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Magister Krambambouli",
+            "name": "Kyo Schelfhout",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "Z",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Zangfeest",
+            "name": "Kyo Schelfhout",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "Z",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Webmaster",
+            "name": "Gérard Lichtert",
+            "stars": [
+                "G",
+                "Z",
+                "Z",
+                "G",
+                "Z",
+                "Z",
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Spocul",
+            "name": "Jean Parent",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Mathieu Dumoulin",
+            "stars": [
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Joppe Van Belle",
+            "stars": [
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Yngwie Derycker",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Artur Delclef",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Seth De Vleeschouwer",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Lionel Vanderhelstraete",
+            "stars": [
+                "G",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Zoë Debo",
+            "stars": [
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Jishi Vandoorne",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Zander Deriemaeker",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Staf Bosmans",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Stef De Neubourg",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Charlotte Van Riet",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Lucie Madou",
+            "stars": [
+                "G",
+                "G",
+                "G"
+            ]
+        }
+    ]
+}
