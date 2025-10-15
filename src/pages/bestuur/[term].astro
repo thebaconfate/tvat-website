@@ -37,14 +37,20 @@ function createHref(term: string) {
   parts[parts.length - 1] = term;
   return parts.join("/");
 }
+const navigatinContainerStyle = isFirst
+  ? "flex-end"
+  : isLast
+    ? "flex-start"
+    : "space-between";
 ---
 
 <Layout title={title}>
   <h1 class="term">{term}</h1>
-  <div>
+  <div class=`boardyears-navigation-container ${navigatinContainerStyle}`>
     {
       !isFirst && (
         <input
+          class="boardyears-navigation"
           type="button"
           onclick={`window.location.href='${createHref(terms[index - 1])}'`}
           value={terms[index - 1]}
@@ -54,6 +60,7 @@ function createHref(term: string) {
     {
       !isLast && (
         <input
+          class="boardyears-navigation"
           type="button"
           onclick={`window.location.href='${createHref(terms[index + 1])}'`}
           value={terms[index + 1]}
@@ -84,6 +91,28 @@ function createHref(term: string) {
     margin-top: 2rem;
     display: flex;
     justify-content: center;
+  }
+  .boardyears-navigation-container {
+    display: flex;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+  .boardyears-navigation {
+    padding: 0.5rem;
+  }
+
+  .space-between {
+    justify-content: space-between;
+  }
+
+  .flex-start {
+    justify-content: flex-start;
+  }
+
+  .flex-end {
+    justify-content: flex-end;
   }
 
   @media (min-width: 768px) {
