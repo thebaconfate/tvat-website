@@ -53,6 +53,8 @@ const navigatinContainerStyle = isFirst
   : isLast
     ? "flex-start"
     : "space-between";
+
+const boardSize = boardYear.boardMembers.length;
 ---
 
 <Layout title={title}>
@@ -80,7 +82,7 @@ const navigatinContainerStyle = isFirst
     }
   </div>
 </Layout>
-<div class="board-container">
+<div class={`board-container ${boardSize === 1 ? "single" : "multiple"}`}>
   {
     boardYear.boardMembers.map((m, index) => (
       <BoardMemberComponent boardMember={m} term={term} index={index} />
@@ -92,10 +94,18 @@ const navigatinContainerStyle = isFirst
     padding-top: 2rem;
     padding-bottom: 2rem;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
     margin: 0 auto;
     row-gap: 2rem;
     align-items: end;
+  }
+
+  @media (min-width: 768px) {
+    .multiple {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .single {
+    place-content: center;
   }
 
   .term {
