@@ -1,0 +1,45 @@
+{
+    "term": "2013-2014",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Aurelie Merckx"
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Filip Vanhoorelbeke"
+        },
+        {
+            "name": "Tine Merckx",
+            "boardRole": "Quaestor"
+        },
+        {
+            "name": "Mink Decraene",
+            "boardRole": "Cantor"
+        },
+        {
+            "name": "Maxime Opsomer",
+            "boardRole": "Temmer"
+        },
+        {
+            "name": "Silke Van de Velde",
+            "boardRole": "Temmer"
+        },
+        {
+            "name": "Tuur Snauwaert",
+            "boardRole": "Temmer"
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Arno Deflorenne"
+        },
+        {
+            "name": "Alissa Van de Schoor",
+            "boardRole": "Scriptor"
+        },
+        {
+            "boardRole": "Cultuurmeester",
+            "name": "Ruben Van Craen"
+        }
+    ]
+}

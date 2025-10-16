@@ -1,0 +1,49 @@
+{
+    "term": "2009-2010",
+    "boardMembers": [
+        {
+            "name": "Jasper Stegen",
+            "boardRole": "Praeses"
+        },
+        {
+            "name": "Davy Van Belle",
+            "boardRole": "Vice-Praeses"
+        },
+        {
+            "name": "Leentje Maes",
+            "boardRole": "Quaestor"
+        },
+        {
+            "name": "Sarah Cosyns",
+            "boardRole": "Ab-Actis"
+        },
+        {
+            "name": "Amber Praats",
+            "boardRole": "Scriptor"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Diego Tinoco"
+        },
+        {
+            "name": "Lionel Molandre",
+            "boardRole": "Temmer"
+        },
+        {
+            "name": "Servatius Rosier",
+            "boardRole": "Temmer"
+        },
+        {
+            "boardRole": "Cultuurmeester",
+            "name": "Karlien Geerts"
+        },
+        {
+            "boardRole": "Biermeester",
+            "name": "Kiliana Kindermans"
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Kiliana Kindermans"
+        }
+    ]
+}

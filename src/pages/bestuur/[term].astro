@@ -2,7 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { readdir, readFile } from "fs/promises";
 import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
-import { boardRoleOrder } from "../../lib/board/board-role";
+import { compareBoardRoles } from "../../lib/board/board-role";
 import BoardMemberComponent from "../../components/board/board-member/BoardMemberComponent.astro";
 import { sortByTerm } from "../../lib/board/board-year";
 import { websiteRoutes } from "../../lib/routes";
@@ -36,8 +36,7 @@ const title = "Bestuur";
 const { term } = Astro.params;
 const { boardYear, terms } = Astro.props;
 boardYear.boardMembers.sort((a, b) => {
-  const r =
-    boardRoleOrder.indexOf(a.boardRole) - boardRoleOrder.indexOf(b.boardRole);
+  const r = compareBoardRoles(a.boardRole, b.boardRole);
   if (r === 0) return a.name.localeCompare(b.name);
   else return r;
 });

@@ -1,0 +1,45 @@
+{
+    "term": "2011-2012",
+    "boardMembers": [
+        {
+            "name": "Filip Vanhoorelbeke",
+            "boardRole": "Praeses"
+        },
+        {
+            "name": "Steven Vanden Branden",
+            "boardRole": "Vice-Praeses"
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Kim Willems"
+        },
+        {
+            "name": "Thomas Wyseur",
+            "boardRole": "Cantor"
+        },
+        {
+            "name": "Margot Gadeyne",
+            "boardRole": "Temmer"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Gerri Vanderhaegen"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Stijn Van der Perre"
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Tine Merckx"
+        },
+        {
+            "boardRole": "Scriptor",
+            "name": "Joris Loveniers"
+        },
+        {
+            "boardRole": "Cultuurmeester",
+            "name": "Mink Decraene"
+        }
+    ]
+}
