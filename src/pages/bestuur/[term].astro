@@ -62,33 +62,27 @@ const boardSize = boardYear.boardMembers.length;
   <div class=`boardyears-navigation-container ${navigatinContainerStyle}`>
     {
       !isFirst && (
-        <input
-          class="boardyears-navigation"
-          type="button"
-          onclick={`window.location.href='${createHref(terms[index - 1])}'`}
-          value={terms[index - 1]}
-        />
+        <a class="boardyears-navigation" href={createHref(terms[index - 1])}>
+          <span class="arrow previous">{terms[index - 1]}</span>
+        </a>
       )
     }
     {
       !isLast && (
-        <input
-          class="boardyears-navigation"
-          type="button"
-          onclick={`window.location.href='${createHref(terms[index + 1])}'`}
-          value={terms[index + 1]}
-        />
+        <a class="boardyears-navigation" href={createHref(terms[index + 1])}>
+          <span class="arrow next">{terms[index + 1]}</span>
+        </a>
       )
     }
   </div>
+  <div class={`board-container ${boardSize === 1 ? "single" : "multiple"}`}>
+    {
+      boardYear.boardMembers.map((m, index) => (
+        <BoardMemberComponent boardMember={m} term={term} index={index} />
+      ))
+    }
+  </div>
 </Layout>
-<div class={`board-container ${boardSize === 1 ? "single" : "multiple"}`}>
-  {
-    boardYear.boardMembers.map((m, index) => (
-      <BoardMemberComponent boardMember={m} term={term} index={index} />
-    ))
-  }
-</div>
 <style>
   .board-container {
     padding-top: 2rem;
@@ -121,7 +115,64 @@ const boardSize = boardYear.boardMembers.length;
     margin-right: 10%;
   }
   .boardyears-navigation {
+    text-decoration: none;
+    color: black;
+    position: relative;
+  }
+
+  .previous::after {
+    content: "";
+    position: absolute;
     padding: 0.5rem;
+    top: 0;
+    right: -10px;
+    top: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .arrow {
+    display: inline-block;
+    background: #0078ff;
+    position: relative;
+    padding: 0.7rem;
+    background-color: purple;
+    color: yellow;
+  }
+  .next {
+    border-radius: 3px 0 0 3px;
+  }
+
+  .previous {
+    border-radius: 0 3px 3px 0;
+  }
+
+  .previous::before {
+    content: "";
+    position: absolute;
+    left: -1.5rem;
+    display: flex;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 2rem solid transparent;
+    border-bottom: 2rem solid transparent;
+    border-right: 2rem solid purple;
+  }
+
+  .next::after {
+    content: "";
+    position: absolute;
+    right: -1.5rem;
+    display: flex;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 2rem solid transparent;
+    border-bottom: 2rem solid transparent;
+    border-left: 2rem solid purple;
   }
 
   .space-between {
@@ -146,5 +197,9 @@ const boardSize = boardYear.boardMembers.length;
     .board-container {
       column-gap: 7rem;
     }
+  }
+  .arrow-link {
+    display: inline-block;
+    text-decoration: none;
   }
 </style>
