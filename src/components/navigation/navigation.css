@@ -1,135 +1,136 @@
 .nav-container {
-    display: flex;
-    justify-content: center;
-    --burger-width: 2rem;
-    --burger-height: 1.75rem;
+  display: flex;
+  justify-content: center;
+  --burger-width: 2rem;
+  --burger-height: 1.75rem;
 }
 
-
 .hamburger-icon {
-    cursor: pointer;
-    width: var(--burger-width);
-    height: var(--burger-height);
-    top: 2rem;
-    right: 2rem;
-    position: fixed;
-    --bar-height: 4px;
-    --bar-color: #585858;
-    z-index: 1;
-    transition: all 0.5s;
+  cursor: pointer;
+  width: var(--burger-width);
+  height: var(--burger-height);
+  top: 2rem;
+  right: 2rem;
+  position: fixed;
+  --bar-height: 4px;
+  --bar-color: #585858;
+  z-index: 1;
+  transition: all 0.5s;
 }
 
 .top-bun,
 .bottom-bun,
 .patty {
-    height: var(--bar-height);
-    border: 1px solid var(--bar-color);
-    border-radius: 5px;
-    background-color: var(--bar-color);
-    width: var(--burger-width);
-    transition: inherit;
-    position: absolute;
+  height: var(--bar-height);
+  border: 1px solid var(--bar-color);
+  border-radius: 5px;
+  background-color: var(--bar-color);
+  width: var(--burger-width);
+  transition: inherit;
+  position: absolute;
 }
 
 .top-bun {
-    top: 0;
+  top: 0;
 }
 
 .patty {
-    top: 50%;
-    transform: translateY(-50%);
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .bottom-bun {
-    bottom: 0;
+  bottom: 0;
 }
 
-.hamburger-icon:hover>* {
-    background-color: purple;
-    border-color: purple;
+.hamburger-icon:hover > * {
+  background-color: purple;
+  border-color: purple;
 }
 
-.active>.top-bun {
-    transform: translateY(calc(var(--burger-height) / 2 - var(--bar-height) / 2)) rotate(45deg);
-    z-index: 1;
+.active > .top-bun {
+  transform: translateY(calc(var(--burger-height) / 2 - var(--bar-height) / 2))
+    rotate(45deg);
+  z-index: 1;
 }
 
-
-.active>.bottom-bun {
-    transform: translateY(calc(var(--burger-height) / -2 + var(--bar-height)/ 2)) rotate(-45deg);
+.active > .bottom-bun {
+  transform: translateY(calc(var(--burger-height) / -2 + var(--bar-height) / 2))
+    rotate(-45deg);
 }
 
-.active>.patty {
-    transform: translateX(30rem);
-    opacity: 0;
-    z-index: -1;
+.active > .patty {
+  transform: translateX(30rem);
+  opacity: 0;
+  z-index: -1;
 }
 
-.active>.bottom-bun,
-.active>.top-bun {
-    background-color: purple;
+.active > .bottom-bun,
+.active > .top-bun {
+  background-color: purple;
 }
 
 .hamburger-icon.active {
-    transform: translateX(-20rem);
+  transform: translateX(-20rem);
 }
 
-.nav-item>* {
-    display: grid;
-    grid-template-rows: auto 2px;
-    color: white;
-    text-decoration: none;
+.nav-item > * {
+  display: grid;
+  grid-template-rows: auto 2px;
+  color: white;
+  text-decoration: none;
 }
 
 .horizontal-line {
-    display: block;
-    background-color: purple;
-    height: 2px;
-    width: 100%;
+  display: block;
+  background-color: purple;
+  height: 2px;
+  width: 100%;
 }
 
-.nav-item> :first-child {
-    padding: 1rem 1rem 1rem 0rem;
+.nav-item > :first-child {
+  padding: 1rem 1rem 1rem 0rem;
 }
 
-.nav-item>*:hover {
-    transition: ease all 0.3s;
-    color: purple;
+.nav-item > *:hover {
+  transition: ease all 0.3s;
+  color: purple;
 }
 
 .nav-menu {
-    position: fixed;
-    list-style: none;
-    background-color: rgb(88, 88, 88);
-    transition: all ease 0.5s;
-    overflow-x: hidden;
-    display: flex;
-    padding: 2rem;
-    height: 100%;
-    flex-direction: column;
-    gap: 1rem;
-    right: -20rem;
+  position: fixed;
+  list-style: none;
+  background-color: rgb(88, 88, 88);
+  transition: all ease 0.5s;
+  overflow-x: hidden;
+  display: flex;
+  padding: 2rem;
+  height: 100%;
+  flex-direction: column;
+  gap: 1rem;
+  right: -20rem;
 }
 
 .nav-menu.active {
-    transform: translateX(-20rem);
+  z-index: 1;
+  transform: translateX(-20rem);
 }
 
-.nav-menu> :first-child {
-    color: white;
+.nav-menu > :first-child {
+  color: white;
 }
 
 .menu-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(288, 288, 288, 0.7);
-    display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(288, 288, 288, 0.7);
+  display: none;
 }
 
 .menu-overlay.active {
-    display: block;
-    scroll-behavior: none;
+  display: block;
+  scroll-behavior: none;
 }
