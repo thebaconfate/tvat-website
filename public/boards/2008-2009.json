@@ -1,0 +1,49 @@
+{
+    "term": "2008-2009",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Noemi Keijman"
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Davy Van Belle"
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Kiliana Kindermans"
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Margot Gadeyne"
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Linda Martens"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Gerri Vanderhaeghe"
+        },
+        {
+            "name": "Jasper Stegen",
+            "boardRole": "Temmer"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Kris Peeters"
+        },
+        {
+            "boardRole": "Biermeester",
+            "name": "Yuri"
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Sarah Coseyns"
+        },
+        {
+            "boardRole": "Cultuurmeester",
+            "name": "Diego Tinoco"
+        }
+    ]
+}

@@ -25,11 +25,18 @@
             "boardRole": "Temmer",
             "name": "Gérard Lichtert",
             "stars": [
-                "G"
+                "G",
+                "G",
+                "Z",
+                "Z",
+                "G",
+                "G",
+                "Z"
             ]
         },
         {
-            "name": "Emilio Callies"
+            "name": "Emilio Callies",
+            "boardRole": "Medewerker"
         },
         {
             "name": "Evelien Awouters",
@@ -40,15 +47,23 @@
             "boardRole": "Cantor"
         },
         {
-            "name": "Jean Gazeau"
+            "name": "Jarni Van Waesberge",
+            "boardRole": "Magister Krambambouli"
         },
         {
-            "name": "Jean-Bosco André-Dumont"
+            "name": "Jean Gazeau",
+            "boardRole": "Medewerker"
         },
         {
-            "name": "Jolien Salberter"
+            "name": "Jean-Bosco André-Dumont",
+            "boardRole": "Medewerker"
         },
         {
+            "name": "Jolien Salberter",
+            "boardRole": "Gala-verantwoordelijke"
+        },
+        {
+            "boardRole": "Webmaster",
             "name": "Jonas Brüll"
         },
         {
@@ -56,20 +71,24 @@
             "boardRole": "Temmer"
         },
         {
-            "name": "Kiana Schamp"
+            "name": "Kiana Schamp",
+            "boardRole": "EHBO"
         },
         {
             "name": "Kyo Schelfhout",
             "boardRole": "Temmer"
         },
         {
-            "name": "Matteo Postiglione"
+            "name": "Matteo Postiglione",
+            "boardRole": "Medewerker"
         },
         {
-            "name": "Maxym Desauvage"
+            "name": "Maxym Desauvage",
+            "boardRole": "Medewerker"
         },
         {
-            "name": "Robin Voet"
+            "name": "Robin Voet",
+            "boardRole": "Medewerker"
         },
         {
             "name": "Trent De Smet",

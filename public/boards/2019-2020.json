@@ -49,7 +49,11 @@
         {
             "boardRole": "Ab-Actis",
             "name": "Gérard Lichtert",
-            "stars": []
+            "stars": [
+                "G",
+                "G",
+                "Z"
+            ]
         },
         {
             "boardRole": "Medewerker",
