@@ -1,17 +1,30 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { readFile } from "fs/promises";
+import { readdir, readFile } from "fs/promises";
 import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
-import { boardRoleOrder } from "../../lib/board/board-role";
+import { compareBoardRoles } from "../../lib/board/board-role";
 import BoardMemberComponent from "../../components/board/board-member/BoardMemberComponent.astro";
 import { sortByTerm } from "../../lib/board/board-year";
+import { websiteRoutes } from "../../lib/routes";
+import path from "path";
 
 export const prerender = true;
 export async function getStaticPaths() {
-  const jsonString = await readFile("./public/boards.json", "utf-8");
-  const data: BoardYearInterface[] = JSON.parse(jsonString);
-  const terms = data.map((d) => d.term).toSorted(sortByTerm);
-  return data.map((d) => {
+  const directoryPath = path.resolve("./public/boards");
+  const directoryPromise = readdir(directoryPath);
+  const termRegex = /^\d{4}-\d{4}\.json$/;
+  const directory = await directoryPromise;
+  const filenames = directory.filter((path) => termRegex.test(path));
+  const boardYears: BoardYearInterface[] = await Promise.all(
+    filenames.map(async (filename) => {
+      const filePath = path.join(directoryPath, filename);
+      const board = await readFile(filePath, "utf-8");
+      return JSON.parse(board);
+    }),
+  );
+  const terms = boardYears.map((d) => d.term);
+  terms.sort(sortByTerm);
+  return boardYears.map((d) => {
     return {
       params: { term: d.term },
       props: { boardYear: new BoardYear(d), terms: terms },
@@ -23,52 +36,169 @@ const title = "Bestuur";
 const { term } = Astro.params;
 const { boardYear, terms } = Astro.props;
 boardYear.boardMembers.sort((a, b) => {
-  const r =
-    boardRoleOrder.indexOf(a.boardRole) - boardRoleOrder.indexOf(b.boardRole);
+  const r = compareBoardRoles(a.boardRole, b.boardRole);
   if (r === 0) return a.name.localeCompare(b.name);
   else return r;
 });
+const index = terms.indexOf(term);
+const isLast = index === terms.length - 1;
+const isFirst = index === 0;
+function createHref(term: string) {
+  const parts = websiteRoutes.board.url.split("/");
+  parts[parts.length - 1] = term;
+  return parts.join("/");
+}
+const navigatinContainerStyle = isFirst
+  ? "flex-end"
+  : isLast
+    ? "flex-start"
+    : "space-between";
+
+const boardSize = boardYear.boardMembers.length;
 ---
 
 <Layout title={title}>
   <h1 class="term">{term}</h1>
-  <div class="board-container">
+  <div class=`boardyears-navigation-container ${navigatinContainerStyle}`>
     {
-      boardYear.boardMembers.map((m) => (
-        <BoardMemberComponent boardMember={m} term={term} />
+      !isFirst && (
+        <a class="boardyears-navigation" href={createHref(terms[index - 1])}>
+          <span class="arrow previous">{terms[index - 1]}</span>
+        </a>
+      )
+    }
+    {
+      !isLast && (
+        <a class="boardyears-navigation" href={createHref(terms[index + 1])}>
+          <span class="arrow next">{terms[index + 1]}</span>
+        </a>
+      )
+    }
+  </div>
+  <div class={`board-container ${boardSize === 1 ? "single" : "multiple"}`}>
+    {
+      boardYear.boardMembers.map((m, index) => (
+        <BoardMemberComponent boardMember={m} term={term} index={index} />
       ))
     }
   </div>
-  <style>
-    .board-container {
-      padding-top: 2rem;
-      padding-bottom: 2rem;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      margin: 0 auto;
-      row-gap: 2rem;
-      align-items: end;
-    }
-
-    .term {
-      margin-top: 2rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    @media (min-width: 768px) {
-      .board-container {
-        column-gap: 5rem;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .board-container {
-        column-gap: 7rem;
-      }
-    }
-  </style>
-  <script is:inline>
-    window.location.replace(`${boardMembers}`);
-  </script>
 </Layout>
+<style>
+  .board-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    display: grid;
+    margin: 0 auto;
+    row-gap: 2rem;
+    align-items: end;
+  }
+
+  @media (min-width: 768px) {
+    .multiple {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .single {
+    place-content: center;
+  }
+
+  .term {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  .boardyears-navigation-container {
+    display: flex;
+    margin-top: 1.5rem;
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+  .boardyears-navigation {
+    text-decoration: none;
+    color: black;
+    position: relative;
+  }
+
+  .previous::after {
+    content: "";
+    position: absolute;
+    padding: 0.5rem;
+    top: 0;
+    right: -10px;
+    top: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .arrow {
+    display: inline-block;
+    background: #0078ff;
+    position: relative;
+    padding: 0.7rem;
+    background-color: purple;
+    color: yellow;
+  }
+  .next {
+    border-radius: 3px 0 0 3px;
+  }
+
+  .previous {
+    border-radius: 0 3px 3px 0;
+  }
+
+  .previous::before {
+    content: "";
+    position: absolute;
+    left: -1.5rem;
+    display: flex;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 2rem solid transparent;
+    border-bottom: 2rem solid transparent;
+    border-right: 2rem solid purple;
+  }
+
+  .next::after {
+    content: "";
+    position: absolute;
+    right: -1.5rem;
+    display: flex;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 2rem solid transparent;
+    border-bottom: 2rem solid transparent;
+    border-left: 2rem solid purple;
+  }
+
+  .space-between {
+    justify-content: space-between;
+  }
+
+  .flex-start {
+    justify-content: flex-start;
+  }
+
+  .flex-end {
+    justify-content: flex-end;
+  }
+
+  @media (min-width: 768px) {
+    .board-container {
+      column-gap: 5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .board-container {
+      column-gap: 7rem;
+    }
+  }
+  .arrow-link {
+    display: inline-block;
+    text-decoration: none;
+  }
+</style>

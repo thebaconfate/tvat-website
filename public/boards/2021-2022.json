@@ -1,0 +1,61 @@
+{
+    "term": "2021-2022",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Kyo Schelfhout",
+            "stars": []
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Kiana Schamp",
+            "stars": []
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Joeri Van Goubergen",
+            "stars": []
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Jarni Van Waesberge",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Jolien Salberter",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Gérard Lichtert",
+            "stars": [
+                "G",
+                "G",
+                "Z",
+                "Z",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Jannes Broigniez",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Lien Smets",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Matthias Willocx",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Jean-Bosco André-Dumont",
+            "stars": []
+        }
+    ]
+}

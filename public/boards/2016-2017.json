@@ -1,0 +1,70 @@
+{
+    "term": "2016-2017",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Alexander Lesuisse",
+            "boulons": []
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Lex Withofs",
+            "boulons": []
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Arwen Van Wittenberghe",
+            "stars": []
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Royghe Van Severen",
+            "boulons": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Adam Brooking",
+            "boulons": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Burak Günes",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Jarni van Waesberge",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Silke Vannitsen",
+            "stars": []
+        },
+        {
+            "boardRole": "Kodak",
+            "name": "Jill Ver Eecke",
+            "stars": []
+        },
+        {
+            "boardRole": "Scriptor",
+            "name": "Astrid Vandevoorde",
+            "stars": []
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Rani Ackermans",
+            "stars": []
+        },
+        {
+            "boardRole": "Cultuurmeester",
+            "name": "Hannah Casier",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Tim Pottilius",
+            "stars": []
+        }
+    ]
+}

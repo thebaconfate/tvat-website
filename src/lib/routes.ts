@@ -1,9 +1,13 @@
-import { sortByTerm, type BoardYearInterface } from "./board/board-year";
-import rawData from "../../public/boards.json";
+import { sortByTerm } from "./board/board-year";
 
-const data = rawData as BoardYearInterface[];
-const boardYears = data.map((d) => d.term).toSorted(sortByTerm);
-const latestTerm = boardYears[0];
+const boardFiles = import.meta.glob("../../public/boards/*.json", {
+  eager: true,
+});
+const terms = Object.keys(boardFiles)
+  .map((path) => path.match(/boards\/(\d{4}-\d{4})\.json$/)?.[1])
+  .filter(Boolean) as string[];
+terms.sort(sortByTerm);
+const latestTerm = terms[0];
 
 const websiteRoutes = {
   home: { url: "/" },

@@ -1,3 +1,17 @@
+.board-member {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  --opacity: 0.6;
+  --purple: rgb(98, 52, 150);
+  --red: rgb(173, 41, 37);
+  --green: rgb(67, 150, 41);
+  --purple-a: rgba(98, 52, 150, var(--opacity));
+  --red-a: rgba(173, 41, 37, var(--opacity));
+  --green-a: rgba(67, 150, 41, var(--opacity));
+}
+
 .board-role {
   text-align: center;
 }
@@ -6,28 +20,37 @@
   width: 100%;
   aspect-ratio: 1 /1;
   object-fit: cover;
-  border-radius: 0.5rem;
   text-align: center;
-  max-width: 100px;
+  max-width: 175px;
   display: block;
 }
 
-img.board-member-picture {
-  border: solid purple 2px;
+picture.board-member-picture {
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 .board-member-stars > img {
-  max-width: 0.6rem;
+  max-width: 1rem;
 }
 
 @media (min-width: 375px) {
   .board-member picture,
   .board-member img {
-    max-width: 125px;
+    max-width: 200px;
+  }
+}
+
+@media (min-width: 375px) {
+  .board-member picture,
+  .board-member img {
+    max-width: 250px;
   }
 
   .board-member-stars > img {
-    max-width: 0.8rem;
+    max-width: 1.2rem;
   }
 }
 
@@ -37,26 +60,30 @@ img.board-member-picture {
     max-width: 250px;
   }
   .board-member-stars > img {
-    max-width: 1.5rem;
+    max-width: 1.3rem;
   }
 }
 
 @media (min-width: 1024px) {
   .board-member picture,
   .board-member img {
-    max-width: 300px;
+    max-width: 350px;
+  }
+  .board-member-stars > img {
+    max-width: 1.8rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .board-member picture,
+  .board-member img {
+    max-width: 450px;
   }
   .board-member-stars > img {
     max-width: 1.5rem;
   }
 }
 
-.board-member {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 1rem;
-}
 .board-member-picture-container {
   display: flex;
   justify-content: center;
@@ -89,7 +116,6 @@ img.board-member-picture {
 .board-member-picture-container:hover .board-member-overlay,
 .board-member-picture-container:active .board-member-overlay {
   opacity: 1;
-  background-color: rgba(128, 0, 128, 0.5);
 }
 
 .board-member-picture-container:hover .bar,
@@ -105,7 +131,6 @@ img.board-member-picture {
 
 .bar {
   position: absolute;
-  background-color: purple;
   height: 0.7%;
   width: 33%;
   --distance: 10%;
@@ -140,4 +165,44 @@ img.board-member-picture {
   bottom: var(--distance);
   transform-origin: left bottom;
   rotate: -45deg;
+}
+
+.red {
+  background-color: var(--red);
+}
+
+.purple {
+  background-color: var(--purple);
+}
+
+.green {
+  background-color: var(--green);
+}
+
+.red-a {
+  background-color: var(--red-a);
+}
+
+.purple-a {
+  background-color: var(--purple-a);
+}
+
+.green-a {
+  background-color: var(--green-a);
+}
+
+.border-purple {
+  border-color: var(--purple);
+}
+
+.border-red {
+  border-color: var(--red);
+}
+
+.border-green {
+  border-color: var(--green);
+}
+
+.hidden {
+  display: none;
 }
