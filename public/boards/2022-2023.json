@@ -1,0 +1,61 @@
+{
+    "term": "2022-2023",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Kyo Schelfhout",
+            "stars": []
+        },
+        {
+            "boardRole": "Schachtentemmer",
+            "name": "Evelien Awouters",
+            "stars": [
+                "G",
+                "G",
+                "Z",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Sam Van de Velde",
+            "boulons": []
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Marie Van Gysegem"
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Jarni Van Waesberge"
+        },
+        {
+            "boardRole": "Schachtentemmer",
+            "name": "Freya Claes"
+        },
+        {
+            "name": "Mats Mardaga",
+            "boardRole": "Schachtentemmer"
+        },
+        {
+            "name": "Kiana Schamp",
+            "boardRole": "Schachtentemmer"
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Robin Voet"
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Jean-Bosco André-Dumont"
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Emilio Callies"
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Lucie Ledecq"
+        }
+    ]
+}

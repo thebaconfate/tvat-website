@@ -1,0 +1,98 @@
+{
+    "term": "2023-2024",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Sam Van de Velde",
+            "boulons": [
+                "Z",
+                "Z",
+                "Z",
+                "Z",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Anke Deconinck",
+            "stars": []
+        },
+        {
+            "name": "Marie Van Gysegem",
+            "boardRole": "Quaestor"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Gérard Lichtert",
+            "stars": [
+                "G",
+                "G",
+                "Z",
+                "Z",
+                "G",
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "name": "Emilio Callies",
+            "boardRole": "Medewerker"
+        },
+        {
+            "name": "Evelien Awouters",
+            "boardRole": "Temmer"
+        },
+        {
+            "name": "Jarni Van Waesberge",
+            "boardRole": "Cantor"
+        },
+        {
+            "name": "Jarni Van Waesberge",
+            "boardRole": "Magister Krambambouli"
+        },
+        {
+            "name": "Jean Gazeau",
+            "boardRole": "Medewerker"
+        },
+        {
+            "name": "Jean-Bosco André-Dumont",
+            "boardRole": "Medewerker"
+        },
+        {
+            "name": "Jolien Salberter",
+            "boardRole": "Gala-verantwoordelijke"
+        },
+        {
+            "boardRole": "Webmaster",
+            "name": "Jonas Brüll"
+        },
+        {
+            "name": "Julia Saalmink",
+            "boardRole": "Temmer"
+        },
+        {
+            "name": "Kiana Schamp",
+            "boardRole": "EHBO"
+        },
+        {
+            "name": "Kyo Schelfhout",
+            "boardRole": "Temmer"
+        },
+        {
+            "name": "Matteo Postiglione",
+            "boardRole": "Medewerker"
+        },
+        {
+            "name": "Maxym Desauvage",
+            "boardRole": "Medewerker"
+        },
+        {
+            "name": "Robin Voet",
+            "boardRole": "Medewerker"
+        },
+        {
+            "name": "Trent De Smet",
+            "boardRole": "Temmer"
+        }
+    ]
+}

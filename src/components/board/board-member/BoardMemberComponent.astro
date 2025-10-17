@@ -9,14 +9,15 @@ interface Props {
   boardMember: BoardMember;
   term: string;
   last?: boolean;
+  index: number;
 }
 export function removeAccents(str: string): string {
   return str
     .normalize("NFD") // Split letters and diacritics (e.g. "é" → "é")
     .replace(/[\u0300-\u036f]/g, ""); // Remove all combining marks
 }
-const { boardMember, term } = Astro.props;
-const src = `/board/${term}/${removeAccents(boardMember.name.toLowerCase()).replaceAll(" ", "-")}`;
+const { boardMember, term, index } = Astro.props;
+const src = `/boards/${term}/${removeAccents(boardMember.name.toLowerCase()).replaceAll(" ", "-")}`;
 const pngPath = `./public${src}.png`;
 const jpgPath = `./public${src}.jpg`;
 async function fileExists(path: string): Promise<boolean> {
@@ -31,51 +32,58 @@ const [pngExists, jpgExists] = await Promise.all([
   fileExists(pngPath),
   fileExists(jpgPath),
 ]);
+const rgbColors = ["purple", "red", "green"];
+const rgbaColors = ["purple-a", "red-a", "green-a"];
+const borderColors = ["border-purple", "border-red", "border-green"];
+const i = index % 3;
 ---
 
 <div class="board-member">
   <h2 class="board-role">{boardMember.boardRole}</h2>
-  <div class="board-member-picture-container">
-    <picture class="board-member-picture">
-      {pngExists && <source srcset={src + ".png"} type="image/png" />}
-      <img
-        class="board-member-picture"
-        src={src + ".jpg"}
-        alt={jpgExists
-          ? boardMember.name + "'s foto"
-          : "Gebrek aan " + boardMember.name + "'s foto"}
-      />
-    </picture>
-    <div class="board-member-overlay">
-      {/* TODO: Finisht the stars on hover*/}
-      <div class="bars-container">
-        <div class="left-top-bar bar"></div>
-        <div class="right-top-bar bar"></div>
-        <div class="left-bottom-bar bar"></div>
-        <div class="right-bottom-bar bar"></div>
-      </div>
-      <div class="board-member-stars">
-        {
-          boardMember.stars
-            ? boardMember.stars.map((s) =>
-                s === Star.Gold ? (
-                  <img src="/star-g.png" alt="Gouden ster" />
-                ) : (
-                  <img src="/star-s.png" alt="Zilvere ster" />
-                ),
-              )
-            : boardMember.boulons
-              ? boardMember.boulons.map((b) =>
-                  b === Boulon.Silver ? (
-                    <img src="/boulon-s.png" alt="Zilvere boulon" />
+  {
+    (pngExists || jpgExists) && (
+      <div class={"board-member-picture-container"}>
+        <picture class={`board-member-picture ${borderColors[i]}`}>
+          {pngExists && <source srcset={src + ".png"} type="image/png" />}
+          <img
+            class="board-member-picture"
+            src={src + ".jpg"}
+            alt={
+              jpgExists
+                ? boardMember.name + "'s foto"
+                : "Gebrek aan " + boardMember.name + "'s foto"
+            }
+          />
+        </picture>
+        <div class={`board-member-overlay ${rgbaColors[i]}`}>
+          <div class="bars-container">
+            <div class={`left-top-bar bar ${rgbColors[i]}`} />
+            <div class={`right-top-bar bar ${rgbColors[i]}`} />
+            <div class={`left-bottom-bar bar ${rgbColors[i]}`} />
+            <div class={`right-bottom-bar bar ${rgbColors[i]}`} />
+          </div>
+          <div class="board-member-stars">
+            {boardMember.stars
+              ? boardMember.stars.map((s) =>
+                  s === Star.Gold ? (
+                    <img src="/star-g.png" alt="Gouden ster" />
                   ) : (
-                    <img src="/boulon-g" alt="Gouden boulon" />
+                    <img src="/star-s.png" alt="Zilvere ster" />
                   ),
                 )
-              : "nein"
-        }
+              : boardMember.boulons
+                ? boardMember.boulons.map((b) =>
+                    b === Boulon.Silver ? (
+                      <img src="/boulon-s.png" alt="Zilvere boulon" />
+                    ) : (
+                      <img src="/boulon-g" alt="Gouden boulon" />
+                    ),
+                  )
+                : ""}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-  <p>{boardMember.name}</p>
+    )
+  }
+  <h3>{boardMember.name}</h3>
 </div>

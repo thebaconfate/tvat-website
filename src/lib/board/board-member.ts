@@ -15,9 +15,15 @@ export class BoardMember {
   stars?: (Star | undefined)[];
   boulons?: (Boulon | undefined)[];
 
-  constructor(boardMemberInterface: BoardMemberInterface) {
+  constructor(boardMemberInterface: BoardMemberInterface, term?: string) {
     this.name = boardMemberInterface.name;
-    this.boardRole = stringToBoardRole(boardMemberInterface.boardRole);
+    try {
+      this.boardRole = stringToBoardRole(boardMemberInterface.boardRole);
+    } catch (e) {
+      throw new Error(
+        `Role: ${boardMemberInterface.boardRole} from term: ${term} not defined in BoardRole enum`,
+      );
+    }
     if (boardMemberInterface.stars)
       this.stars = boardMemberInterface.stars.map(stringToStar);
     else if (boardMemberInterface.boulons)

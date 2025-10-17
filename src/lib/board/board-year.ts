@@ -11,7 +11,7 @@ export class BoardYear {
   constructor(boardYearInterface: BoardYearInterface) {
     this.term = boardYearInterface.term;
     this.boardMembers = boardYearInterface.boardMembers.map(
-      (i) => new BoardMember(i),
+      (i) => new BoardMember(i, boardYearInterface.term),
     );
   }
 }
@@ -22,6 +22,8 @@ export function sortBoardYearByTerm(a: BoardYear, b: BoardYear) {
   return startA - startB;
 }
 
-export function sortByTerm(a: string, b: string) {
-  return parseInt(a.split("-")[0]) - parseInt(b.split("-")[0]);
+export function sortByTerm(a: string, b: string, descending = true) {
+  return descending
+    ? parseInt(b.split("-")[0]) - parseInt(a.split("-")[0])
+    : parseInt(a.split("-")[0]) - parseInt(b.split("-")[0]);
 }

@@ -1,0 +1,64 @@
+{
+    "term": "2019-2020",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Justine Paul",
+            "stars": []
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Julien Menten",
+            "stars": []
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Joeri Van Goubergen",
+            "stars": []
+        },
+        {
+            "boardRole": "Beestenmeester",
+            "name": "Benoit vanhumbeck",
+            "stars": []
+        },
+        {
+            "boardRole": "Beestenmeester",
+            "name": "Jarni Van Waesberge",
+            "stars": []
+        },
+        {
+            "boardRole": "Beestenmeester",
+            "name": "Kiana Schamp",
+            "stars": []
+        },
+        {
+            "boardRole": "Beestenmeester",
+            "name": "Jasper Theuns",
+            "stars": []
+        },
+        {
+            "boardRole": "Sport meester",
+            "name": "Cédric Willems",
+            "stars": []
+        },
+        {
+            "boardRole": "Cultuur meester",
+            "name": "Noah Chatelain",
+            "stars": []
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Gérard Lichtert",
+            "stars": [
+                "G",
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Yorick Steenhoudt",
+            "stars": []
+        }
+    ]
+}

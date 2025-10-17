@@ -1,0 +1,62 @@
+{
+    "term": "2015-2016",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Silke Vannitsen"
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Alexander Lesuisse"
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Maarten Van der Auwera",
+            "boulons": []
+        },
+        {
+            "boardRole": "Zangfeest",
+            "name": "Jill Ver Eecke"
+        },
+        {
+            "boardRole": "Kodak",
+            "name": "Jill Ver Eecke"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Xana Coppens"
+        },
+        {
+            "boardRole": "Sport",
+            "name": "Tuur Snauwaert"
+        },
+        {
+            "boardRole": "Cultuurmeester",
+            "name": "Wannes van Hassel"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Babette Jaime Moens"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Maxime Opsomer"
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Bram Vermeulen"
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Jarni Van Waesberge"
+        },
+        {
+            "boardRole": "Feest",
+            "name": "Joey van Wandele"
+        },
+        {
+            "boardRole": "Designer",
+            "name": "Astrid Vandevoorde"
+        }
+    ]
+}

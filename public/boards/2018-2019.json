@@ -1,0 +1,66 @@
+{
+    "term": "2018-2019",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Jarni Van Waesberge",
+            "stars": []
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Jasper Theuns",
+            "stars": []
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Joeri Van Goubergen",
+            "stars": []
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Lies Neyens",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Justine Paul",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Lex Withofs"
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Lex Withofs"
+        },
+        {
+            "name": "Robert Theunissen",
+            "boardRole": "Temmer"
+        },
+        {
+            "boardRole": "Gala",
+            "name": "Rani Ackermans"
+        },
+        {
+            "name": "Astrid Vandevoorde",
+            "boardRole": "Design"
+        },
+        {
+            "name": "Felix Vandenplas",
+            "boardRole": "Temmer"
+        },
+        {
+            "boardRole": "Cultuur",
+            "name": "Justine Paul"
+        },
+        {
+            "name": "Casper Guffens",
+            "boardRole": "Medewerker"
+        },
+        {
+            "name": "Stijn Rooselaers",
+            "boardRole": "Medewerker"
+        }
+    ]
+}
