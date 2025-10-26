@@ -124,7 +124,6 @@ class Database {
   static async getInstance() {
     if (Database.instance) return Database.instance;
     else {
-      console.log(DatabaseConstants.CONFIG);
       const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
       Database.init(DatabaseConstants.TABLES, connectionPool);
       const newInstance = new Database(
