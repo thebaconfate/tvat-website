@@ -13,13 +13,13 @@ import { Product } from "../lib/store";
 import type { ActivityInterface } from "../lib/activity";
 import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 import { createUrl } from "../lib/utils";
+import Database from "../lib/db";
 
 const title = "Krambambouli";
 const formActive = true;
 const origin = Astro.url.origin;
-function throwHttpError(response: Response) {
-  throw new Error(`HTTP error: ${response.status}`);
-}
+const database = await Database.getInstance();
+console.log(database);
 
 let [
   products,
@@ -40,73 +40,6 @@ let [
   ActivityInterface | null,
   any | null,
 ];
-const productsPromise = fetch(
-  createUrl([
-    origin,
-    apiRoutes.store.url,
-    apiRoutes.store.products.url,
-    apiRoutes.store.products.krambambouli.url,
-  ]),
-).then((response) => {
-  if (response.ok) {
-    return response.json();
-  } else throwHttpError(response);
-});
-
-const pickupLocationsPromise = fetch(
-  createUrl([
-    origin,
-    apiRoutes.krambambouli.url,
-    apiRoutes.krambambouli.pickup.url,
-  ]),
-)
-  .then((response) => {
-    if (response.ok) {
-      return response.json();
-    } else throwHttpError(response);
-  })
-  .then((data: PickUpLocation[]) => {
-    return data;
-  });
-const deliverlyLocationsPromise = fetch(
-  [
-    origin,
-    apiRoutes.krambambouli.url,
-    apiRoutes.krambambouli.delivery.url,
-  ].join(""),
-)
-  .then((response) => {
-    if (response.ok) {
-      return response.json();
-    } else throwHttpError(response);
-  })
-  .then((data: DeliveryLocation[]) => {
-    return data;
-  });
-
-const krambambouliCantusPromise = fetch(
-  [origin, apiRoutes.krambambouli.url, apiRoutes.krambambouli.cantus.url].join(
-    "",
-  ),
-)
-  .then((response) => {
-    if (response.ok) {
-      return response.json();
-    } else throwHttpError(response);
-  })
-  .then((data: ActivityInterface) => data);
-try {
-  [products, pickupLocations, deliveryLocations, krambambouliCantus] =
-    await Promise.all([
-      productsPromise,
-      pickupLocationsPromise,
-      deliverlyLocationsPromise,
-      krambambouliCantusPromise,
-    ]);
-} catch (e) {
-  errors = e;
-  console.error(e);
-}
 ---
 
 <Layout title={title}>

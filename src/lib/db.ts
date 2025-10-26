@@ -11,15 +11,60 @@ import type {
 
 class Database {
   private static instance: Database | null = null;
-  private tables: Tables;
+  private static tables: Tables = DatabaseConstants.TABLES;
+  private static retries = 5;
   private pool: mysql.Pool;
 
-  constructor(tables: Tables, pool: mysql.Pool) {
-    this.tables = tables;
+  constructor(pool: mysql.Pool) {
     this.pool = pool;
   }
 
-  private static async init(
+  static async connect() {
+    Database.instance = new Database(
+      mysql.createPool(DatabaseConstants.CONFIG),
+    );
+    return Database.instance;
+  }
+
+  static async getInstance(retries: number = Database.retries) {
+    if (Database.instance) return Database.instance;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
+        Database.instance = new Database(connectionPool);
+        return Database.instance;
+      } catch (err) {
+        console.warn("DB connection failed, retrying...", err);
+        Database.instance = null;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    console.error(
+      `Could not connect to database after ${retries} attempts, using fallback`,
+    );
+  }
+
+  // TODO: implement this as a wrapper around pool.query but taking into account
+  // cold database starts
+  private async query<T>(
+    sql: string,
+    params: any[] = [],
+    retries: number = Database.retries,
+  ): Promise<T> {
+    return new Promise(() => undefined);
+  }
+
+  // TODO: Implement this as a wrapper around pool.execute but taking into
+  // account cold database starts
+  private async execute<T>(
+    sql: string,
+    params: any[] = [],
+    retries: number = Database.retries,
+  ): Promise<T> {
+    return new Promise(() => undefined);
+  }
+
+  static async init(
     tables: Tables = DatabaseConstants.TABLES,
     connectionPool: mysql.Pool,
   ) {
@@ -118,19 +163,6 @@ class Database {
     );
   }
 
-  static async getInstance() {
-    if (Database.instance) return Database.instance;
-    else {
-      const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
-      Database.init(DatabaseConstants.TABLES, connectionPool);
-      Database.instance = new Database(
-        DatabaseConstants.TABLES,
-        connectionPool,
-      );
-      return Database.instance;
-    }
-  }
-
   private createColumnNames(tableName: string, values: string[]) {
     return values.map((val) => `${tableName}.${val}`).join(", ");
   }
@@ -138,7 +170,7 @@ class Database {
   /* PRODUCTS */
 
   async getKrambambouliProducts() {
-    const table = this.tables.PRODUCTS;
+    const table = Database.tables.PRODUCTS;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(table, [
         "id",
@@ -158,7 +190,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   /* AFHAAL LOCATIES*/
   async getPickUpLocation() {
     if (!this.pool) return [];
-    const table = this.tables.PICKUP_LOCATIONS;
+    const table = Database.tables.PICKUP_LOCATIONS;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(table, ["name", "area"])} FROM ${table};`,
     );
@@ -166,8 +198,8 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async getDeliveryLocations() {
-    const deliverTable = this.tables.DELIVERY_LOCATIONS;
-    const codesTable = this.tables.LOCATION_CODES;
+    const deliverTable = Database.tables.DELIVERY_LOCATIONS;
+    const codesTable = Database.tables.LOCATION_CODES;
     const [rows] = await this.pool.query(
       `SELECT ${this.createColumnNames(deliverTable, [
         "area",
@@ -182,7 +214,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return rows;
   }
   async getKrambambouliCantus() {
-    const activitiesTable = this.tables.ACTIVITIES;
+    const activitiesTable = Database.tables.ACTIVITIES;
     const [rows] = await this.pool.query(
       `SELECT * from ${activitiesTable} WHERE lower(${activitiesTable}.name) LIKE '%krambambouli%' AND lower(${activitiesTable}.name) LIKE '%cantus%' ORDER BY ${activitiesTable}.date DESC LIMIT 1; `,
     );
@@ -198,7 +230,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     euros: number,
     cents: number,
   ) {
-    const query = `INSERT INTO ${this.tables.KRAMBAMBOULI_CUSTOMERS} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_CUSTOMERS} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
     const [insertResult] = await connection.execute<mysql.ResultSetHeader>(
       query,
       [
@@ -218,7 +250,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     customer_id: number,
     pickupLocation: string,
   ) {
-    const query = `INSERT INTO ${this.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, location) values (?, ?)`;
+    const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, location) values (?, ?)`;
     await connection.execute(query, [customer_id, pickupLocation]);
   }
 
@@ -231,7 +263,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     post: number,
     city: string,
   ) {
-    const query = `INSERT INTO ${this.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} (customer_id, street_name, house_number, bus, post, city) values (?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} (customer_id, street_name, house_number, bus, post, city) values (?, ?, ?, ?, ?, ?)`;
     await connection.execute(query, [
       customer_id,
       streetName,
@@ -248,7 +280,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     product_id: number,
     amount: number,
   ) {
-    const query = `INSERT INTO ${this.tables.KRAMBAMBOULI_ORDERS} (customer_id, product_id, amount) values (?, ?, ?)`;
+    const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_ORDERS} (customer_id, product_id, amount) values (?, ?, ?)`;
     return connection.execute(query, [customer_id, product_id, amount]);
   }
 
@@ -347,26 +379,26 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async getKrambambouliOrders() {
-    const query = `SELECT product_id as productId, amount FROM ${this.tables.KRAMBAMBOULI_ORDERS}`;
+    const query = `SELECT product_id as productId, amount FROM ${Database.tables.KRAMBAMBOULI_ORDERS}`;
     const [rows] = await this.pool.query<mysql.ResultSetHeader>(query);
     return rows;
   }
 
   async getKrambambouliOrdersByCustomer() {
-    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) as orders FROM ${this.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${this.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id GROUP BY c.id`;
+    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) as orders FROM ${Database.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${Database.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id GROUP BY c.id`;
     const [rows] = await this.pool.query(query);
     return rows;
   }
 
   async getUser(email: string) {
-    const query = `SELECT * FROM ${this.tables.USERS} WHERE email = ?`;
+    const query = `SELECT * FROM ${Database.tables.USERS} WHERE email = ?`;
     const [rows] = await this.pool.query<mysql.QueryResult>(query, [email]);
     const result = rows as { id?: number; email: string; password: string }[];
     return result[0];
   }
 
   async saveUser(email: string, password: string) {
-    const query = `INSERT INTO ${this.tables.USERS} (email, password)  VALUES (?, ?)`;
+    const query = `INSERT INTO ${Database.tables.USERS} (email, password)  VALUES (?, ?)`;
     await this.pool.execute(query, [email, password]);
   }
 
@@ -374,7 +406,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     interface Count {
       count: number;
     }
-    const query = `SELECT COUNT(*) AS count FROM ${this.tables.USERS}`;
+    const query = `SELECT COUNT(*) AS count FROM ${Database.tables.USERS}`;
     const [rows] = await this.pool.query(query);
     const result = rows as Count[];
     console.log(result);
@@ -382,7 +414,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async updateKrambambouliPayment(customerId: number, paid: boolean) {
-    const query = `UPDATE ${this.tables.KRAMBAMBOULI_CUSTOMERS} SET paid = ? WHERE id = ?`;
+    const query = `UPDATE ${Database.tables.KRAMBAMBOULI_CUSTOMERS} SET paid = ? WHERE id = ?`;
     await this.pool.query(query, [paid, customerId]);
     return;
   }
