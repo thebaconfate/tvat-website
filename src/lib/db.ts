@@ -8,9 +8,6 @@ import type {
   KrambambouliCustomerAddress,
   KrambambouliProduct,
 } from "./krambambouli";
-//import * as dotenv from "dotenv";
-
-//dotenv.config();
 
 class Database {
   private static instance: Database | null = null;
@@ -126,12 +123,11 @@ class Database {
     else {
       const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
       Database.init(DatabaseConstants.TABLES, connectionPool);
-      const newInstance = new Database(
+      Database.instance = new Database(
         DatabaseConstants.TABLES,
         connectionPool,
       );
-      Database.instance = newInstance;
-      return newInstance;
+      return Database.instance;
     }
   }
 

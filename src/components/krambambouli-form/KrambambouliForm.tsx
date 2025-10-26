@@ -488,7 +488,10 @@ export default function KrambambouliForm({
             <p>
               Met mededeling:{" "}
               <b>
-                krambambouli + {form.firstName} {form.lastName}
+                krambambouli +{" "}
+                {!form.firstName && !form.lastName
+                  ? "[Voornaam Achternaam]"
+                  : [form.firstName, form.lastName].join(" ")}
               </b>
             </p>
           </div>
