@@ -29,7 +29,6 @@ export const DatabaseConfig = Object.freeze({
   user: getEnv("DB_USER"),
   password: getEnv("DB_PASSWORD"),
   database: getEnv("DB_DATABASE"),
-  waitForConnection: true,
   connectionLimit: 10,
 });
 
