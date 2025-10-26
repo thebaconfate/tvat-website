@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 export const Tables = Object.freeze({
   PRODUCTS: "products",
   PICKUP_LOCATIONS: "pickup_locations",
@@ -11,14 +15,20 @@ export const Tables = Object.freeze({
   USERS: "users",
 });
 
+function getEnv(key: string) {
+  const value = process.env[key];
+  if (!value) throw Error(`Missing env variable: ${key}`);
+  return value;
+}
+
 export type Tables = typeof Tables;
 
 export const DatabaseConfig = Object.freeze({
-  host: process.env.DB_HOST ?? "",
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 0,
-  user: process.env.DB_USER ?? "",
-  password: process.env.DB_PASSWORD ?? "",
-  database: process.env.DB_DATABASE ?? "",
+  host: getEnv("DB_HOST"),
+  port: parseInt(getEnv("DB_PORT")),
+  user: getEnv("DB_USER"),
+  password: getEnv("DB_PASSWORD"),
+  database: getEnv("DB_DATABASE"),
   connectionLimit: 10,
 });
 
