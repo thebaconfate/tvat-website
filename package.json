@@ -1,8 +1,9 @@
 {
-    "name": "tvat-website",
+    "name": "'t VAT website",
     "type": "module",
-    "version": "0.0.1",
+    "version": "1.2.0",
     "scripts": {
+        "predev": "node scripts/generateTerms.js",
         "dev": "astro dev",
         "start": "astro dev",
         "prebuild": "node scripts/generateTerms.js",
