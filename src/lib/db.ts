@@ -3,12 +3,14 @@ import {
   Database as DatabaseConstants,
   type Tables,
 } from "./constants/database";
-import type { KrambambouliCustomer, KrambambouliCustomerAddress, KrambambouliProduct } from "./krambambouli";
+import type {
+  KrambambouliCustomer,
+  KrambambouliCustomerAddress,
+  KrambambouliProduct,
+} from "./krambambouli";
 //import * as dotenv from "dotenv";
 
 //dotenv.config();
-
-
 
 class Database {
   private static instance: Database | null = null;
@@ -122,6 +124,7 @@ class Database {
   static async getInstance() {
     if (Database.instance) return Database.instance;
     else {
+      console.log(DatabaseConstants.CONFIG);
       const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
       Database.init(DatabaseConstants.TABLES, connectionPool);
       const newInstance = new Database(
