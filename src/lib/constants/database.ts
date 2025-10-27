@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import type { ConnectionOptions } from "mysql2/promise";
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ function getEnv(key: string) {
 
 export type Tables = typeof Tables;
 
-export const DatabaseConfig = Object.freeze({
+export const DatabaseConfig: ConnectionOptions = Object.freeze({
   host: getEnv("DB_HOST"),
   port: parseInt(getEnv("DB_PORT")),
   user: getEnv("DB_USER"),

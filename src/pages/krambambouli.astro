@@ -4,42 +4,31 @@ import Cookbook from "../svgs/Cookbook.astro";
 import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
 import { apiRoutes } from "../lib/routes";
-import type {
-  PickUpLocation,
-  DeliveryLocation,
-  ProductInterface,
-} from "../lib/store";
 import { Product } from "../lib/store";
 import type { ActivityInterface } from "../lib/activity";
 import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 import { createUrl } from "../lib/utils";
 import Database from "../lib/db";
+import type { ProductInterface } from "../lib/interfaces/database/product";
+import type { pickupLocationInterface } from "../lib/interfaces/database/pickupLocation";
+import type { DeliveryZoneInterface } from "../lib/interfaces/database/deliveryZone";
 
 const title = "Krambambouli";
 const formActive = true;
 const origin = Astro.url.origin;
-const database = await Database.getInstance();
-console.log(database);
+let products: undefined | ProductInterface[],
+  pickupLocations: undefined | pickupLocationInterface[],
+  deliveryLocations: undefined | DeliveryZoneInterface[],
+  errors: undefined | any;
 
-let [
-  products,
-  deliveryLocations,
-  pickupLocations,
-  krambambouliCantus,
-  errors,
-]: [
-  null | ProductInterface[],
-  null | DeliveryLocation[],
-  null | PickUpLocation[],
-  null | ActivityInterface,
-  null | any,
-] = Array(4).fill(null) as [
-  Product[] | null,
-  DeliveryLocation[] | null,
-  PickUpLocation[] | null,
-  ActivityInterface | null,
-  any | null,
-];
+try {
+  const database = await Database.getInstance();
+  const products = await database?.getKrambambouliProducts();
+
+  console.log(result);
+} catch (e) {
+  console.error(e);
+}
 ---
 
 <Layout title={title}>
