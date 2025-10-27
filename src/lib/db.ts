@@ -1,13 +1,9 @@
-import mysql from "mysql2/promise";
+import mysql, { type PoolConnection, type RowDataPacket } from "mysql2/promise";
 import {
   Database as DatabaseConstants,
   type Tables,
 } from "./constants/database";
-import type {
-  KrambambouliCustomer,
-  KrambambouliCustomerAddress,
-  KrambambouliProduct,
-} from "./krambambouli";
+import type { ProductInterface } from "./interfaces/database/product";
 
 class Database {
   private static instance: Database | null = null;
@@ -32,6 +28,7 @@ class Database {
       try {
         const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
         Database.instance = new Database(connectionPool);
+        console.log(`Retried ${i} times`);
         return Database.instance;
       } catch (err) {
         console.warn("DB connection failed, retrying...", err);
@@ -39,35 +36,83 @@ class Database {
         await new Promise((r) => setTimeout(r, 500));
       }
     }
-    console.error(
-      `Could not connect to database after ${retries} attempts, using fallback`,
-    );
+    const msg = `Could not connect to database after ${retries} attempts`;
+    console.error(msg);
+    throw Error(msg);
   }
 
-  // TODO: implement this as a wrapper around pool.query but taking into account
-  // cold database starts
-  private async query<T>(
+  private async query<T extends RowDataPacket>(
     sql: string,
     params: any[] = [],
     retries: number = Database.retries,
-  ): Promise<T> {
-    return new Promise(() => undefined);
-  }
-
-  // TODO: Implement this as a wrapper around pool.execute but taking into
-  // account cold database starts
-  private async execute<T>(
-    sql: string,
-    params: any[] = [],
-    retries: number = Database.retries,
-  ): Promise<T> {
-    return new Promise(() => undefined);
-  }
-
-  static async init(
-    tables: Tables = DatabaseConstants.TABLES,
-    connectionPool: mysql.Pool,
   ) {
+    let lastError;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const database = await Database.getInstance();
+        return database.pool.query<T[]>(sql, params);
+      } catch (err) {
+        lastError = err;
+        console.warn("Failed to query database, retrying...", err);
+        Database.instance = null;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    throw lastError;
+  }
+
+  private async execute<T extends RowDataPacket>(
+    sql: string,
+    params: any[] = [],
+    retries: number = Database.retries,
+  ) {
+    let lastError;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const database = await Database.getInstance();
+        return database.pool.execute<T[]>(sql, params);
+      } catch (err) {
+        lastError = err;
+        console.warn("Failed to query database, retrying...", err);
+        Database.instance = null;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    throw lastError;
+  }
+
+  private async withTransaction<T extends RowDataPacket>(
+    transaction: (conn: PoolConnection) => Promise<[T[], mysql.FieldPacket[]]>,
+    retries: number = Database.retries,
+  ) {
+    let lastError;
+    for (let i = 0; i < retries; i++) {
+      let connection;
+      try {
+        const database = await Database.getInstance();
+        connection = await database.pool.getConnection();
+        connection.beginTransaction();
+        const result = await transaction(connection);
+        await connection.commit();
+        connection.release();
+        return result;
+      } catch (error) {
+        lastError = error;
+        console.warn("Failed to do transaction, retrying...", error);
+        try {
+          connection?.rollback();
+        } catch {}
+        connection?.release();
+        Database.instance = null;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+  }
+
+  static async init(tables: Tables = DatabaseConstants.TABLES) {
+    const database = await Database.getInstance();
+    const connectionPool = database.pool;
+
     function createTableIfNotExists(tableName: string, values: string[]) {
       return `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
     }
@@ -171,7 +216,7 @@ class Database {
 
   async getKrambambouliProducts() {
     const table = Database.tables.PRODUCTS;
-    const [rows] = await this.pool.query(
+    const [rows] = await this.query<ProductInterface>(
       `SELECT ${this.createColumnNames(table, [
         "id",
         "name",
@@ -284,6 +329,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return connection.execute(query, [customer_id, product_id, amount]);
   }
 
+  /*
   async createKrambambuliPickUpOrder(
     userDetails: KrambambouliCustomer,
     pickupLocation: string,
@@ -328,7 +374,9 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
       conn.release();
     }
   }
+  */
 
+  /*
   async createKrambambouliDeliveryOrder(
     userDetails: KrambambouliCustomer,
     customerAddress: KrambambouliCustomerAddress,
@@ -377,6 +425,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
       conn.release();
     }
   }
+    */
 
   async getKrambambouliOrders() {
     const query = `SELECT product_id as productId, amount FROM ${Database.tables.KRAMBAMBOULI_ORDERS}`;
