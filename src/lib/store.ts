@@ -1,7 +1,7 @@
-export interface PriceInterface {
-  euros: number;
-  cents?: number;
-}
+import type { DeliveryZoneInterface } from "./interfaces/database/deliveryZone";
+import type { PickupLocationInterface } from "./interfaces/database/pickupLocation";
+import type { PriceInterface } from "./interfaces/database/price";
+import type { ProductInterface } from "./interfaces/database/product";
 
 export class Price {
   euros: number;
@@ -29,14 +29,6 @@ export class Price {
     const result = `€${this.euros},` + postComma;
     return result;
   }
-}
-
-export interface ProductInterface {
-  id: number;
-  name: string;
-  description?: string;
-  imageUrl?: string;
-  price: PriceInterface;
 }
 
 export class Product {
@@ -71,13 +63,17 @@ export class Product {
   }
 }
 
-export class PickUpLocation {
-  name: string;
-  area: string;
+export class PickupLocation {
+  id: number;
+  description: string;
 
-  constructor(name: string, area: string) {
-    this.name = name;
-    this.area = area;
+  constructor(id: number, description: string) {
+    this.id = id;
+    this.description = description;
+  }
+
+  static from(pickupLocation: PickupLocationInterface) {
+    return new PickupLocation(pickupLocation.id, pickupLocation.description);
   }
 }
 
@@ -99,5 +95,13 @@ export class DeliveryLocation {
     this.area = area;
     this.range = range;
     this.price = price;
+  }
+
+  static from(deliveryLocation: DeliveryZoneInterface) {
+    return new DeliveryLocation(
+      deliveryLocation.area,
+      deliveryLocation.ranges.map((r) => new Range(r.areaStart, r.areaEnd)),
+      Price.from(deliveryLocation.price),
+    );
   }
 }
