@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from "react";
 import "./styles.css";
-import {
-  DeliveryLocation,
-  Price,
-  Product,
-  type PickUpLocation,
-  type ProductInterface,
-} from "../../lib/store";
-import { Activity, type ActivityInterface } from "../../lib/activity";
 import DOMPurify from "dompurify";
 import { apiRoutes } from "../../lib/routes";
 import { createUrl } from "../../lib/utils";
 import { Popup } from "../popup/Popup";
 import { PopupEnum } from "../../lib/popup";
+import type { ProductInterface } from "../../lib/interfaces/database/product";
+import type { PickupLocationInterface } from "../../lib/interfaces/database/pickupLocation";
+import type { DeliveryZoneInterface } from "../../lib/interfaces/database/deliveryZone";
+import {
+  DeliveryLocation,
+  PickupLocation,
+  Price,
+  Product,
+} from "../../lib/store";
 
 interface Props {
   products: ProductInterface[];
-  pickUpLocations: PickUpLocation[];
-  deliveryLocations: DeliveryLocation[];
-  krambambouliCantus: ActivityInterface;
+  pickUpLocations: PickupLocationInterface[];
+  deliveryLocations?: DeliveryZoneInterface[];
 }
 
 enum DeliveryOption {
@@ -48,52 +48,56 @@ const initialForm = {
   city: null,
 };
 
-export default function KrambambouliForm({
-  products: productObjs,
-  pickUpLocations,
-  deliveryLocations,
-  krambambouliCantus: krambambouliCantusObj,
-}: Props) {
-  const products = productObjs.map(
-    (product) =>
-      new Product(
-        product.id,
-        product.name,
-        new Price(product.price.euros, product.price.cents),
-        product.description,
-        product.imageUrl,
-      ),
+function createPickupStartDate(str: string) {
+  const strplit = str.split("/");
+  const now = new Date();
+  now.setDate(parseInt(strplit[0]));
+  now.setMonth(parseInt(strplit[1]) - 1);
+  return now;
+}
+
+function dateToDDMM(date: Date) {
+  return [
+    `${String(date.getDate()).padStart(2, "0")}`,
+    `${String(date.getMonth() + 1).padStart(2, "0")}`,
+  ].join("/");
+}
+
+function dateToDDMMYYYY(date: Date) {
+  return [dateToDDMM(date), `${String(date.getFullYear())}`].join("/");
+}
+export default function KrambambouliForm(props: Props) {
+  const products = props.products.map((product) => Product.from(product));
+  const pickupLocations = props.pickUpLocations.map((l) =>
+    PickupLocation.from(l),
   );
-  const krambambouliCantus = new Activity(
-    krambambouliCantusObj.name,
-    krambambouliCantusObj.location,
-    new Date(krambambouliCantusObj.date),
-    krambambouliCantusObj.description,
-    krambambouliCantusObj.id,
-  );
-  deliveryLocations = deliveryLocations.map(
-    (loc) =>
-      new DeliveryLocation(
-        loc.area,
-        loc.range,
-        new Price(loc.price.euros, loc.price.cents),
-      ),
-  );
-  deliveryLocations.sort((loc1, loc2) =>
-    loc1.price.euros === loc2.price.euros
-      ? loc1.price.cents - loc2.price.cents
-      : loc1.price.euros - loc2.price.euros,
+  const deliveryLocations = props.deliveryLocations?.map((loc) =>
+    DeliveryLocation.from(loc),
   );
 
-  const deliveryStartDate = new Date(krambambouliCantus.date);
+  const krambambouliCantus = pickupLocations.find((l) => {
+    return l.description
+      .toLowerCase()
+      .replaceAll(" ", "")
+      .includes("krambamboulicantus");
+  });
+
+  if (!krambambouliCantus)
+    throw Error("No krambamboulicantus as pick up point");
+  const match = krambambouliCantus.description.match(/\b(\d{1,2}\/\d{1,2})\b/);
+  if (!match) throw Error("No pick up start date");
+
+  const pickupStartDate = createPickupStartDate(match[0]);
+
+  const deliveryStartDate = new Date(pickupStartDate);
   deliveryStartDate.setDate(deliveryStartDate.getDate() + 1);
 
-  const pickUpStartDate = new Date(deliveryStartDate);
-  const pickUpEndDate = new Date(pickUpStartDate);
-  pickUpEndDate.setFullYear(pickUpEndDate.getFullYear() + 1);
-  pickUpEndDate.setDate(1);
-  pickUpEndDate.setMonth(2);
-  pickUpEndDate.setDate(pickUpEndDate.getDate() - 1);
+  const pickupEndDate = new Date(pickupStartDate);
+  // Sets the pickupEndDate to the last day of February
+  pickupEndDate.setFullYear(pickupStartDate.getFullYear() + 1);
+  pickupEndDate.setDate(1);
+  pickupEndDate.setMonth(2); // March
+  pickupEndDate.setDate(pickupEndDate.getDate() - 1);
 
   const deliveryEndDate = new Date(deliveryStartDate);
   deliveryEndDate.setDate(deliveryEndDate.getDate() + 10);
@@ -161,7 +165,7 @@ export default function KrambambouliForm({
       new Price(0),
     );
     if (selectedOption === DeliveryOption.Delivery)
-      if (selectedDeliveryOption != null)
+      if (selectedDeliveryOption != null && deliveryLocations)
         return total.add(deliveryLocations[selectedDeliveryOption].price);
     return total;
   }
@@ -210,12 +214,11 @@ export default function KrambambouliForm({
       selectedOption === DeliveryOption.PickUp &&
       selectedPickUpOption != null
     ) {
-      if (selectedPickUpOption > 0)
+      if (selectedPickUpOption >= 0)
         formData.append(
           "pickUpLocation",
-          sanitize(pickUpLocations[selectedPickUpOption].name),
+          sanitize(pickupLocations[selectedPickUpOption].description),
         );
-      else formData.append("pickUpLocation", sanitize(krambambouliCantus.name));
     } else if (
       selectedOption === DeliveryOption.Delivery &&
       selectedDeliveryOption != null
@@ -357,35 +360,26 @@ export default function KrambambouliForm({
                 checked={selectedOption === DeliveryOption.PickUp}
                 onChange={handleChangeOption}
               />
-              {`Afhalen tussen ${krambambouliCantus.fmtDate()} en ${pickUpEndDate.getDate()}/${pickUpEndDate.getMonth() + 1}/${pickUpEndDate.getFullYear()}`}
+              {`Afhalen tussen ${dateToDDMM(pickupStartDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
             </label>
-            <label>
-              <input
-                type="radio"
-                name="option"
-                required
-                value={DeliveryOption.Delivery}
-                checked={selectedOption === DeliveryOption.Delivery}
-                onChange={handleChangeOption}
-              />
-              {`Leveren tussen ${deliveryStartDate.getDate()}/${deliveryStartDate.getMonth() + 1} en ${deliveryEndDate.getDate()}/${deliveryEndDate.getMonth() + 1}`}
-            </label>
+            {deliveryLocations && (
+              <label>
+                <input
+                  type="radio"
+                  name="option"
+                  required
+                  value={DeliveryOption.Delivery}
+                  checked={selectedOption === DeliveryOption.Delivery}
+                  onChange={handleChangeOption}
+                />
+                {`Leveren tussen ${dateToDDMM(deliveryStartDate)} en ${dateToDDMM(deliveryEndDate)}`}
+              </label>
+            )}
           </div>
           {(selectedOption === DeliveryOption.PickUp && (
             <div className="field-row">
               <label>Afhaallocatie</label>
-              <label>
-                <input
-                  type="radio"
-                  name="pick-up-option"
-                  value={-1}
-                  required
-                  checked={-1 == selectedPickUpOption}
-                  onChange={handleChangePickUpOption}
-                />
-                {`${krambambouliCantus.name} (${krambambouliCantus.fmtDate()})`}
-              </label>
-              {pickUpLocations.map((loc, index) => {
+              {pickupLocations.map((loc, index) => {
                 return (
                   <label key={index}>
                     <input
@@ -396,88 +390,91 @@ export default function KrambambouliForm({
                       checked={index == selectedPickUpOption}
                       onChange={handleChangePickUpOption}
                     />
-                    {`Bij ${loc.name} (${loc.area}) (vanaf ${pickUpStartDate.getDate()}/${pickUpStartDate.getMonth() + 1})`}
+                    {krambambouliCantus.description === loc.description
+                      ? krambambouliCantus.description
+                      : `Bij ${loc.description} vanaf ${pickupStartDate.getDate()}/${pickupStartDate.getMonth() + 1}`}
                   </label>
                 );
               })}
             </div>
           )) ||
-            (selectedOption === DeliveryOption.Delivery && (
-              <>
-                <div className="field-row">
-                  <label form="delivery-option">Leveroptie</label>
-                  {deliveryLocations.map((loc, idx) => {
-                    return (
-                      <span key={idx} className="delivery-row">
-                        <label htmlFor={`delivery-option-${idx}`}>
-                          <input
-                            id={`delivery-option-${idx}`}
-                            type="radio"
-                            name="delivery-option"
-                            value={idx}
-                            required
-                            checked={idx === selectedDeliveryOption}
-                            onChange={makeHandleChangeDeliveryOption(idx)}
-                          />
-                          {`Levering ${loc.area}`}
-                        </label>
-                        <p>{loc.price.toString()}</p>
-                      </span>
-                    );
-                  })}
-                </div>
-                <div className="address-row">
+            (selectedOption === DeliveryOption.Delivery &&
+              deliveryLocations && (
+                <>
                   <div className="field-row">
-                    <label htmlFor="streetName">Straatnaam</label>
-                    <input
-                      id="streetName"
-                      type="text"
-                      value={form.streetName ?? ""}
-                      name="streetName"
-                      required
-                      onChange={handleTextInput}
-                    />
-                    <label htmlFor="bus">Nummer</label>
-                    <input
-                      id="streetNumber"
-                      type="text"
-                      name="streetNumber"
-                      required
-                      value={form.streetNumber ?? ""}
-                      onChange={handleTextInput}
-                    />
-                    <label>Bus</label>
-                    <input
-                      id="bus"
-                      type="text"
-                      name="bus"
-                      value={form.bus ?? ""}
-                      onChange={handleTextInput}
-                    />
+                    <label form="delivery-option">Leveroptie</label>
+                    {deliveryLocations.map((loc, idx) => {
+                      return (
+                        <span key={idx} className="delivery-row">
+                          <label htmlFor={`delivery-option-${idx}`}>
+                            <input
+                              id={`delivery-option-${idx}`}
+                              type="radio"
+                              name="delivery-option"
+                              value={idx}
+                              required
+                              checked={idx === selectedDeliveryOption}
+                              onChange={makeHandleChangeDeliveryOption(idx)}
+                            />
+                            {`Levering ${loc.area}`}
+                          </label>
+                          <p>{loc.price.toString()}</p>
+                        </span>
+                      );
+                    })}
                   </div>
-                  <div className="field-row">
-                    <label htmlFor="post">Postcode</label>
-                    <input
-                      id="post"
-                      type="number"
-                      name="post"
-                      value={form.post ?? ""}
-                      onChange={handleNumberInput}
-                      required
-                    />
-                    <label htmlFor="city">Stad</label>
-                    <input
-                      id="city"
-                      type="text"
-                      required
-                      value={form.city ?? ""}
-                      name="city"
-                      onChange={handleTextInput}
-                    />
+                  <div className="address-row">
+                    <div className="field-row">
+                      <label htmlFor="streetName">Straatnaam</label>
+                      <input
+                        id="streetName"
+                        type="text"
+                        value={form.streetName ?? ""}
+                        name="streetName"
+                        required
+                        onChange={handleTextInput}
+                      />
+                      <label htmlFor="bus">Nummer</label>
+                      <input
+                        id="streetNumber"
+                        type="text"
+                        name="streetNumber"
+                        required
+                        value={form.streetNumber ?? ""}
+                        onChange={handleTextInput}
+                      />
+                      <label>Bus</label>
+                      <input
+                        id="bus"
+                        type="text"
+                        name="bus"
+                        value={form.bus ?? ""}
+                        onChange={handleTextInput}
+                      />
+                    </div>
+                    <div className="field-row">
+                      <label htmlFor="post">Postcode</label>
+                      <input
+                        id="post"
+                        type="number"
+                        name="post"
+                        value={form.post ?? ""}
+                        onChange={handleNumberInput}
+                        required
+                      />
+                      <label htmlFor="city">Stad</label>
+                      <input
+                        id="city"
+                        type="text"
+                        required
+                        value={form.city ?? ""}
+                        name="city"
+                        onChange={handleTextInput}
+                      />
+                    </div>
                   </div>
-                </div>
-              </>
-            ))}
+                </>
+              ))}
           <div className="information-container">
             <p>
               Totaalbedrag <b>{calcTotalAmount().toString()}</b>

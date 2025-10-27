@@ -4,6 +4,8 @@ import {
   type Tables,
 } from "./constants/database";
 import type { ProductInterface } from "./interfaces/database/product";
+import type { PickupLocationInterface } from "./interfaces/database/pickupLocation";
+import { type DeliveryZoneInterface } from "./interfaces/database/deliveryZone";
 
 class Database {
   private static instance: Database | null = null;
@@ -236,8 +238,8 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   async getPickUpLocation() {
     if (!this.pool) return [];
     const table = Database.tables.PICKUP_LOCATIONS;
-    const [rows] = await this.pool.query(
-      `SELECT ${this.createColumnNames(table, ["name", "area"])} FROM ${table};`,
+    const [rows] = await this.query<PickupLocationInterface>(
+      `SELECT ${this.createColumnNames(table, ["id", "description"])} FROM ${table};`,
     );
     return rows;
   }
@@ -245,12 +247,12 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   async getDeliveryLocations() {
     const deliverTable = Database.tables.DELIVERY_LOCATIONS;
     const codesTable = Database.tables.LOCATION_CODES;
-    const [rows] = await this.pool.query(
+    const [rows] = await this.query<DeliveryZoneInterface>(
       `SELECT ${this.createColumnNames(deliverTable, [
         "area",
-      ])}, JSON_OBJECT('euros', ${deliverTable}.euros, 'cents', ${deliverTable}.cents) AS price, JSON_ARRAYAGG(JSON_OBJECT('lower', ${codesTable}.lower, 'upper', ${
+      ])}, JSON_OBJECT('euros', ${deliverTable}.euros, 'cents', ${deliverTable}.cents) AS price, JSON_ARRAYAGG(JSON_OBJECT('areaStart', ${codesTable}.area_start, 'areaEnd', ${
         codesTable
-      }.upper)) AS ranges FROM ${deliverTable} JOIN ${
+      }.area_end)) AS ranges FROM ${deliverTable} JOIN ${
         codesTable
       } ON ${deliverTable}.id = ${codesTable}.location_id GROUP BY ${
         deliverTable

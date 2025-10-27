@@ -10,24 +10,35 @@ import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 import { createUrl } from "../lib/utils";
 import Database from "../lib/db";
 import type { ProductInterface } from "../lib/interfaces/database/product";
-import type { pickupLocationInterface } from "../lib/interfaces/database/pickupLocation";
+import type { PickupLocationInterface } from "../lib/interfaces/database/pickupLocation";
 import type { DeliveryZoneInterface } from "../lib/interfaces/database/deliveryZone";
 
 const title = "Krambambouli";
 const formActive = true;
+const deliveryActive = true;
 const origin = Astro.url.origin;
 let products: undefined | ProductInterface[],
-  pickupLocations: undefined | pickupLocationInterface[],
+  pickupLocations: undefined | PickupLocationInterface[],
   deliveryLocations: undefined | DeliveryZoneInterface[],
-  errors: undefined | any;
+  error: any;
 
 try {
   const database = await Database.getInstance();
-  const products = await database?.getKrambambouliProducts();
-
-  console.log(result);
+  [products, pickupLocations, deliveryLocations] = await Promise.all([
+    database?.getKrambambouliProducts(),
+    database?.getPickUpLocation(),
+    deliveryActive
+      ? database?.getDeliveryLocations()
+      : Promise.resolve(undefined),
+  ]);
+  deliveryLocations?.sort((loc1, loc2) =>
+    loc1.price.euros === loc2.price.euros
+      ? loc1.price.cents - loc2.price.cents
+      : loc1.price.euros - loc2.price.euros,
+  );
 } catch (e) {
   console.error(e);
+  error = e;
 }
 ---
 
@@ -54,19 +65,14 @@ try {
       </li>
     </ul>
     {
-      errors ? (
+      error ? (
         "Something went wrong...."
-      ) : products &&
-        deliveryLocations &&
-        pickupLocations &&
-        krambambouliCantus &&
-        formActive ? (
+      ) : products && deliveryLocations && pickupLocations && formActive ? (
         <KrambambouliForm
           client:visible
           products={products}
           deliveryLocations={deliveryLocations}
           pickUpLocations={pickupLocations}
-          krambambouliCantus={krambambouliCantus}
         />
       ) : (
         "De form is niet langer beschikbaar. Indien u een bestelling heeft geplaatst zal er contact opgenomen worden"

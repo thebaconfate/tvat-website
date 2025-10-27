@@ -68,7 +68,7 @@ function containsUserDetails(form: FormData) {
   );
 }
 
-function constainsPickUpLocation(form: FormData) {
+function containsPickupLocation(form: FormData) {
   return form.has("pickUpLocation");
 }
 
@@ -89,6 +89,14 @@ function containsOrder(form: FormData) {
   return form.has("order");
 }
 
+function isValidForm(form: FormData) {
+  const validUser = containsUserDetails(form);
+  const validPickup = containsPickupLocation(form);
+  const validDelivery = containsDeliveryDetails(form);
+  const validOrder = containsOrder(form);
+  return validUser && validOrder && (validPickup || validDelivery);
+}
+
 const badResponse = new Response(null, {
   status: 400,
 });
@@ -100,9 +108,29 @@ const successResponse = new Response(null, {
 const internalServerError = new Response(null, {
   status: 500,
 });
+
+type UserDetails = {
+  firstName: string;
+  lastName: string;
+};
+
+type Order = { id: number; amount: number };
+type PickupLocation = string;
+async function createPickupOrder(
+  userDetails: UserDetails,
+  pickupLocation: PickupLocation,
+  orders: Order[],
+) {
+  const database = await Database.getInstance();
+  return database.createKrambambouliPickupOrder(
+    userDetails,
+    pickupLocation,
+    orders,
+  );
+}
 export async function POST({ request }: { request: Request }) {
   const formData = await request.formData();
-  if (!containsUserDetails(formData)) return badResponse;
+  if (!isValidForm(formData)) return badResponse;
   const rawUserDetails = {
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
@@ -110,27 +138,22 @@ export async function POST({ request }: { request: Request }) {
     deliveryOption: formData.get("deliveryOption"),
     owedAmount: formData.get("owedAmount"),
   };
-  console.log(rawUserDetails);
   try {
-    const userDetails = userDetailsSchema.parse(rawUserDetails);
+    const userDetails: UserDetails = userDetailsSchema.parse(rawUserDetails);
+    switch (rawUserDetails.deliveryOption) {
+      case "pick up":
+        "beepboop";
+      case "delivery":
+        "boopbeep";
+    }
     if (rawUserDetails.deliveryOption === "pick up") {
-      if (!constainsPickUpLocation(formData)) return badResponse;
       const rawPickUpLocation = formData.get("pickUpLocation");
-      const pickUpLocation = pickUpLocationSchema.parse(rawPickUpLocation);
-      if (!containsOrder(formData)) return badResponse;
+      const pickUpLocation: string =
+        pickUpLocationSchema.parse(rawPickUpLocation);
       const rawOrders = formData.getAll("order");
-      const orders = orderSchema.parse(rawOrders);
-      const result = await Database.getInstance().then((database) =>
-        database.createKrambambuliPickUpOrder(
-          userDetails,
-          pickUpLocation,
-          orders,
-        ),
-      );
-      if (result) return successResponse;
-      else return internalServerError;
+      const orders: Order[] = orderSchema.parse(rawOrders);
+      return createPickupOrder(userDetails, pickUpLocation, orders);
     } else if (rawUserDetails.deliveryOption === "delivery") {
-      if (!containsDeliveryDetails(formData)) return badResponse;
       const rawDeliveryDetails = {
         streetName: formData.get("deliveryStreetName"),
         houseNumber: formData.get("deliveryStreetNumber"),
@@ -141,7 +164,6 @@ export async function POST({ request }: { request: Request }) {
       console.log(rawDeliveryDetails);
       const deliveryDetails = deliveryAddressSchema.parse(rawDeliveryDetails);
       console.log(deliveryDetails);
-      if (!containsOrder(formData)) return badResponse;
       const rawOrders = formData.getAll("order");
       const orders = orderSchema.parse(rawOrders);
       const result = await Database.getInstance().then((database) =>
