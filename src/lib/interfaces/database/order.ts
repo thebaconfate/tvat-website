@@ -1,7 +1,7 @@
 import type { RowDataPacket } from "mysql2/promise";
 
 export interface OrderInterface extends RowDataPacket {
-  id: number;
+  customerId: number;
   firstName: string;
   lastName: string;
   email: string;
