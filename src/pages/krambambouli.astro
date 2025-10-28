@@ -3,202 +3,116 @@ import Layout from "../layouts/Layout.astro";
 import Cookbook from "../svgs/Cookbook.astro";
 import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
-import { apiRoutes } from "../lib/routes";
-import type {
-    PickUpLocation,
-    DeliveryLocation,
-    ProductInterface,
-} from "../lib/store";
-import { Product } from "../lib/store";
-import type { ActivityInterface } from "../lib/activity";
 import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
-import { createUrl } from "../lib/utils";
+import Database from "../lib/database";
+import type { ProductInterface } from "../lib/interfaces/database/product";
+import type { PickupLocationInterface } from "../lib/interfaces/database/pickupLocation";
+import type { DeliveryZoneInterface } from "../lib/interfaces/database/deliveryZone";
 
 const title = "Krambambouli";
-const formActive = false;
-const origin = Astro.url.origin;
-function throwHttpError(response: Response) {
-    throw new Error(`HTTP error: ${response.status}`);
-}
+const formActive = true;
+const deliveryActive = true;
+let products: undefined | ProductInterface[],
+  pickupLocations: undefined | PickupLocationInterface[],
+  deliveryLocations: undefined | DeliveryZoneInterface[],
+  error: any;
 
-let [
-    products,
-    deliveryLocations,
-    pickupLocations,
-    krambambouliCantus,
-    errors,
-]: [
-    null | ProductInterface[],
-    null | DeliveryLocation[],
-    null | PickUpLocation[],
-    null | ActivityInterface,
-    null | any,
-] = Array(4).fill(null) as [
-    Product[] | null,
-    DeliveryLocation[] | null,
-    PickUpLocation[] | null,
-    ActivityInterface | null,
-    any | null,
-];
-const productsPromise = fetch(
-    createUrl([
-        origin,
-        apiRoutes.store.url,
-        apiRoutes.store.products.url,
-        apiRoutes.store.products.krambambouli.url,
-    ]),
-).then((response) => {
-    if (response.ok) {
-        return response.json();
-    } else throwHttpError(response);
-});
-
-const pickupLocationsPromise = fetch(
-    createUrl([
-        origin,
-        apiRoutes.krambambouli.url,
-        apiRoutes.krambambouli.pickup.url,
-    ]),
-)
-    .then((response) => {
-        if (response.ok) {
-            return response.json();
-        } else throwHttpError(response);
-    })
-    .then((data: PickUpLocation[]) => {
-        return data;
-    });
-const deliverlyLocationsPromise = fetch(
-    [
-        origin,
-        apiRoutes.krambambouli.url,
-        apiRoutes.krambambouli.delivery.url,
-    ].join(""),
-)
-    .then((response) => {
-        if (response.ok) {
-            return response.json();
-        } else throwHttpError(response);
-    })
-    .then((data: DeliveryLocation[]) => {
-        return data;
-    });
-
-const krambambouliCantusPromise = fetch(
-    [
-        origin,
-        apiRoutes.krambambouli.url,
-        apiRoutes.krambambouli.cantus.url,
-    ].join(""),
-)
-    .then((response) => {
-        if (response.ok) {
-            return response.json();
-        } else throwHttpError(response);
-    })
-    .then((data: ActivityInterface) => data);
 try {
-    [products, pickupLocations, deliveryLocations, krambambouliCantus] =
-        await Promise.all([
-            productsPromise,
-            pickupLocationsPromise,
-            deliverlyLocationsPromise,
-            krambambouliCantusPromise,
-        ]);
+  const database = await Database.getInstance();
+  [products, pickupLocations, deliveryLocations] = await Promise.all([
+    database?.getKrambambouliProducts(),
+    database?.getPickUpLocation(),
+    deliveryActive
+      ? database?.getDeliveryLocations()
+      : Promise.resolve(undefined),
+  ]);
+  deliveryLocations?.sort((loc1, loc2) =>
+    loc1.price.euros === loc2.price.euros
+      ? loc1.price.cents - loc2.price.cents
+      : loc1.price.euros - loc2.price.euros,
+  );
 } catch (e) {
-    errors = e;
-    console.error(e);
+  console.error(e);
+  error = e;
 }
 ---
 
 <Layout title={title}>
-    <main>
-        <picture class="brouwers-image-container">
-            <img
-                src="banner.jpg"
-                alt="brouwers aan het werk"
-                class="brouwers"
-            />
-        </picture>
-        <ul class="intro-text">
-            <li class="row-container">
-                <Cookbook />
-                <p>
-                    Krambambouli is een drank op basis van wijn, rum, en een
-                    heleboel geheime ingrediënten.
-                </p>
-            </li>
-            <li class="row-container">
-                <Expertise />
-                <p>Wordt met liefde en expertise door 't VAT gebrouwen.</p>
-            </li>
-            <li class="row-container">
-                <Wine />
-                <p>
-                    Bevat meer dan 15% procent alcohol en wordt warm gedronken.
-                </p>
-            </li>
-        </ul>
-        {
-            errors ? (
-                "Something went wrong...."
-            ) : products &&
-              deliveryLocations &&
-              pickupLocations &&
-              krambambouliCantus &&
-              formActive ? (
-                <KrambambouliForm
-                    client:visible
-                    products={products}
-                    deliveryLocations={deliveryLocations}
-                    pickUpLocations={pickupLocations}
-                    krambambouliCantus={krambambouliCantus}
-                />
-            ) : (
-                "De form is niet langer beschikbaar. Indien u een bestelling heeft geplaatst zal er contact opgenomen worden"
-            )
+  <main>
+    <picture class="brouwers-image-container">
+      <img src="banner.jpg" alt="brouwers aan het werk" class="brouwers" />
+    </picture>
+    <ul class="intro-text">
+      <li class="row-container">
+        <Cookbook />
+        <p>
+          Krambambouli is een drank op basis van wijn, rum, en een heleboel
+          geheime ingrediënten.
+        </p>
+      </li>
+      <li class="row-container">
+        <Expertise />
+        <p>Wordt met liefde en expertise door 't VAT gebrouwen.</p>
+      </li>
+      <li class="row-container">
+        <Wine />
+        <p>Bevat meer dan 15% procent alcohol en wordt warm gedronken.</p>
+      </li>
+    </ul>
+    {
+      error ? (
+        "Something went wrong...."
+      ) : products && deliveryLocations && pickupLocations && formActive ? (
+        <KrambambouliForm
+          client:visible
+          products={products}
+          deliveryLocations={deliveryLocations}
+          pickUpLocations={pickupLocations}
+        />
+      ) : (
+        "De form is niet langer beschikbaar. Indien u een bestelling heeft geplaatst zal er contact opgenomen worden"
+      )
+    }
+
+    <style>
+      main {
+        padding: var(--standard-padding) calc(var(--standard-padding) * 3);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .brouwers-image-container {
+        display: flex;
+        justify-content: center;
+      }
+
+      .brouwers {
+        width: 90%;
+      }
+
+      .intro-text {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .row-container {
+        display: grid;
+        grid-template-columns: 1.5rem auto;
+        align-items: center;
+        gap: calc(1rem / 2);
+      }
+
+      .row-container > p {
+        font-size: 1rem;
+      }
+
+      @media screea and (max-width: 767px) {
+        main {
+          padding: 1rem 0.5rem;
         }
-
-        <style>
-            main {
-                padding: var(--standard-padding)
-                    calc(var(--standard-padding) * 3);
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .brouwers-image-container {
-                display: flex;
-                justify-content: center;
-            }
-
-            .brouwers {
-                width: 90%;
-            }
-
-            .intro-text {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .row-container {
-                display: grid;
-                grid-template-columns: 1.5rem auto;
-                align-items: center;
-                gap: calc(1rem / 2);
-            }
-
-            .row-container > p {
-                font-size: 1rem;
-            }
-
-            @media screea and (max-width: 767px) {
-                main {
-                    padding: 1rem 0.5rem;
-                }
-            }
-        </style>
-    </main>
+      }
+    </style>
+  </main>
 </Layout>

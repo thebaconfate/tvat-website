@@ -1,0 +1,474 @@
+import mysql, {
+  type PoolConnection,
+  type ResultSetHeader,
+  type RowDataPacket,
+} from "mysql2/promise";
+import {
+  Database as DatabaseConstants,
+  type Tables,
+} from "./constants/database";
+import type { ProductInterface } from "./interfaces/database/product";
+import type { PickupLocationInterface } from "./interfaces/database/pickupLocation";
+import { type DeliveryZoneInterface } from "./interfaces/database/deliveryZone";
+import type {
+  KrambambouliCustomer,
+  KrambambouliCustomerAddress,
+  KrambambouliProduct,
+} from "./krambambouli";
+import { type OrderInterface } from "./interfaces/database/order";
+
+class Database {
+  private static instance: Database | null = null;
+  private static tables: Tables = DatabaseConstants.TABLES;
+  private static retries = 5;
+  private pool: mysql.Pool;
+
+  constructor(pool: mysql.Pool) {
+    this.pool = pool;
+  }
+
+  static async getInstance(retries: number = Database.retries) {
+    if (Database.instance) return Database.instance;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
+        Database.instance = new Database(connectionPool);
+        console.log(`Retried ${i} times`);
+        return Database.instance;
+      } catch (err) {
+        console.warn("DB connection failed, retrying...", err);
+        Database.instance = null;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    const msg = `Could not connect to database after ${retries} attempts`;
+    console.error(msg);
+    throw Error(msg);
+  }
+
+  private async query<T extends RowDataPacket[]>(
+    sql: string,
+    params: any[] = [],
+    retries: number = Database.retries,
+  ) {
+    let lastError;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const database = await Database.getInstance();
+        return database.pool.query<T>(sql, params);
+      } catch (err) {
+        lastError = err;
+        console.warn("Failed to query database, retrying...", err);
+        Database.instance = null;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    throw lastError;
+  }
+
+  private async execute<
+    T extends RowDataPacket[] | ResultSetHeader = RowDataPacket[],
+  >(sql: string, params: any[] = [], retries: number = Database.retries) {
+    let lastError;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const database = await Database.getInstance();
+        return database.pool.execute<T>(sql, params);
+      } catch (err) {
+        lastError = err;
+        console.warn("Failed to query database, retrying...", err);
+        Database.instance = null;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
+    throw lastError;
+  }
+
+  private async withTransaction<
+    T extends RowDataPacket[] | ResultSetHeader = RowDataPacket[],
+  >(
+    transaction: (conn: PoolConnection) => Promise<[T, mysql.FieldPacket[]]>,
+    retries: number = Database.retries,
+  ) {
+    let lastError;
+    for (let i = 0; i < retries; i++) {
+      let connection;
+      try {
+        const database = await Database.getInstance();
+        connection = await database.pool.getConnection();
+        await connection.beginTransaction();
+        const result = await transaction(connection);
+        await connection.commit();
+        connection.release();
+        return result;
+      } catch (error) {
+        lastError = error;
+        console.warn("Failed to do transaction, retrying...", error);
+        if (connection)
+          try {
+            await connection?.rollback();
+          } catch {}
+        Database.instance = null;
+        await new Promise((r) => setTimeout(r, 500));
+      } finally {
+        connection?.release();
+      }
+    }
+    throw lastError;
+  }
+
+  static async init(tables: Tables = DatabaseConstants.TABLES) {
+    const database = await Database.getInstance();
+    const connectionPool = database.pool;
+
+    function createTableIfNotExists(tableName: string, values: string[]) {
+      return `CREATE TABLE IF NOT EXISTS ${tableName} (${values.join(", ")})`;
+    }
+
+    await connectionPool.query(
+      createTableIfNotExists(tables.PRODUCTS, [
+        "id INT PRIMARY KEY AUTO_INCREMENT",
+        "name VARCHAR(255) NOT NULL UNIQUE",
+        "description VARCHAR(255)",
+        "image_url VARCHAR(255)",
+        "euros INT DEFAULT 0",
+        "cents INT DEFAULT 0",
+      ]),
+    );
+    await connectionPool.query(
+      createTableIfNotExists(tables.PICKUP_LOCATIONS, [
+        "name VARCHAR(255) PRIMARY KEY",
+        "area VARCHAR(255) NOT NULL",
+      ]),
+    );
+
+    await connectionPool.query(
+      createTableIfNotExists(tables.DELIVERY_LOCATIONS, [
+        "id INT PRIMARY KEY AUTO_INCREMENT",
+        "area VARCHAR(255) NOT NULL UNIQUE",
+        "euros INT DEFAULT 0",
+        "cents INT DEFAULT 0",
+      ]),
+    );
+
+    await connectionPool.query(
+      createTableIfNotExists(tables.LOCATION_CODES, [
+        "location_id INT NOT NULL",
+        "lower INT",
+        "upper INT",
+        "CHECK (lower <= upper)",
+        `FOREIGN KEY (location_id) REFERENCES ${tables.DELIVERY_LOCATIONS}(id) ON DELETE CASCADE`,
+      ]),
+    );
+    await connectionPool.query(
+      createTableIfNotExists(tables.ACTIVITIES, [
+        "id INT PRIMARY KEY AUTO_INCREMENT",
+        "name VARCHAR(255) NOT NULL",
+        "location VARCHAR(255) NOT NULL",
+        "description VARCHAR(255)",
+        "date DATETIME NOT NULL",
+      ]),
+    );
+    await connectionPool.query(
+      createTableIfNotExists(tables.KRAMBAMBOULI_CUSTOMERS, [
+        "id INT PRIMARY KEY AUTO_INCREMENT",
+        "first_name VARCHAR(255) NOT NULL",
+        "last_name VARCHAR(255) NOT NULL",
+        "email VARCHAR(255) NOT NULL",
+        "delivery_option VARCHAR(255) NOT NULL",
+        "owed_euros INT NOT NULL",
+        "owed_cents INT NOT NULL",
+        "paid BOOLEAN NOT NULL DEFAULT FALSE",
+      ]),
+    );
+    await connectionPool.query(
+      createTableIfNotExists(tables.KRAMBAMBOULI_ORDERS, [
+        "customer_id INT NOT NULL",
+        "product_id INT NOT NULL",
+        "amount INT NOT NULL",
+        `FOREIGN KEY (customer_id) REFERENCES ${tables.KRAMBAMBOULI_CUSTOMERS}(id) ON DELETE CASCADE`,
+        `FOREIGN KEY (product_id) REFERENCES ${tables.PRODUCTS}(id) ON DELETE CASCADE`,
+      ]),
+    );
+    await connectionPool.query(
+      createTableIfNotExists(tables.KRAMBAMBOULI_DELIVERY_ADDRESS, [
+        "customer_id INT NOT NULL",
+        "street_name VARCHAR(255) NOT NULL",
+        "house_number VARCHAR(255) NOT NULL",
+        "bus VARCHAR(255) NOT NULL",
+        "post INT NOT NULL",
+        "city VARCHAR(255)",
+        `FOREIGN KEY (customer_id) REFERENCES ${tables.KRAMBAMBOULI_CUSTOMERS}(id) ON DELETE CASCADE`,
+      ]),
+    );
+    await connectionPool.query(
+      createTableIfNotExists(tables.KRAMBAMBOULI_PICK_UP_LOCATION, [
+        "customer_id INT NOT NULL",
+        "location VARCHAR(255)",
+      ]),
+    );
+    await connectionPool.query(
+      createTableIfNotExists(tables.USERS, [
+        "id INT PRIMARY KEY AUTO_INCREMENT",
+        "email VARCHAR(255) NOT NULL UNIQUE",
+        "password VARCHAR(255) NOT NULL",
+      ]),
+    );
+  }
+
+  private createColumnNames(tableName: string, values: string[]) {
+    return values.map((val) => `${tableName}.${val}`).join(", ");
+  }
+
+  /* PRODUCTS */
+
+  async getKrambambouliProducts() {
+    const table = Database.tables.PRODUCTS;
+    const [rows] = await this.query<ProductInterface[]>(
+      `SELECT ${this.createColumnNames(table, [
+        "id",
+        "name",
+        "description",
+        "image_url as imageUrl",
+      ])}, JSON_OBJECT("euros", ${this.createColumnNames(table, [
+        "euros",
+      ])} , "cents", ${this.createColumnNames(table, ["cents"])}) AS price
+FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
+    );
+    return rows;
+  }
+
+  /* KRAMBAMBOULI */
+
+  /* AFHAAL LOCATIES*/
+  async getPickUpLocation() {
+    if (!this.pool) return [];
+    const table = Database.tables.PICKUP_LOCATIONS;
+    const [rows] = await this.query<PickupLocationInterface[]>(
+      `SELECT ${this.createColumnNames(table, ["id", "description"])} FROM ${table};`,
+    );
+    return rows;
+  }
+
+  /* DELIVERY LOCATIONS */
+  async getDeliveryLocations() {
+    const deliverTable = Database.tables.DELIVERY_LOCATIONS;
+    const codesTable = Database.tables.LOCATION_CODES;
+    const [rows] = await this.query<DeliveryZoneInterface[]>(
+      `SELECT ${this.createColumnNames(deliverTable, [
+        "area",
+      ])}, JSON_OBJECT('euros', ${deliverTable}.euros, 'cents', ${deliverTable}.cents) AS price, JSON_ARRAYAGG(JSON_OBJECT('areaStart', ${codesTable}.area_start, 'areaEnd', ${
+        codesTable
+      }.area_end)) AS ranges FROM ${deliverTable} JOIN ${
+        codesTable
+      } ON ${deliverTable}.id = ${codesTable}.location_id GROUP BY ${
+        deliverTable
+      }.area`,
+    );
+    return rows;
+  }
+
+  private async createKrambambouliCustomer(
+    customerFirstName: string,
+    customerLastName: string,
+    customerEmail: string,
+    deliveryOption: string,
+    euros: number,
+    cents: number,
+    connection: mysql.PoolConnection | undefined = undefined,
+  ) {
+    const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_CUSTOMERS} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
+    const params = [
+      customerFirstName,
+      customerLastName,
+      customerEmail,
+      deliveryOption,
+      euros,
+      cents,
+    ];
+    if (connection) {
+      return connection.execute<ResultSetHeader>(sql, params);
+    }
+    const database = await Database.getInstance();
+    return database.execute<ResultSetHeader>(sql, params);
+  }
+
+  private async createKrambambouliCustomerPickUpLocation(
+    customer_id: number,
+    pickupLocation: string,
+    connection: mysql.PoolConnection | undefined = undefined,
+  ) {
+    const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, location) values (?, ?)`;
+    const params = [customer_id, pickupLocation];
+    if (connection) {
+      return connection.execute<ResultSetHeader>(sql, params);
+    }
+    const database = await Database.getInstance();
+    return database.execute<ResultSetHeader>(sql, params);
+  }
+
+  private async createKrambambouliCustomerDeliveryAddress(
+    customer_id: number,
+    streetName: string,
+    houseNumber: string,
+    bus: string,
+    post: number,
+    city: string,
+    connection: mysql.PoolConnection | undefined = undefined,
+  ) {
+    const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} (customer_id, street_name, house_number, bus, post, city) values (?, ?, ?, ?, ?, ?)`;
+    if (!connection) {
+      const database = await Database.getInstance();
+      connection = await database.pool.getConnection();
+    }
+    await connection.execute(query, [
+      customer_id,
+      streetName,
+      houseNumber,
+      bus,
+      post,
+      city,
+    ]);
+  }
+
+  private async createKrambambouliCustomerOrderPromise(
+    customer_id: number,
+    product_id: number,
+    amount: number,
+    connection: mysql.PoolConnection | undefined = undefined,
+  ) {
+    const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_ORDERS} (customer_id, product_id, amount) values (?, ?, ?)`;
+    if (!connection) {
+      const database = await Database.getInstance();
+      connection = await database.pool.getConnection();
+    }
+    return connection.execute(query, [customer_id, product_id, amount]);
+  }
+
+  async createKrambambuliPickupOrder(
+    userDetails: KrambambouliCustomer,
+    pickupLocation: string,
+    products: KrambambouliProduct[],
+  ) {
+    const database = await Database.getInstance();
+    const [row] = await database.withTransaction<ResultSetHeader>(
+      async (conn) => {
+        const result = await this.createKrambambouliCustomer(
+          userDetails.firstName,
+          userDetails.lastName,
+          userDetails.email,
+          userDetails.deliveryOption,
+          userDetails.owedAmount.euros,
+          userDetails.owedAmount.cents,
+          conn,
+        );
+        const [row] = result;
+        if (!row.insertId) throw new Error("failed to insert customer");
+        await this.createKrambambouliCustomerPickUpLocation(
+          row.insertId,
+          pickupLocation,
+          conn,
+        );
+        await Promise.all(
+          products.map((product) =>
+            this.createKrambambouliCustomerOrderPromise(
+              row.insertId,
+              product.id,
+              product.amount,
+              conn,
+            ),
+          ),
+        );
+        return result;
+      },
+    );
+    return row.insertId;
+  }
+
+  async createKrambambouliDeliveryOrder(
+    userDetails: KrambambouliCustomer,
+    customerAddress: KrambambouliCustomerAddress,
+    products: KrambambouliProduct[],
+  ) {
+    const database = await Database.getInstance();
+    const [result] = await database.withTransaction<ResultSetHeader>(
+      async (conn) => {
+        const result = await this.createKrambambouliCustomer(
+          userDetails.firstName,
+          userDetails.lastName,
+          userDetails.email,
+          userDetails.deliveryOption,
+          userDetails.owedAmount.euros,
+          userDetails.owedAmount.cents,
+          conn,
+        );
+        const [row] = result;
+        if (!row.insertId) throw new Error("failed to insert customer");
+        await this.createKrambambouliCustomerDeliveryAddress(
+          row.insertId,
+          customerAddress.streetName,
+          customerAddress.houseNumber,
+          customerAddress.bus,
+          customerAddress.post,
+          customerAddress.city,
+          conn,
+        );
+        await Promise.all(
+          products.map((product) =>
+            this.createKrambambouliCustomerOrderPromise(
+              row.insertId,
+              product.id,
+              product.amount,
+              conn,
+            ),
+          ),
+        );
+        return result;
+      },
+    );
+    return result;
+  }
+
+  async getKrambambouliOrders() {
+    const query = `SELECT product_id as productId, amount FROM ${Database.tables.KRAMBAMBOULI_ORDERS}`;
+    const [rows] = await this.pool.query<mysql.ResultSetHeader>(query);
+    return rows;
+  }
+
+  async getKrambambouliOrdersByCustomer() {
+    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) AS orders, c.created_at as createdAt FROM ${Database.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${Database.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id GROUP BY c.id`;
+    const [rows] = await this.query<OrderInterface[]>(query);
+    return rows;
+  }
+
+  async getUser(email: string) {
+    const query = `SELECT * FROM ${Database.tables.USERS} WHERE email = ?`;
+    const [rows] = await this.pool.query<mysql.QueryResult>(query, [email]);
+    const result = rows as { id?: number; email: string; password: string }[];
+    return result[0];
+  }
+
+  async saveUser(email: string, password: string) {
+    const query = `INSERT INTO ${Database.tables.USERS} (email, password)  VALUES (?, ?)`;
+    await this.pool.execute(query, [email, password]);
+  }
+
+  async countUsers() {
+    interface Count {
+      count: number;
+    }
+    const query = `SELECT COUNT(*) AS count FROM ${Database.tables.USERS}`;
+    const [rows] = await this.pool.query(query);
+    const result = rows as Count[];
+    console.log(result);
+    return result[0].count;
+  }
+
+  async updateKrambambouliPayment(customerId: number, paid: boolean) {
+    const query = `UPDATE ${Database.tables.KRAMBAMBOULI_CUSTOMERS} SET paid = ? WHERE id = ?`;
+    await this.pool.query(query, [paid, customerId]);
+    return;
+  }
+}
+
+export default Database;
