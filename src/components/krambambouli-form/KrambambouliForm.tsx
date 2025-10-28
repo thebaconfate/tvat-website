@@ -87,10 +87,10 @@ export default function KrambambouliForm(props: Props) {
   const match = krambambouliCantus.description.match(/\b(\d{1,2}\/\d{1,2})\b/);
   if (!match) throw Error("No pick up start date");
 
-  const pickupStartDate = createPickupStartDate(match[0]);
-
+  const krambambouliCantusDate = createPickupStartDate(match[0]);
+  const pickupStartDate = new Date(krambambouliCantusDate);
+  pickupStartDate.setDate(pickupStartDate.getDate() + 1);
   const deliveryStartDate = new Date(pickupStartDate);
-  deliveryStartDate.setDate(deliveryStartDate.getDate() + 1);
 
   const pickupEndDate = new Date(pickupStartDate);
   // Sets the pickupEndDate to the last day of February
@@ -360,7 +360,7 @@ export default function KrambambouliForm(props: Props) {
                 checked={selectedOption === DeliveryOption.PickUp}
                 onChange={handleChangeOption}
               />
-              {`Afhalen tussen ${dateToDDMM(pickupStartDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
+              {`Afhalen tussen ${dateToDDMM(krambambouliCantusDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
             </label>
             {deliveryLocations && (
               <label>
