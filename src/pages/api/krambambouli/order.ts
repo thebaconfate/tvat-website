@@ -107,10 +107,6 @@ const successResponse = new Response(null, {
   status: 201,
 });
 
-const internalServerError = new Response(null, {
-  status: 500,
-});
-
 type Order = { id: number; amount: number };
 type PickupLocation = string;
 async function createPickupOrder(

@@ -27,6 +27,7 @@ if (!authorized) return Astro.redirect("/login");
 const title = "Dashboard";
 const db = await Database.getInstance();
 const result = await db.getKrambambouliOrdersByCustomer();
+console.log(result);
 const orders = result as unknown as CustomerOrder[];
 function fmtPrice(euros: number, cents: number) {
   return `€${euros},${cents === 0 ? "-" : cents}`;

@@ -15,6 +15,7 @@ import type {
   KrambambouliCustomerAddress,
   KrambambouliProduct,
 } from "./krambambouli";
+import { type OrderInterface } from "./interfaces/database/order";
 
 class Database {
   private static instance: Database | null = null;
@@ -45,7 +46,7 @@ class Database {
     throw Error(msg);
   }
 
-  private async query<T extends RowDataPacket>(
+  private async query<T extends RowDataPacket[]>(
     sql: string,
     params: any[] = [],
     retries: number = Database.retries,
@@ -54,7 +55,7 @@ class Database {
     for (let i = 0; i < retries; i++) {
       try {
         const database = await Database.getInstance();
-        return database.pool.query<T[]>(sql, params);
+        return database.pool.query<T>(sql, params);
       } catch (err) {
         lastError = err;
         console.warn("Failed to query database, retrying...", err);
@@ -223,7 +224,7 @@ class Database {
 
   async getKrambambouliProducts() {
     const table = Database.tables.PRODUCTS;
-    const [rows] = await this.query<ProductInterface>(
+    const [rows] = await this.query<ProductInterface[]>(
       `SELECT ${this.createColumnNames(table, [
         "id",
         "name",
@@ -243,7 +244,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   async getPickUpLocation() {
     if (!this.pool) return [];
     const table = Database.tables.PICKUP_LOCATIONS;
-    const [rows] = await this.query<PickupLocationInterface>(
+    const [rows] = await this.query<PickupLocationInterface[]>(
       `SELECT ${this.createColumnNames(table, ["id", "description"])} FROM ${table};`,
     );
     return rows;
@@ -253,7 +254,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   async getDeliveryLocations() {
     const deliverTable = Database.tables.DELIVERY_LOCATIONS;
     const codesTable = Database.tables.LOCATION_CODES;
-    const [rows] = await this.query<DeliveryZoneInterface>(
+    const [rows] = await this.query<DeliveryZoneInterface[]>(
       `SELECT ${this.createColumnNames(deliverTable, [
         "area",
       ])}, JSON_OBJECT('euros', ${deliverTable}.euros, 'cents', ${deliverTable}.cents) AS price, JSON_ARRAYAGG(JSON_OBJECT('areaStart', ${codesTable}.area_start, 'areaEnd', ${
@@ -435,8 +436,8 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   async getKrambambouliOrdersByCustomer() {
-    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) as orders FROM ${Database.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${Database.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id GROUP BY c.id`;
-    const [rows] = await this.pool.query(query);
+    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) AS orders, c.created_at as createdAt FROM ${Database.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${Database.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id GROUP BY c.id`;
+    const [rows] = await this.query<OrderInterface[]>(query);
     return rows;
   }
 

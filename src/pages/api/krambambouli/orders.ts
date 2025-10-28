@@ -8,6 +8,7 @@ interface Order {
 }
 
 export async function GET({}) {
+  return false;
   const result = (await Database.getInstance().then((database) => {
     return database.getKrambambouliOrders();
   })) as Order[];
