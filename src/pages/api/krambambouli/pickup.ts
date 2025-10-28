@@ -1,4 +1,4 @@
-import Database from "../../../lib/db";
+import Database from "../../../lib/database";
 
 export const prerender = false;
 export async function GET() {

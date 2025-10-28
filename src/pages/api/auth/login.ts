@@ -1,5 +1,5 @@
 import { Auth } from "../../../lib/auth";
-import Database from "../../../lib/db";
+import Database from "../../../lib/database";
 
 const unAuthorizedResponse = new Response(null, {
   status: 402,

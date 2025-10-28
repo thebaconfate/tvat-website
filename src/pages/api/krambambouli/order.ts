@@ -1,7 +1,9 @@
 import { z } from "zod";
-import Database from "../../../lib/db";
+import Database from "../../../lib/database";
+import type { KrambambouliCustomer } from "../../../lib/krambambouli";
 
 export const prerender = false;
+
 const userDetailsSchema = z
   .object({
     firstName: z.string(),
@@ -109,26 +111,25 @@ const internalServerError = new Response(null, {
   status: 500,
 });
 
-type UserDetails = {
-  firstName: string;
-  lastName: string;
-};
-
 type Order = { id: number; amount: number };
 type PickupLocation = string;
 async function createPickupOrder(
-  userDetails: UserDetails,
+  userDetails: KrambambouliCustomer,
   pickupLocation: PickupLocation,
   orders: Order[],
 ) {
   const database = await Database.getInstance();
-  return database.createKrambambouliPickupOrder(
+  return database.createKrambambuliPickupOrder(
     userDetails,
     pickupLocation,
     orders,
   );
 }
-export async function POST({ request }: { request: Request }) {
+export async function POST({
+  request,
+}: {
+  request: Request;
+}): Promise<Response> {
   const formData = await request.formData();
   if (!isValidForm(formData)) return badResponse;
   const rawUserDetails = {
@@ -139,7 +140,8 @@ export async function POST({ request }: { request: Request }) {
     owedAmount: formData.get("owedAmount"),
   };
   try {
-    const userDetails: UserDetails = userDetailsSchema.parse(rawUserDetails);
+    const userDetails: KrambambouliCustomer =
+      userDetailsSchema.parse(rawUserDetails);
     switch (rawUserDetails.deliveryOption) {
       case "pick up":
         "beepboop";
@@ -152,7 +154,8 @@ export async function POST({ request }: { request: Request }) {
         pickUpLocationSchema.parse(rawPickUpLocation);
       const rawOrders = formData.getAll("order");
       const orders: Order[] = orderSchema.parse(rawOrders);
-      return createPickupOrder(userDetails, pickUpLocation, orders);
+      await createPickupOrder(userDetails, pickUpLocation, orders);
+      return successResponse;
     } else if (rawUserDetails.deliveryOption === "delivery") {
       const rawDeliveryDetails = {
         streetName: formData.get("deliveryStreetName"),
@@ -166,15 +169,14 @@ export async function POST({ request }: { request: Request }) {
       console.log(deliveryDetails);
       const rawOrders = formData.getAll("order");
       const orders = orderSchema.parse(rawOrders);
-      const result = await Database.getInstance().then((database) =>
+      await Database.getInstance().then((database) =>
         database.createKrambambouliDeliveryOrder(
           userDetails,
           deliveryDetails,
           orders,
         ),
       );
-      if (result) return successResponse;
-      else return internalServerError;
+      return successResponse;
     } else return badResponse;
   } catch (e: any) {
     console.error(e);
