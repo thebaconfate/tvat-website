@@ -1,3 +1,8 @@
+import dotenv from "dotenv";
+import type { ConnectionOptions } from "mysql2/promise";
+
+dotenv.config();
+
 export const Tables = Object.freeze({
   PRODUCTS: "products",
   PICKUP_LOCATIONS: "pickup_locations",
@@ -5,20 +10,26 @@ export const Tables = Object.freeze({
   LOCATION_CODES: "location_codes",
   ACTIVITIES: "activities",
   KRAMBAMBOULI_CUSTOMERS: "krambambouli_customers",
-  KRAMBAMBOULI_DELIVERY_ADDRESS: "krambambouli_pick_up_locations",
-  KRAMBAMBOULI_PICK_UP_LOCATION: "krambambouli_pick_up_locations",
+  KRAMBAMBOULI_DELIVERY_ADDRESS: "krambambouli_delivery_addresses",
+  KRAMBAMBOULI_PICK_UP_LOCATION: "krambambouli_pickup_locations",
   KRAMBAMBOULI_ORDERS: "krambambouli_orders",
   USERS: "users",
 });
 
+function getEnv(key: string) {
+  const value = process.env[key];
+  if (!value) throw Error(`Missing env variable: ${key}`);
+  return value;
+}
+
 export type Tables = typeof Tables;
 
-export const DatabaseConfig = Object.freeze({
-  host: process.env.DB_HOST ?? "",
-  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 0,
-  user: process.env.DB_USER ?? "",
-  password: process.env.DB_PASSWORD ?? "",
-  database: process.env.DB_DATABASE ?? "",
+export const DatabaseConfig: ConnectionOptions = Object.freeze({
+  host: getEnv("DB_HOST"),
+  port: parseInt(getEnv("DB_PORT")),
+  user: getEnv("DB_USER"),
+  password: getEnv("DB_PASSWORD"),
+  database: getEnv("DB_DATABASE"),
   connectionLimit: 10,
 });
 
