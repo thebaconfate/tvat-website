@@ -1,23 +1,23 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { Auth } from "../../lib/auth";
-import Database from "../../lib/db";
+import Database from "../../lib/database";
 import Checkbox from "../../components/krambambouli/dashboard/checkbox/Checkbox";
 
 interface Order {
-    productId: number;
-    amount: number;
+  productId: number;
+  amount: number;
 }
 
 interface CustomerOrder {
-    customerId: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-    owedEuros: number;
-    owedCents: number;
-    paid: number;
-    orders: Order[];
+  customerId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  owedEuros: number;
+  owedCents: number;
+  paid: number;
+  orders: Order[];
 }
 export const prerender = false;
 const request = Astro.request;
@@ -29,53 +29,53 @@ const db = await Database.getInstance();
 const result = await db.getKrambambouliOrdersByCustomer();
 const orders = result as unknown as CustomerOrder[];
 function fmtPrice(euros: number, cents: number) {
-    return `€${euros},${cents === 0 ? "-" : cents}`;
+  return `€${euros},${cents === 0 ? "-" : cents}`;
 }
 ---
 
 <Layout title={title}>
-    <table>
-        <thead>
-            <th>ID</th>
-            <th>Naam</th>
-            <th>Email</th>
-            <th>Schuld</th>
-            <th>Classics</th>
-            <th>Minussen</th>
-            <th>Betaald</th>
-        </thead>
-        <tbody>
-            {
-                orders.map((order) => (
-                    <tr>
-                        <td>{order.customerId}</td>
-                        <td>{`${order.firstName} ${order.lastName}`}</td>
-                        <td>{order.email}</td>
-                        <td>{fmtPrice(order.owedEuros, order.owedCents)}</td>
-                        <td>
-                            {order.orders.reduce(
-                                (prev, next) =>
-                                    next.productId === 1 ? prev + next.amount : prev,
-                                0,
-                            )}
-                        </td>
-                        <td>
-                            {order.orders.reduce(
-                                (prev, next) =>
-                                    next.productId === 2 ? prev + next.amount : prev,
-                                0,
-                            )}
-                        </td>
-                        <td>
-                            <Checkbox
-                                client:visible
-                                customerId={order.customerId}
-                                paid={order.paid}
-                            />
-                        </td>
-                    </tr>
-                ))
-            }
-        </tbody>
-    </table>
+  <table>
+    <thead>
+      <th>ID</th>
+      <th>Naam</th>
+      <th>Email</th>
+      <th>Schuld</th>
+      <th>Classics</th>
+      <th>Minussen</th>
+      <th>Betaald</th>
+    </thead>
+    <tbody>
+      {
+        orders.map((order) => (
+          <tr>
+            <td>{order.customerId}</td>
+            <td>{`${order.firstName} ${order.lastName}`}</td>
+            <td>{order.email}</td>
+            <td>{fmtPrice(order.owedEuros, order.owedCents)}</td>
+            <td>
+              {order.orders.reduce(
+                (prev, next) =>
+                  next.productId === 1 ? prev + next.amount : prev,
+                0,
+              )}
+            </td>
+            <td>
+              {order.orders.reduce(
+                (prev, next) =>
+                  next.productId === 2 ? prev + next.amount : prev,
+                0,
+              )}
+            </td>
+            <td>
+              <Checkbox
+                client:visible
+                customerId={order.customerId}
+                paid={order.paid}
+              />
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
 </Layout>

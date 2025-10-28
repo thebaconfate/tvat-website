@@ -10,8 +10,8 @@ export const Tables = Object.freeze({
   LOCATION_CODES: "location_codes",
   ACTIVITIES: "activities",
   KRAMBAMBOULI_CUSTOMERS: "krambambouli_customers",
-  KRAMBAMBOULI_DELIVERY_ADDRESS: "krambambouli_pick_up_locations",
-  KRAMBAMBOULI_PICK_UP_LOCATION: "krambambouli_pick_up_locations",
+  KRAMBAMBOULI_DELIVERY_ADDRESS: "krambambouli_delivery_addresses",
+  KRAMBAMBOULI_PICK_UP_LOCATION: "krambambouli_pickup_locations",
   KRAMBAMBOULI_ORDERS: "krambambouli_orders",
   USERS: "users",
 });

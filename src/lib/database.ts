@@ -1,4 +1,8 @@
-import mysql, { type PoolConnection, type RowDataPacket } from "mysql2/promise";
+import mysql, {
+  type PoolConnection,
+  type ResultSetHeader,
+  type RowDataPacket,
+} from "mysql2/promise";
 import {
   Database as DatabaseConstants,
   type Tables,
@@ -6,6 +10,11 @@ import {
 import type { ProductInterface } from "./interfaces/database/product";
 import type { PickupLocationInterface } from "./interfaces/database/pickupLocation";
 import { type DeliveryZoneInterface } from "./interfaces/database/deliveryZone";
+import type {
+  KrambambouliCustomer,
+  KrambambouliCustomerAddress,
+  KrambambouliProduct,
+} from "./krambambouli";
 
 class Database {
   private static instance: Database | null = null;
@@ -15,13 +24,6 @@ class Database {
 
   constructor(pool: mysql.Pool) {
     this.pool = pool;
-  }
-
-  static async connect() {
-    Database.instance = new Database(
-      mysql.createPool(DatabaseConstants.CONFIG),
-    );
-    return Database.instance;
   }
 
   static async getInstance(retries: number = Database.retries) {
@@ -63,16 +65,14 @@ class Database {
     throw lastError;
   }
 
-  private async execute<T extends RowDataPacket>(
-    sql: string,
-    params: any[] = [],
-    retries: number = Database.retries,
-  ) {
+  private async execute<
+    T extends RowDataPacket[] | ResultSetHeader = RowDataPacket[],
+  >(sql: string, params: any[] = [], retries: number = Database.retries) {
     let lastError;
     for (let i = 0; i < retries; i++) {
       try {
         const database = await Database.getInstance();
-        return database.pool.execute<T[]>(sql, params);
+        return database.pool.execute<T>(sql, params);
       } catch (err) {
         lastError = err;
         console.warn("Failed to query database, retrying...", err);
@@ -83,8 +83,10 @@ class Database {
     throw lastError;
   }
 
-  private async withTransaction<T extends RowDataPacket>(
-    transaction: (conn: PoolConnection) => Promise<[T[], mysql.FieldPacket[]]>,
+  private async withTransaction<
+    T extends RowDataPacket[] | ResultSetHeader = RowDataPacket[],
+  >(
+    transaction: (conn: PoolConnection) => Promise<[T, mysql.FieldPacket[]]>,
     retries: number = Database.retries,
   ) {
     let lastError;
@@ -93,7 +95,7 @@ class Database {
       try {
         const database = await Database.getInstance();
         connection = await database.pool.getConnection();
-        connection.beginTransaction();
+        await connection.beginTransaction();
         const result = await transaction(connection);
         await connection.commit();
         connection.release();
@@ -101,14 +103,17 @@ class Database {
       } catch (error) {
         lastError = error;
         console.warn("Failed to do transaction, retrying...", error);
-        try {
-          connection?.rollback();
-        } catch {}
-        connection?.release();
+        if (connection)
+          try {
+            await connection?.rollback();
+          } catch {}
         Database.instance = null;
         await new Promise((r) => setTimeout(r, 500));
+      } finally {
+        connection?.release();
       }
     }
+    throw lastError;
   }
 
   static async init(tables: Tables = DatabaseConstants.TABLES) {
@@ -244,6 +249,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return rows;
   }
 
+  /* DELIVERY LOCATIONS */
   async getDeliveryLocations() {
     const deliverTable = Database.tables.DELIVERY_LOCATIONS;
     const codesTable = Database.tables.LOCATION_CODES;
@@ -260,57 +266,60 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     );
     return rows;
   }
-  async getKrambambouliCantus() {
-    const activitiesTable = Database.tables.ACTIVITIES;
-    const [rows] = await this.pool.query(
-      `SELECT * from ${activitiesTable} WHERE lower(${activitiesTable}.name) LIKE '%krambambouli%' AND lower(${activitiesTable}.name) LIKE '%cantus%' ORDER BY ${activitiesTable}.date DESC LIMIT 1; `,
-    );
-    return rows;
-  }
 
   private async createKrambambouliCustomer(
-    connection: mysql.PoolConnection,
     customerFirstName: string,
     customerLastName: string,
     customerEmail: string,
     deliveryOption: string,
     euros: number,
     cents: number,
+    connection: mysql.PoolConnection | undefined = undefined,
   ) {
-    const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_CUSTOMERS} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
-    const [insertResult] = await connection.execute<mysql.ResultSetHeader>(
-      query,
-      [
-        customerFirstName,
-        customerLastName,
-        customerEmail,
-        deliveryOption,
-        euros,
-        cents,
-      ],
-    );
-    return insertResult;
+    const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_CUSTOMERS} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
+    const params = [
+      customerFirstName,
+      customerLastName,
+      customerEmail,
+      deliveryOption,
+      euros,
+      cents,
+    ];
+    if (connection) {
+      return connection.execute<ResultSetHeader>(sql, params);
+    }
+    const database = await Database.getInstance();
+    return database.execute<ResultSetHeader>(sql, params);
   }
 
   private async createKrambambouliCustomerPickUpLocation(
-    connection: mysql.PoolConnection,
     customer_id: number,
     pickupLocation: string,
+    connection: mysql.PoolConnection | undefined = undefined,
   ) {
-    const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, location) values (?, ?)`;
-    await connection.execute(query, [customer_id, pickupLocation]);
+    const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, location) values (?, ?)`;
+    const params = [customer_id, pickupLocation];
+    if (connection) {
+      return connection.execute<ResultSetHeader>(sql, params);
+    }
+    const database = await Database.getInstance();
+    return database.execute<ResultSetHeader>(sql, params);
   }
 
   private async createKrambambouliCustomerDeliveryAddress(
-    connection: mysql.PoolConnection,
     customer_id: number,
     streetName: string,
     houseNumber: string,
     bus: string,
     post: number,
     city: string,
+    connection: mysql.PoolConnection | undefined = undefined,
   ) {
     const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} (customer_id, street_name, house_number, bus, post, city) values (?, ?, ?, ?, ?, ?)`;
+    if (!connection) {
+      const database = await Database.getInstance();
+      connection = await database.pool.getConnection();
+    }
     await connection.execute(query, [
       customer_id,
       streetName,
@@ -322,112 +331,102 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   private async createKrambambouliCustomerOrderPromise(
-    connection: mysql.PoolConnection,
     customer_id: number,
     product_id: number,
     amount: number,
+    connection: mysql.PoolConnection | undefined = undefined,
   ) {
     const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_ORDERS} (customer_id, product_id, amount) values (?, ?, ?)`;
+    if (!connection) {
+      const database = await Database.getInstance();
+      connection = await database.pool.getConnection();
+    }
     return connection.execute(query, [customer_id, product_id, amount]);
   }
 
-  /*
-  async createKrambambuliPickUpOrder(
+  async createKrambambuliPickupOrder(
     userDetails: KrambambouliCustomer,
     pickupLocation: string,
     products: KrambambouliProduct[],
   ) {
-    if (!this.pool) return null;
-    const conn = await this.pool.getConnection();
-    try {
-      await conn.beginTransaction();
-      const row = await this.createKrambambouliCustomer(
-        conn,
-        userDetails.firstName,
-        userDetails.lastName,
-        userDetails.email,
-        userDetails.deliveryOption,
-        userDetails.owedAmount.euros,
-        userDetails.owedAmount.cents,
-      );
-      if (!row.insertId) throw new Error("failed to insert customer");
-      await this.createKrambambouliCustomerPickUpLocation(
-        conn,
-        row.insertId,
-        pickupLocation,
-      );
-      await Promise.all(
-        products.map((product) =>
-          this.createKrambambouliCustomerOrderPromise(
-            conn,
-            row.insertId,
-            product.id,
-            product.amount,
+    const database = await Database.getInstance();
+    const [row] = await database.withTransaction<ResultSetHeader>(
+      async (conn) => {
+        const result = await this.createKrambambouliCustomer(
+          userDetails.firstName,
+          userDetails.lastName,
+          userDetails.email,
+          userDetails.deliveryOption,
+          userDetails.owedAmount.euros,
+          userDetails.owedAmount.cents,
+          conn,
+        );
+        const [row] = result;
+        if (!row.insertId) throw new Error("failed to insert customer");
+        await this.createKrambambouliCustomerPickUpLocation(
+          row.insertId,
+          pickupLocation,
+          conn,
+        );
+        await Promise.all(
+          products.map((product) =>
+            this.createKrambambouliCustomerOrderPromise(
+              row.insertId,
+              product.id,
+              product.amount,
+              conn,
+            ),
           ),
-        ),
-      );
-      await conn.commit();
-      return row.insertId;
-    } catch (e: any) {
-      console.error(e);
-      await conn.rollback();
-      return null;
-    } finally {
-      conn.release();
-    }
+        );
+        return result;
+      },
+    );
+    return row.insertId;
   }
-  */
 
-  /*
   async createKrambambouliDeliveryOrder(
     userDetails: KrambambouliCustomer,
     customerAddress: KrambambouliCustomerAddress,
     products: KrambambouliProduct[],
   ) {
-    if (!this.pool) return null;
-    const conn = await this.pool.getConnection();
-    try {
-      await conn.beginTransaction();
-      const row = await this.createKrambambouliCustomer(
-        conn,
-        userDetails.firstName,
-        userDetails.lastName,
-        userDetails.email,
-        userDetails.deliveryOption,
-        userDetails.owedAmount.euros,
-        userDetails.owedAmount.cents,
-      );
-      if (!row.insertId) throw new Error("failed to insert customer");
-      await this.createKrambambouliCustomerDeliveryAddress(
-        conn,
-        row.insertId,
-        customerAddress.streetName,
-        customerAddress.houseNumber,
-        customerAddress.bus,
-        customerAddress.post,
-        customerAddress.city,
-      );
-      await Promise.all(
-        products.map((product) =>
-          this.createKrambambouliCustomerOrderPromise(
-            conn,
-            row.insertId,
-            product.id,
-            product.amount,
+    const database = await Database.getInstance();
+    const [result] = await database.withTransaction<ResultSetHeader>(
+      async (conn) => {
+        const result = await this.createKrambambouliCustomer(
+          userDetails.firstName,
+          userDetails.lastName,
+          userDetails.email,
+          userDetails.deliveryOption,
+          userDetails.owedAmount.euros,
+          userDetails.owedAmount.cents,
+          conn,
+        );
+        const [row] = result;
+        if (!row.insertId) throw new Error("failed to insert customer");
+        await this.createKrambambouliCustomerDeliveryAddress(
+          row.insertId,
+          customerAddress.streetName,
+          customerAddress.houseNumber,
+          customerAddress.bus,
+          customerAddress.post,
+          customerAddress.city,
+          conn,
+        );
+        await Promise.all(
+          products.map((product) =>
+            this.createKrambambouliCustomerOrderPromise(
+              row.insertId,
+              product.id,
+              product.amount,
+              conn,
+            ),
           ),
-        ),
-      );
-      await conn.commit();
-      return row.insertId;
-    } catch (e: any) {
-      console.error(e);
-      await conn.rollback();
-      return null;
-    } finally {
-      conn.release();
-    }
+        );
+        return result;
+      },
+    );
+    return result;
   }
-    */
 
   async getKrambambouliOrders() {
     const query = `SELECT product_id as productId, amount FROM ${Database.tables.KRAMBAMBOULI_ORDERS}`;
