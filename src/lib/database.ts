@@ -23,20 +23,24 @@ class Database {
   private static retries = 5;
   private pool: mysql.Pool;
 
-  constructor(pool: mysql.Pool) {
-    this.pool = pool;
+  constructor() {
+    this.pool = mysql.createPool(DatabaseConstants.CONFIG);
   }
 
   static async getInstance(retries: number = Database.retries) {
+    let lastError;
     if (Database.instance) return Database.instance;
     for (let i = 0; i < retries; i++) {
       try {
-        const connectionPool = mysql.createPool(DatabaseConstants.CONFIG);
-        Database.instance = new Database(connectionPool);
         console.log(`Retried ${i} times`);
+        const instance = new Database();
+        await instance.pool.query("SELECT 1");
+        Database.instance = instance;
         return Database.instance;
       } catch (err) {
+        lastError = err;
         console.warn("DB connection failed, retrying...", err);
+        if (!isConnectionError(err)) break;
         Database.instance = null;
         await new Promise((r) => setTimeout(r, 500));
       }
@@ -44,6 +48,10 @@ class Database {
     const msg = `Could not connect to database after ${retries} attempts`;
     console.error(msg);
     throw Error(msg);
+  }
+
+  private async connect() {
+    this.pool = mysql.createPool(DatabaseConstants.CONFIG);
   }
 
   private async query<T extends RowDataPacket[]>(
@@ -54,12 +62,11 @@ class Database {
     let lastError;
     for (let i = 0; i < retries; i++) {
       try {
-        const database = await Database.getInstance();
-        return database.pool.query<T>(sql, params);
+        return this.pool.query<T>(sql, params);
       } catch (err) {
         lastError = err;
         console.warn("Failed to query database, retrying...", err);
-        Database.instance = null;
+        if (isConnectionError(err)) await this.connect();
         await new Promise((r) => setTimeout(r, 500));
       }
     }
@@ -72,12 +79,11 @@ class Database {
     let lastError;
     for (let i = 0; i < retries; i++) {
       try {
-        const database = await Database.getInstance();
-        return database.pool.execute<T>(sql, params);
+        return this.pool.execute<T>(sql, params);
       } catch (err) {
         lastError = err;
         console.warn("Failed to query database, retrying...", err);
-        Database.instance = null;
+        if (isConnectionError(err)) await this.connect();
         await new Promise((r) => setTimeout(r, 500));
       }
     }
@@ -94,8 +100,7 @@ class Database {
     for (let i = 0; i < retries; i++) {
       let connection;
       try {
-        const database = await Database.getInstance();
-        connection = await database.pool.getConnection();
+        connection = await this.pool.getConnection();
         await connection.beginTransaction();
         const result = await transaction(connection);
         await connection.commit();
@@ -108,7 +113,7 @@ class Database {
           try {
             await connection?.rollback();
           } catch {}
-        Database.instance = null;
+        if (isConnectionError(error)) await this.connect();
         await new Promise((r) => setTimeout(r, 500));
       } finally {
         connection?.release();
@@ -245,7 +250,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     if (!this.pool) return [];
     const table = Database.tables.PICKUP_LOCATIONS;
     const [rows] = await this.query<PickupLocationInterface[]>(
-      `SELECT ${this.createColumnNames(table, ["id", "description"])} FROM ${table};`,
+      `SELECT ${this.createColumnNames(table, ["id", "description"])} FROM ${table} WHERE active = TRUE;`,
     );
     return rows;
   }
@@ -276,7 +281,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     euros: number,
     cents: number,
     connection: mysql.PoolConnection | undefined = undefined,
-  ) {
+  ): Promise<[ResultSetHeader, mysql.FieldPacket[]]> {
     const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_CUSTOMERS} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
     const params = [
       customerFirstName,
@@ -289,8 +294,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     if (connection) {
       return connection.execute<ResultSetHeader>(sql, params);
     }
-    const database = await Database.getInstance();
-    return database.execute<ResultSetHeader>(sql, params);
+    return this.execute<ResultSetHeader>(sql, params);
   }
 
   private async createKrambambouliCustomerPickUpLocation(
@@ -303,8 +307,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     if (connection) {
       return connection.execute<ResultSetHeader>(sql, params);
     }
-    const database = await Database.getInstance();
-    return database.execute<ResultSetHeader>(sql, params);
+    return this.execute<ResultSetHeader>(sql, params);
   }
 
   private async createKrambambouliCustomerDeliveryAddress(
@@ -318,8 +321,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   ) {
     const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} (customer_id, street_name, house_number, bus, post, city) values (?, ?, ?, ?, ?, ?)`;
     if (!connection) {
-      const database = await Database.getInstance();
-      connection = await database.pool.getConnection();
+      connection = await this.pool.getConnection();
     }
     await connection.execute(query, [
       customer_id,
@@ -339,8 +341,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   ) {
     const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_ORDERS} (customer_id, product_id, amount) values (?, ?, ?)`;
     if (!connection) {
-      const database = await Database.getInstance();
-      connection = await database.pool.getConnection();
+      connection = await this.pool.getConnection();
     }
     return connection.execute(query, [customer_id, product_id, amount]);
   }
@@ -350,38 +351,35 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     pickupLocation: string,
     products: KrambambouliProduct[],
   ) {
-    const database = await Database.getInstance();
-    const [row] = await database.withTransaction<ResultSetHeader>(
-      async (conn) => {
-        const result = await this.createKrambambouliCustomer(
-          userDetails.firstName,
-          userDetails.lastName,
-          userDetails.email,
-          userDetails.deliveryOption,
-          userDetails.owedAmount.euros,
-          userDetails.owedAmount.cents,
-          conn,
-        );
-        const [row] = result;
-        if (!row.insertId) throw new Error("failed to insert customer");
-        await this.createKrambambouliCustomerPickUpLocation(
-          row.insertId,
-          pickupLocation,
-          conn,
-        );
-        await Promise.all(
-          products.map((product) =>
-            this.createKrambambouliCustomerOrderPromise(
-              row.insertId,
-              product.id,
-              product.amount,
-              conn,
-            ),
+    const [row] = await this.withTransaction<ResultSetHeader>(async (conn) => {
+      const result = await this.createKrambambouliCustomer(
+        userDetails.firstName,
+        userDetails.lastName,
+        userDetails.email,
+        userDetails.deliveryOption,
+        userDetails.owedAmount.euros,
+        userDetails.owedAmount.cents,
+        conn,
+      );
+      const [row] = result;
+      if (!row.insertId) throw new Error("failed to insert customer");
+      await this.createKrambambouliCustomerPickUpLocation(
+        row.insertId,
+        pickupLocation,
+        conn,
+      );
+      await Promise.all(
+        products.map((product) =>
+          this.createKrambambouliCustomerOrderPromise(
+            row.insertId,
+            product.id,
+            product.amount,
+            conn,
           ),
-        );
-        return result;
-      },
-    );
+        ),
+      );
+      return result;
+    });
     return row.insertId;
   }
 
@@ -390,8 +388,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     customerAddress: KrambambouliCustomerAddress,
     products: KrambambouliProduct[],
   ) {
-    const database = await Database.getInstance();
-    const [result] = await database.withTransaction<ResultSetHeader>(
+    const [result] = await this.withTransaction<ResultSetHeader>(
       async (conn) => {
         const result = await this.createKrambambouliCustomer(
           userDetails.firstName,
@@ -429,18 +426,21 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return result;
   }
 
+  // TODO: Refactor
   async getKrambambouliOrders() {
     const query = `SELECT product_id as productId, amount FROM ${Database.tables.KRAMBAMBOULI_ORDERS}`;
     const [rows] = await this.pool.query<mysql.ResultSetHeader>(query);
     return rows;
   }
 
+  // TODO: Refactor
   async getKrambambouliOrdersByCustomer() {
-    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) AS orders, c.created_at as createdAt FROM ${Database.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${Database.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id GROUP BY c.id`;
+    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) AS orders, p.location AS pickupLocation, c.created_at as createdAt FROM ${Database.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${Database.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id LEFT JOIN ${Database.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} d ON c.id = d.customer_id LEFT JOIN ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} p ON c.id = p.customer_id GROUP BY c.id`;
     const [rows] = await this.query<OrderInterface[]>(query);
     return rows;
   }
 
+  // TODO: Refactor
   async getUser(email: string) {
     const query = `SELECT * FROM ${Database.tables.USERS} WHERE email = ?`;
     const [rows] = await this.pool.query<mysql.QueryResult>(query, [email]);
@@ -448,11 +448,13 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return result[0];
   }
 
+  // TODO: Refactor
   async saveUser(email: string, password: string) {
     const query = `INSERT INTO ${Database.tables.USERS} (email, password)  VALUES (?, ?)`;
     await this.pool.execute(query, [email, password]);
   }
 
+  // TODO: Refactor
   async countUsers() {
     interface Count {
       count: number;
@@ -464,6 +466,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     return result[0].count;
   }
 
+  // TODO: Refactor
   async updateKrambambouliPayment(customerId: number, paid: boolean) {
     const query = `UPDATE ${Database.tables.KRAMBAMBOULI_CUSTOMERS} SET paid = ? WHERE id = ?`;
     await this.pool.query(query, [paid, customerId]);
@@ -471,4 +474,12 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 }
 
+function isConnectionError(err: any): boolean {
+  const connectionErrors = [
+    "PROTOCOL_CONNECTION_LOST",
+    "ECONNREFUSED",
+    "ETIMEDOUT",
+  ];
+  return connectionErrors.includes(err.code);
+}
 export default Database;
