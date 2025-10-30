@@ -28,7 +28,9 @@ const userDetailsSchema = z
   })
   .strict();
 
-const pickUpLocationSchema = z.string();
+const pickUpLocationSchema = z.coerce
+  .number({ message: "pickup location is not a number" })
+  .nonnegative("pickup location cannot be a negative number");
 
 const orderSchema = z
   .string()
@@ -96,6 +98,10 @@ function isValidForm(form: FormData) {
   const validPickup = containsPickupLocation(form);
   const validDelivery = containsDeliveryDetails(form);
   const validOrder = containsOrder(form);
+  if (!validUser) console.error("Invalid user");
+  if (!validOrder) console.error("Invalid order");
+  if (!validPickup && !validDelivery)
+    console.error("Invalid pickup or delivery");
   return validUser && validOrder && (validPickup || validDelivery);
 }
 
@@ -108,7 +114,7 @@ const successResponse = new Response(null, {
 });
 
 type Order = { id: number; amount: number };
-type PickupLocation = string;
+type PickupLocation = number;
 async function createPickupOrder(
   userDetails: KrambambouliCustomer,
   pickupLocation: PickupLocation,
@@ -138,17 +144,15 @@ export async function POST({
   try {
     const userDetails: KrambambouliCustomer =
       userDetailsSchema.parse(rawUserDetails);
-    switch (rawUserDetails.deliveryOption) {
-      case "pick up":
-        "beepboop";
-      case "delivery":
-        "boopbeep";
-    }
     if (rawUserDetails.deliveryOption === "pick up") {
       const rawPickUpLocation = formData.get("pickUpLocation");
-      const pickUpLocation: string =
+      console.log(rawPickUpLocation);
+      console.log("parsing pickupLocation");
+      const pickUpLocation: number =
         pickUpLocationSchema.parse(rawPickUpLocation);
+      console.log("parsed pickupLocation");
       const rawOrders = formData.getAll("order");
+      console.log("Parsing order");
       const orders: Order[] = orderSchema.parse(rawOrders);
       await createPickupOrder(userDetails, pickUpLocation, orders);
       return successResponse;
