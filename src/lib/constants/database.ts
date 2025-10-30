@@ -11,7 +11,7 @@ export const Tables = Object.freeze({
   ACTIVITIES: "activities",
   KRAMBAMBOULI_CUSTOMERS: "krambambouli_customers",
   KRAMBAMBOULI_DELIVERY_ADDRESS: "krambambouli_delivery_addresses",
-  KRAMBAMBOULI_PICK_UP_LOCATION: "krambambouli_pickups",
+  KRAMBAMBOULI_PICK_UP_LOCATION: "krambambouli_pickup_locations",
   KRAMBAMBOULI_ORDERS: "krambambouli_orders",
   USERS: "users",
 });
