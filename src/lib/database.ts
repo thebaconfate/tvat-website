@@ -302,7 +302,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     pickupLocation: number,
     connection: mysql.PoolConnection | undefined = undefined,
   ) {
-    const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, location) values (?, ?)`;
+    const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, pickup_location_id) values (?, ?)`;
     const params = [customer_id, pickupLocation];
     if (connection) {
       return connection.execute<ResultSetHeader>(sql, params);
