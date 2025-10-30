@@ -217,7 +217,7 @@ export default function KrambambouliForm(props: Props) {
       if (selectedPickUpOption >= 0)
         formData.append(
           "pickUpLocation",
-          sanitize(pickupLocations[selectedPickUpOption].description),
+          sanitize(pickupLocations[selectedPickUpOption].id),
         );
     } else if (
       selectedOption === DeliveryOption.Delivery &&
@@ -229,6 +229,14 @@ export default function KrambambouliForm(props: Props) {
       formData.append("deliveryPost", sanitize(form.post));
       formData.append("deliveryCity", sanitize(form.city));
     }
+    if (amountList.every((a) => a === 0)) {
+      setPopupContent({
+        title: PopupEnum.ERROR,
+        text: "Voeg eerst producten toe aan je winkelmand",
+      });
+      setShowPopup(true);
+      return;
+    }
     for (let i = 0; i < products.length; i++) {
       if (amountList[i] > 0)
         formData.append(
@@ -239,7 +247,6 @@ export default function KrambambouliForm(props: Props) {
           }),
         );
     }
-    console.log(formData);
     await fetch(
       createUrl([
         window.location.origin,

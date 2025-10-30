@@ -299,7 +299,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
 
   private async createKrambambouliCustomerPickUpLocation(
     customer_id: number,
-    pickupLocation: string,
+    pickupLocation: number,
     connection: mysql.PoolConnection | undefined = undefined,
   ) {
     const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, location) values (?, ?)`;
@@ -348,7 +348,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
 
   async createKrambambuliPickupOrder(
     userDetails: KrambambouliCustomer,
-    pickupLocation: string,
+    pickupLocation: number,
     products: KrambambouliProduct[],
   ) {
     const [row] = await this.withTransaction<ResultSetHeader>(async (conn) => {
@@ -482,4 +482,5 @@ function isConnectionError(err: any): boolean {
   ];
   return connectionErrors.includes(err.code);
 }
+
 export default Database;
