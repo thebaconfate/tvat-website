@@ -434,10 +434,67 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   }
 
   // TODO: Refactor
-  async getKrambambouliOrdersByCustomer() {
-    const query = `SELECT c.id as customerId, c.first_name as firstName, c.last_name as lastName, c.email, c.owed_euros as owedEuros, c.owed_cents as owedCents, paid, JSON_ARRAYAGG(JSON_OBJECT('productId', o.product_id, 'amount', o.amount)) AS orders, p.location AS pickupLocation, c.created_at as createdAt FROM ${Database.tables.KRAMBAMBOULI_CUSTOMERS} c LEFT JOIN ${Database.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id LEFT JOIN ${Database.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} d ON c.id = d.customer_id LEFT JOIN ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} p ON c.id = p.customer_id GROUP BY c.id`;
-    const [rows] = await this.query<OrderInterface[]>(query);
-    return rows;
+  async getKrambambouliOrdersByCustomer(
+    start: Date | undefined = undefined,
+    end: Date | undefined = undefined,
+    page: number = 1,
+    pageSize: number = 20,
+  ): Promise<Page<OrderInterface>> {
+    const offset = (page - 1) * pageSize;
+    if (!start) {
+      start = new Date();
+      start = new Date(start.getFullYear(), 0, 1, 0, 0, 0, 0);
+    }
+    if (!end) {
+      end = new Date(start.getFullYear(), 11, 31, 23, 59, 59, 999);
+    }
+    if (start.getTime() > end.getTime()) {
+      const tmp = start;
+      start = end;
+      end = tmp;
+    }
+    const sql = `
+            SELECT
+                c.id as customerId,
+                c.first_name as firstName,
+                c.last_name as lastName,
+                c.email,
+                c.paid,
+                JSON_OBJECT(
+                    'euros', c.owed_euros,
+                    'cents', c.owed_cents) as owed,
+                pl.description,
+                d.street_name as streetName,
+                d.house_number as houseNumber,
+                d.bus as bus,
+                d.post as post,
+                d.city as city,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'productId', o.product_id,
+                        'amount', o.amount)) as orders
+            FROM ${Database.tables.KRAMBAMBOULI_CUSTOMERS} c
+            LEFT JOIN ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} pjt ON pjt.customer_id = c.id
+            LEFT JOIN ${Database.tables.PICKUP_LOCATIONS} pl ON pjt.pickup_location_id = pl.id
+            LEFT JOIN ${Database.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} d ON d.customer_id = c.id
+            LEFT JOIN ${Database.tables.KRAMBAMBOULI_ORDERS} o ON c.id = o.customer_id
+            WHERE c.created_at >= ? AND created_at < ?
+            GROUP BY c.id, pl.description, d.street_name, d.house_number, d.bus, d.post, d.city
+            LIMIT ${pageSize} OFFSET ${offset}`;
+    const countSql = `
+            SELECT COUNT(*) as total
+            FROM krambambouli_customers
+            WHERE created_at >= ? AND created_at < ?`;
+    const [[rows], [total]] = await Promise.all([
+      this.pool.query<OrderInterface[]>(sql, [start, end]),
+      this.pool.query<RowDataPacket[]>(countSql, [start, end]),
+    ]);
+    return {
+      content: rows,
+      page: page,
+      pageSize: pageSize,
+      total: total[0].total,
+    };
   }
 
   // TODO: Refactor
