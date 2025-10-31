@@ -4,21 +4,6 @@ import { Auth } from "../../lib/auth";
 import Database from "../../lib/database";
 import Checkbox from "../../components/krambambouli/dashboard/checkbox/Checkbox";
 
-interface Order {
-  productId: number;
-  amount: number;
-}
-
-interface CustomerOrder {
-  customerId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  owedEuros: number;
-  owedCents: number;
-  paid: number;
-  orders: Order[];
-}
 export const prerender = false;
 const request = Astro.request;
 const auth = new Auth();
@@ -26,9 +11,7 @@ const authorized = await auth.requestPassage(request);
 if (!authorized) return Astro.redirect("/login");
 const title = "Dashboard";
 const db = await Database.getInstance();
-const result = await db.getKrambambouliOrdersByCustomer();
-console.log(result);
-const orders = result as unknown as CustomerOrder[];
+const page = await db.getKrambambouliOrdersByCustomer();
 function fmtPrice(euros: number, cents: number) {
   return `€${euros},${cents === 0 ? "-" : cents}`;
 }
@@ -47,25 +30,28 @@ function fmtPrice(euros: number, cents: number) {
     </thead>
     <tbody>
       {
-        orders.map((order) => (
+        page.content.map((order) => (
           <tr>
             <td>{order.customerId}</td>
             <td>{`${order.firstName} ${order.lastName}`}</td>
             <td>{order.email}</td>
             <td>{fmtPrice(order.owedEuros, order.owedCents)}</td>
             <td>
-              {order.orders.reduce(
+<!--  {order.orders.reduce(
                 (prev, next) =>
                   next.productId === 1 ? prev + next.amount : prev,
                 0,
               )}
+-->
             </td>
             <td>
+<!--
               {order.orders.reduce(
                 (prev, next) =>
                   next.productId === 2 ? prev + next.amount : prev,
                 0,
               )}
+-->
             </td>
             <td>
               <Checkbox
