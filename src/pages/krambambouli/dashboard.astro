@@ -11,7 +11,12 @@ const authorized = await auth.requestPassage(request);
 if (!authorized) return Astro.redirect("/login");
 const title = "Dashboard";
 const db = await Database.getInstance();
-const page = await db.getKrambambouliOrdersByCustomer();
+const [page, products] = await Promise.all([
+  db.getKrambambouliOrdersByCustomer(),
+  db.getKrambambouliProducts(),
+]);
+console.log(page);
+console.log(products);
 function fmtPrice(euros: number, cents: number) {
   return `€${euros},${cents === 0 ? "-" : cents}`;
 }
@@ -36,23 +41,8 @@ function fmtPrice(euros: number, cents: number) {
             <td>{`${order.firstName} ${order.lastName}`}</td>
             <td>{order.email}</td>
             <td>{fmtPrice(order.owedEuros, order.owedCents)}</td>
-            <td>
-<!--  {order.orders.reduce(
-                (prev, next) =>
-                  next.productId === 1 ? prev + next.amount : prev,
-                0,
-              )}
--->
-            </td>
-            <td>
-<!--
-              {order.orders.reduce(
-                (prev, next) =>
-                  next.productId === 2 ? prev + next.amount : prev,
-                0,
-              )}
--->
-            </td>
+            <td />
+            <td />
             <td>
               <Checkbox
                 client:visible
