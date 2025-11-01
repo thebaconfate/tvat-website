@@ -32,7 +32,7 @@ export class Auth {
     if (!token) return false;
     const auth = new Auth();
     const validToken = await auth.verifyToken(token);
-    return validToken;
+    return validToken ? true : false;
   }
 
   async verifyToken(token: string) {

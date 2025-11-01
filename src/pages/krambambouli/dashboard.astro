@@ -20,34 +20,114 @@ console.log(products);
 function fmtPrice(euros: number, cents: number) {
   return `€${euros},${cents === 0 ? "-" : cents}`;
 }
+
+function dateToDDMM(date: Date) {
+  return `${date.getDate()}/${date.getMonth() + 1}`;
+}
+
+type Location = {
+  description: string | null;
+  streetName: string | null;
+  houseNumber: string | null;
+  bus: string | null;
+  post: string | null;
+  city: string | null;
+};
+function fmtLocation({
+  description,
+  streetName,
+  houseNumber,
+  bus,
+  post,
+  city,
+}: Location) {
+  return description
+    ? `Ophalen bij ${description}`
+    : `Levering naar ${streetName?.replace(/^/, (c) => c.toUpperCase())}` +
+        ` ${houseNumber} ` +
+        `${bus ? "Bus " + bus : ""}` +
+        ", " +
+        post +
+        " " +
+        city;
+}
+
+function createUpdateFunction(
+  customerId: number,
+  endpoint: string,
+  key: string,
+) {
+  return function update(newValue: boolean) {
+    return fetch(`/api/krambambouli/${endpoint}`, {
+      body: JSON.stringify({ customerId, [key]: newValue }),
+      method: "PUT",
+    });
+  };
+}
 ---
 
 <Layout title={title}>
+  <div class="filters"></div>
   <table>
     <thead>
-      <th>ID</th>
+      <th>Datum</th>
       <th>Naam</th>
       <th>Email</th>
-      <th>Schuld</th>
-      <th>Classics</th>
-      <th>Minussen</th>
-      <th>Betaald</th>
+      {
+        products.map((p) => (
+          <th>
+            {p.name
+              .toLowerCase()
+              .replace("krambambouli ", "")
+              .trimStart()
+              .replace(/^./, (c) => c.toUpperCase())}
+          </th>
+        ))
+      }
+      <th>Ophaallocatie</th>
+      <th>Prijs</th>
+      <th>Betaald?</th>
+      <th>Opgehaald?</th>
     </thead>
     <tbody>
       {
         page.content.map((order) => (
           <tr>
-            <td>{order.customerId}</td>
+            <td>{dateToDDMM(order.createdAt)}</td>
             <td>{`${order.firstName} ${order.lastName}`}</td>
             <td>{order.email}</td>
-            <td>{fmtPrice(order.owedEuros, order.owedCents)}</td>
-            <td />
-            <td />
+            {products.map((p) => (
+              <td>
+                {order.orders.find((o) => o.productId === p.id)?.amount ?? 0}
+              </td>
+            ))}
+            <td>
+              {fmtLocation({
+                description: order.description,
+                streetName: order.streetName,
+                houseNumber: order.houseNumber,
+                bus: order.bus,
+                post: order.post,
+                city: order.city,
+              })}
+            </td>
+            <td>{fmtPrice(order.owed.euros, order.owed.cents)}</td>
             <td>
               <Checkbox
                 client:visible
                 customerId={order.customerId}
-                paid={order.paid}
+                currentValue={order.paid}
+                endpoint="/api/krambambouli/toggle-payment"
+                bodyKey="paid"
+              />
+            </td>
+            <td>
+              <Checkbox
+                client:visible
+                customerId={order.customerId}
+                currentValue={order.fulfilled}
+                endpoint="/api/krambambouli/toggle-fulfilled"
+                bodyKey="fulfilled"
               />
             </td>
           </tr>

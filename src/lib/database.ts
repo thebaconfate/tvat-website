@@ -1,7 +1,13 @@
-import mysql, {
+import {
+  createPool,
+  type FieldPacket,
+  type Pool,
   type PoolConnection,
+  type QueryResult,
   type ResultSetHeader,
   type RowDataPacket,
+  type TypeCastField,
+  type TypeCastNext,
 } from "mysql2/promise";
 import {
   Database as DatabaseConstants,
@@ -9,22 +15,32 @@ import {
 } from "./constants/database";
 import type { ProductInterface } from "./interfaces/database/product";
 import type { PickupLocationInterface } from "./interfaces/database/pickupLocation";
-import { type DeliveryZoneInterface } from "./interfaces/database/deliveryZone";
+import type { DeliveryZoneInterface } from "./interfaces/database/deliveryZone";
 import type {
   KrambambouliCustomer,
   KrambambouliCustomerAddress,
   KrambambouliProduct,
 } from "./krambambouli";
-import { type OrderInterface } from "./interfaces/database/order";
+import type { OrderInterface } from "./interfaces/database/order";
+
+function castTinyintToBoolean(field: TypeCastField, next: TypeCastNext) {
+  if (field.type === "TINY" && field.length === 1) {
+    return field.string() === "1";
+  }
+  return next();
+}
 
 class Database {
   private static instance: Database | null = null;
   private static tables: Tables = DatabaseConstants.TABLES;
   private static retries = 5;
-  private pool: mysql.Pool;
+  private pool: Pool;
 
   constructor() {
-    this.pool = mysql.createPool(DatabaseConstants.CONFIG);
+    this.pool = createPool({
+      ...DatabaseConstants.CONFIG,
+      typeCast: castTinyintToBoolean,
+    });
   }
 
   static async getInstance(retries: number = Database.retries) {
@@ -51,7 +67,10 @@ class Database {
   }
 
   private async connect() {
-    this.pool = mysql.createPool(DatabaseConstants.CONFIG);
+    this.pool = createPool({
+      ...DatabaseConstants.CONFIG,
+      typeCast: castTinyintToBoolean,
+    });
   }
 
   private async query<T extends RowDataPacket[]>(
@@ -93,7 +112,7 @@ class Database {
   private async withTransaction<
     T extends RowDataPacket[] | ResultSetHeader = RowDataPacket[],
   >(
-    transaction: (conn: PoolConnection) => Promise<[T, mysql.FieldPacket[]]>,
+    transaction: (conn: PoolConnection) => Promise<[T, FieldPacket[]]>,
     retries: number = Database.retries,
   ) {
     let lastError;
@@ -280,8 +299,8 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     deliveryOption: string,
     euros: number,
     cents: number,
-    connection: mysql.PoolConnection | undefined = undefined,
-  ): Promise<[ResultSetHeader, mysql.FieldPacket[]]> {
+    connection: PoolConnection | undefined = undefined,
+  ): Promise<[ResultSetHeader, FieldPacket[]]> {
     const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_CUSTOMERS} (first_name, last_name, email, delivery_option, owed_euros, owed_cents) values (?, ?, ?, ?, ?, ?)`;
     const params = [
       customerFirstName,
@@ -300,7 +319,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   private async createKrambambouliCustomerPickUpLocation(
     customer_id: number,
     pickupLocation: number,
-    connection: mysql.PoolConnection | undefined = undefined,
+    connection: PoolConnection | undefined = undefined,
   ) {
     const sql = `INSERT INTO ${Database.tables.KRAMBAMBOULI_PICK_UP_LOCATION} (customer_id, pickup_location_id) values (?, ?)`;
     const params = [customer_id, pickupLocation];
@@ -317,7 +336,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     bus: string,
     post: number,
     city: string,
-    connection: mysql.PoolConnection | undefined = undefined,
+    connection: PoolConnection | undefined = undefined,
   ) {
     const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_DELIVERY_ADDRESS} (customer_id, street_name, house_number, bus, post, city) values (?, ?, ?, ?, ?, ?)`;
     if (!connection) {
@@ -337,7 +356,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
     customer_id: number,
     product_id: number,
     amount: number,
-    connection: mysql.PoolConnection | undefined = undefined,
+    connection: PoolConnection | undefined = undefined,
   ) {
     const query = `INSERT INTO ${Database.tables.KRAMBAMBOULI_ORDERS} (customer_id, product_id, amount) values (?, ?, ?)`;
     if (!connection) {
@@ -429,7 +448,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   // TODO: Refactor
   async getKrambambouliOrders() {
     const query = `SELECT product_id as productId, amount FROM ${Database.tables.KRAMBAMBOULI_ORDERS}`;
-    const [rows] = await this.pool.query<mysql.ResultSetHeader>(query);
+    const [rows] = await this.pool.query<ResultSetHeader>(query);
     return rows;
   }
 
@@ -459,10 +478,12 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
                 c.first_name as firstName,
                 c.last_name as lastName,
                 c.email,
-                c.paid,
+                c.paid ,
+                c.fulfilled ,
                 JSON_OBJECT(
                     'euros', c.owed_euros,
                     'cents', c.owed_cents) as owed,
+                c.created_at as createdAt,
                 pl.description,
                 d.street_name as streetName,
                 d.house_number as houseNumber,
@@ -500,7 +521,7 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   // TODO: Refactor
   async getUser(email: string) {
     const query = `SELECT * FROM ${Database.tables.USERS} WHERE email = ?`;
-    const [rows] = await this.pool.query<mysql.QueryResult>(query, [email]);
+    const [rows] = await this.pool.query<QueryResult>(query, [email]);
     const result = rows as { id?: number; email: string; password: string }[];
     return result[0];
   }
@@ -527,6 +548,14 @@ FROM ${table}  WHERE LOWER(name) LIKE '%krambambouli%'`,
   async updateKrambambouliPayment(customerId: number, paid: boolean) {
     const query = `UPDATE ${Database.tables.KRAMBAMBOULI_CUSTOMERS} SET paid = ? WHERE id = ?`;
     await this.pool.query(query, [paid, customerId]);
+    return;
+  }
+
+  async updateKrambambouliFulfillment(customerId: number, fulfilled: boolean) {
+    const sql = `
+        UPDATE ${Database.tables.KRAMBAMBOULI_CUSTOMERS}
+        SET fulfilled = ? WHERE id = ?`;
+    await this.execute(sql, [fulfilled, customerId]);
     return;
   }
 }
