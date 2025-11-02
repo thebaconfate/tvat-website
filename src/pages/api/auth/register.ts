@@ -1,4 +1,4 @@
-import { Auth } from "../../../lib/auth";
+import { Auth } from "../../../lib/auth/auth";
 import Database from "../../../lib/database";
 
 export const prerender = false;

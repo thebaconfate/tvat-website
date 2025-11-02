@@ -1,4 +1,4 @@
-import { Auth } from "../../../lib/auth";
+import { Auth } from "../../../lib/auth/auth";
 
 export const prerender = false;
 const unAuthorizedResponse = new Response(null, {

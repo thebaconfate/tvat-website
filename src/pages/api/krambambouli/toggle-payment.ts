@@ -1,5 +1,5 @@
 import type { APIContext } from "astro";
-import { Auth } from "../../../lib/auth";
+import { Auth } from "../../../lib/auth/auth";
 import z from "zod";
 import Database from "../../../lib/database";
 

@@ -1,6 +1,6 @@
 import type { APIContext } from "astro";
 import z from "zod";
-import { Auth } from "../../../lib/auth";
+import { Auth } from "../../../lib/auth/auth";
 import Database from "../../../lib/database";
 
 const schema = z.object({
