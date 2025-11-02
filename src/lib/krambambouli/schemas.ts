@@ -23,7 +23,7 @@ export type KrambambouliPickup = z.infer<typeof krambambouliPickupSchema>;
 
 export const krambambouliPickupOrderSchema = krambambouliBaseOrderSchema
   .omit({ deliveryOption: true })
-  .extend(krambambouliPickupSchema);
+  .extend({ ...krambambouliPickupSchema });
 
 export type KrambambouliPickupOrder = z.infer<
   typeof krambambouliPickupOrderSchema
@@ -42,7 +42,7 @@ export type KrambambouliDelivery = z.infer<typeof krambambouliDeliverySchema>;
 
 export const krambambouliDeliveryOrderSchema = krambambouliBaseOrderSchema
   .omit({ deliveryOption: true })
-  .extend(krambambouliDeliverySchema);
+  .extend({ ...krambambouliDeliverySchema });
 
 export type KrambambouliDeliveryOrder = z.infer<
   typeof krambambouliDeliveryOrderSchema
