@@ -16,10 +16,11 @@ export const Tables = Object.freeze({
   USERS: "users",
 });
 
-function getEnv(key: string) {
+function getEnv(key: string, defaultValue: string | undefined = undefined) {
   const value = process.env[key];
-  if (!value) throw Error(`Missing env variable: ${key}`);
-  return value;
+  if (value) return value;
+  else if (!value && defaultValue) return defaultValue;
+  else throw Error(`Missing env variable: ${key}`);
 }
 
 export type Tables = typeof Tables;
@@ -38,6 +39,7 @@ export type DatabaseConfig = typeof DatabaseConfig;
 export const Database = Object.freeze({
   TABLES: Tables,
   CONFIG: DatabaseConfig,
+  RETRIES: parseInt(getEnv("DB_RETRIES", "10")),
 });
 
 export type Database = typeof Database;
