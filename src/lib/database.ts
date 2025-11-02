@@ -33,7 +33,7 @@ function castTinyintToBoolean(field: TypeCastField, next: TypeCastNext) {
 class Database {
   private static instance: Database | null = null;
   private static tables: Tables = DatabaseConstants.TABLES;
-  private static retries = 5;
+  private static retries = DatabaseConstants.RETRIES;
   private pool: Pool;
 
   constructor() {
@@ -48,17 +48,17 @@ class Database {
     if (Database.instance) return Database.instance;
     for (let i = 0; i < retries; i++) {
       try {
-        console.log(`Retried ${i} times`);
         const instance = new Database();
         await instance.pool.query("SELECT 1");
         Database.instance = instance;
         return Database.instance;
       } catch (err) {
+        console.log(`Tried ${i + 1} times`);
         lastError = err;
         console.warn("DB connection failed, retrying...", err);
         if (!isConnectionError(err)) break;
         Database.instance = null;
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500 * i));
       }
     }
     const msg = `Could not connect to database after ${retries} attempts`;
@@ -86,7 +86,7 @@ class Database {
         lastError = err;
         console.warn("Failed to query database, retrying...", err);
         if (isConnectionError(err)) await this.connect();
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500 * i));
       }
     }
     throw lastError;
@@ -103,7 +103,7 @@ class Database {
         lastError = err;
         console.warn("Failed to query database, retrying...", err);
         if (isConnectionError(err)) await this.connect();
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500 * i));
       }
     }
     throw lastError;
@@ -133,7 +133,7 @@ class Database {
             await connection?.rollback();
           } catch {}
         if (isConnectionError(error)) await this.connect();
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 500 * i));
       } finally {
         connection?.release();
       }
