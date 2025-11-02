@@ -5,12 +5,12 @@ export interface OrderInterface extends RowDataPacket {
   firstName: string;
   lastName: string;
   email: string;
-  euros: number;
-  cents: number;
-  isPaid: boolean;
-  isFulfilled: boolean;
+  owed: { euros: number; cents: number };
+  paid: boolean;
+  fulfilled: boolean;
   pickupLocationId: number | null;
   deliveryZoneId: number | null;
   deliveryAddressId: number | null;
   createdAt: Date;
+  orders: { productId: number; amount: number }[];
 }
