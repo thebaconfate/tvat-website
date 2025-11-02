@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { Auth } from "../../lib/auth";
+import { Auth } from "../../lib/auth/auth";
 import Database from "../../lib/database";
 import Checkbox from "../../components/krambambouli/dashboard/checkbox/Checkbox";
 
@@ -48,19 +48,6 @@ function fmtLocation({
         post +
         " " +
         city;
-}
-
-function createUpdateFunction(
-  customerId: number,
-  endpoint: string,
-  key: string,
-) {
-  return function update(newValue: boolean) {
-    return fetch(`/api/krambambouli/${endpoint}`, {
-      body: JSON.stringify({ customerId, [key]: newValue }),
-      method: "PUT",
-    });
-  };
 }
 ---
 

@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import "./styles.css";
 import { navigate } from "astro/virtual-modules/transitions-router.js";
+import { loginSchema, type LoginData } from "../../lib/auth/schemas";
 
 interface FormErrors {
   email: string[];
@@ -9,87 +12,63 @@ interface FormErrors {
 }
 
 export default function LoginForm({}) {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-  const [formErrors, setFormErrors] = useState<FormErrors>({
-    email: [],
-    password: [],
-    login: [],
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginData>({ resolver: zodResolver(loginSchema) });
+  const [serverErrors, setServerErrors] = useState<string | undefined>(
+    undefined,
+  );
 
-  const changeTextInput = (input: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = input.target;
-    setForm({ ...form, [name]: value });
-  };
-
-  function submitForm(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setFormErrors({
-      email: [],
-      password: [],
-      login: [],
-    });
+  function onSubmit(data: LoginData) {
     const url = "/api/auth/login";
     const formData = new FormData();
-    Object.entries(form).forEach(([key, value]) => formData.append(key, value));
+    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
     fetch(url, {
       body: formData,
       method: "POST",
     })
       .then((response) => {
         if (response.ok) navigate("/krambambouli/dashboard");
-        else setFormErrors({ ...formErrors, login: ["Invalid credentials"] });
+        else setServerErrors("Invalid credentials");
       })
       .catch((e: any) => {
         console.error(e);
-        setFormErrors({
-          ...formErrors,
-          login: ["Something unexpected happened"],
-        });
+        setServerErrors("Something unexpected happened");
       });
   }
   return (
     <>
-      <form onSubmit={submitForm} method="POST">
+      <form onSubmit={handleSubmit(onSubmit)} method="POST">
         <div>
           <div className="input-container">
             <label> Email </label>
             <input
               type="email"
-              name="email"
               placeholder="example@email.com"
+              {...register("email")}
               required
-              value={form.email}
-              onChange={changeTextInput}
             />
           </div>
-          {formErrors.email.length != 0 && (
+          {errors.email && (
             <div>
-              <p>{formErrors.email[0]}</p>
+              <p>{errors.email.message}</p>
             </div>
           )}
           <div className="input-container">
             <label>Wachtwoord</label>
-            <input
-              type="password"
-              name="password"
-              required
-              value={form.password}
-              placeholder="Password"
-              onChange={changeTextInput}
-            />
+            <input type="password" required {...register("password")} />
           </div>
-          {formErrors.password.length != 0 && (
+          {errors.password && (
             <div>
-              <p>{formErrors.password[0]}</p>
+              <p>{errors.password.message}</p>
             </div>
           )}
         </div>
         <div className="button-container">
           <button type="submit">Inloggen</button>
-          {formErrors.login.length != 0 && <div>{formErrors.login[0]}</div>}
+          {serverErrors && <span>{serverErrors}</span>}
         </div>
       </form>
     </>
