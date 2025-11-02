@@ -14,6 +14,21 @@ import {
   Price,
   Product,
 } from "../../lib/store";
+import { useForm } from "react-hook-form";
+import {
+  krambambouliBaseOrderSchema,
+  krambambouliDeliveryOrderSchema,
+  krambambouliDeliverySchema,
+  krambambouliOrderSchema,
+  KrambambouliPickupOrder,
+  krambambouliPickupOrderSchema,
+  krambambouliPickupSchema,
+  type KrambambouliDelivery,
+  type KrambambouliOrder,
+  type KrambambouliPickup,
+} from "../../lib/krambambouli/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod/v4";
 
 interface Props {
   products: ProductInterface[];
@@ -21,22 +36,9 @@ interface Props {
   deliveryLocations?: DeliveryZoneInterface[];
 }
 
-enum DeliveryOption {
-  Delivery = "delivery",
-  PickUp = "pick up",
-}
-
-interface Form {
-  firstName: string;
-  lastName: string;
-  email: string;
-  streetName: null | string;
-  streetNumber: null | string;
-  bus: null | string;
-  post: null | number;
-  city: null | string;
-}
-
+type BaseForm = z.infer<typeof krambambouliBaseOrderSchema>;
+type PickupForm = z.infer<typeof krambambouliPickupOrderSchema>;
+type DeliveryForm = z.infer<typeof krambambouliDeliveryOrderSchema>;
 const initialForm = {
   firstName: "",
   lastName: "",
@@ -81,6 +83,19 @@ export default function KrambambouliForm(props: Props) {
       .replaceAll(" ", "")
       .includes("krambamboulicantus");
   });
+
+  const baseForm = useForm<BaseForm>({
+    resolver: zodResolver(krambambouliBaseOrderSchema),
+  });
+  const pickupForm = useForm<KrambambouliPickup>({
+    resolver: zodResolver(krambambouliPickupSchema),
+  });
+
+  const deliveryForm = useForm<KrambambouliDelivery>({
+    resolver: zodResolver(krambambouliDeliverySchema),
+  });
+
+  const deliveryOption = baseForm.watch("deliveryOption");
 
   if (!krambambouliCantus)
     throw Error("No krambamboulicantus as pick up point");
@@ -195,7 +210,7 @@ export default function KrambambouliForm(props: Props) {
     setShowPopup(false);
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData();
     formData.append("firstName", sanitize(form.firstName));
@@ -281,7 +296,7 @@ export default function KrambambouliForm(props: Props) {
 
   return (
     <div className="form-container">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={onSubmit}>
         <div className="products-container">
           {products.map((product, index) => {
             return (
@@ -325,10 +340,8 @@ export default function KrambambouliForm(props: Props) {
                 id="firstName"
                 type="text"
                 placeholder="John"
-                name="firstName"
                 required
-                value={form.firstName}
-                onChange={handleTextInput}
+                {...register("firstName")}
               />
             </div>
             <div className="field-col">
@@ -337,10 +350,8 @@ export default function KrambambouliForm(props: Props) {
                 id="lastName"
                 type="text"
                 placeholder="Doe"
-                name="lastName"
                 required
-                value={form.lastName}
-                onChange={handleTextInput}
+                {...register("lastName")}
               />
             </div>
           </div>
@@ -383,7 +394,7 @@ export default function KrambambouliForm(props: Props) {
               </label>
             )}
           </div>
-          {(selectedOption === DeliveryOption.PickUp && (
+          {(deliveryOption === "pick up" && (
             <div className="field-row">
               <label>Afhaallocatie</label>
               {pickupLocations.map((loc, index) => {
@@ -405,83 +416,82 @@ export default function KrambambouliForm(props: Props) {
               })}
             </div>
           )) ||
-            (selectedOption === DeliveryOption.Delivery &&
-              deliveryLocations && (
-                <>
+            (deliveryOption === "delivery" && deliveryLocations && (
+              <>
+                <div className="field-row">
+                  <label form="delivery-option">Leveroptie</label>
+                  {deliveryLocations.map((loc, idx) => {
+                    return (
+                      <span key={idx} className="delivery-row">
+                        <label htmlFor={`delivery-option-${idx}`}>
+                          <input
+                            id={`delivery-option-${idx}`}
+                            type="radio"
+                            name="delivery-option"
+                            value={idx}
+                            required
+                            checked={idx === selectedDeliveryOption}
+                            onChange={makeHandleChangeDeliveryOption(idx)}
+                          />
+                          {`Levering ${loc.area}`}
+                        </label>
+                        <p>{loc.price.toString()}</p>
+                      </span>
+                    );
+                  })}
+                </div>
+                <div className="address-row">
                   <div className="field-row">
-                    <label form="delivery-option">Leveroptie</label>
-                    {deliveryLocations.map((loc, idx) => {
-                      return (
-                        <span key={idx} className="delivery-row">
-                          <label htmlFor={`delivery-option-${idx}`}>
-                            <input
-                              id={`delivery-option-${idx}`}
-                              type="radio"
-                              name="delivery-option"
-                              value={idx}
-                              required
-                              checked={idx === selectedDeliveryOption}
-                              onChange={makeHandleChangeDeliveryOption(idx)}
-                            />
-                            {`Levering ${loc.area}`}
-                          </label>
-                          <p>{loc.price.toString()}</p>
-                        </span>
-                      );
-                    })}
+                    <label htmlFor="streetName">Straatnaam</label>
+                    <input
+                      id="streetName"
+                      type="text"
+                      value={form.streetName ?? ""}
+                      name="streetName"
+                      required
+                      onChange={handleTextInput}
+                    />
+                    <label htmlFor="bus">Nummer</label>
+                    <input
+                      id="streetNumber"
+                      type="text"
+                      name="streetNumber"
+                      required
+                      value={form.streetNumber ?? ""}
+                      onChange={handleTextInput}
+                    />
+                    <label>Bus</label>
+                    <input
+                      id="bus"
+                      type="text"
+                      name="bus"
+                      value={form.bus ?? ""}
+                      onChange={handleTextInput}
+                    />
                   </div>
-                  <div className="address-row">
-                    <div className="field-row">
-                      <label htmlFor="streetName">Straatnaam</label>
-                      <input
-                        id="streetName"
-                        type="text"
-                        value={form.streetName ?? ""}
-                        name="streetName"
-                        required
-                        onChange={handleTextInput}
-                      />
-                      <label htmlFor="bus">Nummer</label>
-                      <input
-                        id="streetNumber"
-                        type="text"
-                        name="streetNumber"
-                        required
-                        value={form.streetNumber ?? ""}
-                        onChange={handleTextInput}
-                      />
-                      <label>Bus</label>
-                      <input
-                        id="bus"
-                        type="text"
-                        name="bus"
-                        value={form.bus ?? ""}
-                        onChange={handleTextInput}
-                      />
-                    </div>
-                    <div className="field-row">
-                      <label htmlFor="post">Postcode</label>
-                      <input
-                        id="post"
-                        type="number"
-                        name="post"
-                        value={form.post ?? ""}
-                        onChange={handleNumberInput}
-                        required
-                      />
-                      <label htmlFor="city">Stad</label>
-                      <input
-                        id="city"
-                        type="text"
-                        required
-                        value={form.city ?? ""}
-                        name="city"
-                        onChange={handleTextInput}
-                      />
-                    </div>
+                  <div className="field-row">
+                    <label htmlFor="post">Postcode</label>
+                    <input
+                      id="post"
+                      type="number"
+                      name="post"
+                      value={form.post ?? ""}
+                      onChange={handleNumberInput}
+                      required
+                    />
+                    <label htmlFor="city">Stad</label>
+                    <input
+                      id="city"
+                      type="text"
+                      required
+                      value={form.city ?? ""}
+                      name="city"
+                      onChange={handleTextInput}
+                    />
                   </div>
-                </>
-              ))}
+                </div>
+              </>
+            ))}
           <div className="information-container">
             <p>
               Totaalbedrag <b>{calcTotalAmount().toString()}</b>

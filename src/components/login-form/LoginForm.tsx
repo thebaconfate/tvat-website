@@ -5,12 +5,6 @@ import "./styles.css";
 import { navigate } from "astro/virtual-modules/transitions-router.js";
 import { loginSchema, type LoginData } from "../../lib/auth/schemas";
 
-interface FormErrors {
-  email: string[];
-  password: string[];
-  login: string[];
-}
-
 export default function LoginForm({}) {
   const {
     register,
@@ -23,10 +17,8 @@ export default function LoginForm({}) {
 
   function onSubmit(data: LoginData) {
     const url = "/api/auth/login";
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => formData.append(key, value));
     fetch(url, {
-      body: formData,
+      body: JSON.stringify(data),
       method: "POST",
     })
       .then((response) => {
