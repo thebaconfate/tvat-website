@@ -12,11 +12,9 @@ if (!authorized) return Astro.redirect("/login");
 const title = "Dashboard";
 const db = await Database.getInstance();
 const [page, products] = await Promise.all([
-  db.getKrambambouliOrdersByCustomer(),
+  db.getKrambambouliOrdersByCustomer(undefined, undefined, undefined, 100),
   db.getKrambambouliProducts(),
 ]);
-console.log(page);
-console.log(products);
 function fmtPrice(euros: number, cents: number) {
   return `€${euros},${cents === 0 ? "-" : cents}`;
 }
@@ -91,10 +89,10 @@ function createUpdateFunction(
     </thead>
     <tbody>
       {
-        page.content.map((order) => (
-          <tr>
+        page.content.map((order, index) => (
+          <tr class={index % 2 === 1 ? "coloured" : ""}>
             <td>{dateToDDMM(order.createdAt)}</td>
-            <td>{`${order.firstName} ${order.lastName}`}</td>
+            <td class="name">{`${order.firstName} ${order.lastName}`}</td>
             <td>{order.email}</td>
             {products.map((p) => (
               <td>
@@ -135,4 +133,26 @@ function createUpdateFunction(
       }
     </tbody>
   </table>
+  <style>
+    table {
+      margin: 1rem;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid transparent;
+      color: black;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(222, 208, 225, 1);
+    }
+
+    .name {
+      font-weight: bold;
+    }
+  </style>
 </Layout>
