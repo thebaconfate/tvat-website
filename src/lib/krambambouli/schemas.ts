@@ -16,7 +16,6 @@ export const krambambouliBaseOrderSchema = z.object({
   firstName: z.string().min(1, "First name cannot be the empty string"),
   lastName: z.string().min(1, "Last name cannot be the empty string"),
   email: z.email("Invalid email"),
-  deliveryOption: z.enum(Object.values(DeliveryOptions)),
   orders: krambambouliProductSchema.array(),
 });
 
@@ -29,9 +28,9 @@ export const krambambouliPickupSchema = z.object({
 
 export type KrambambouliPickup = z.infer<typeof krambambouliPickupSchema>;
 
-export const krambambouliPickupOrderSchema = krambambouliBaseOrderSchema
-  .omit({ deliveryOption: true })
-  .extend({ ...krambambouliPickupSchema });
+export const krambambouliPickupOrderSchema = krambambouliBaseOrderSchema.extend(
+  { ...krambambouliPickupSchema },
+);
 
 export type KrambambouliPickupOrder = z.infer<
   typeof krambambouliPickupOrderSchema
@@ -48,9 +47,8 @@ export const krambambouliDeliverySchema = z.object({
 
 export type KrambambouliDelivery = z.infer<typeof krambambouliDeliverySchema>;
 
-export const krambambouliDeliveryOrderSchema = krambambouliBaseOrderSchema
-  .omit({ deliveryOption: true })
-  .extend({ ...krambambouliDeliverySchema });
+export const krambambouliDeliveryOrderSchema =
+  krambambouliBaseOrderSchema.extend({ ...krambambouliDeliverySchema });
 
 export type KrambambouliDeliveryOrder = z.infer<
   typeof krambambouliDeliveryOrderSchema

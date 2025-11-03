@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./styles.css";
 import DOMPurify from "dompurify";
-import { apiRoutes } from "../../lib/routes";
-import { createUrl } from "../../lib/utils";
 import { Popup } from "../popup/Popup";
 import { PopupEnum } from "../../lib/popup";
 import type { ProductInterface } from "../../lib/interfaces/database/product";
@@ -20,17 +18,82 @@ import {
   krambambouliBaseOrderSchema,
   krambambouliDeliverySchema,
   krambambouliPickupSchema,
-  type KrambambouliBaseOrder,
-  type KrambambouliDelivery,
-  type KrambambouliPickup,
 } from "../../lib/krambambouli/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod/v4";
 
 interface Props {
   products: ProductInterface[];
   pickUpLocations: PickupLocationInterface[];
   deliveryLocations?: DeliveryZoneInterface[];
 }
+
+function isNullOrUndefined(value: any) {
+  return value === null || value === undefined;
+}
+
+const schema = krambambouliBaseOrderSchema
+  .extend({ deliveryOption: z.enum(Object.values(DeliveryOptions)) })
+  .and(krambambouliDeliverySchema.omit({ deliveryOption: true }).partial())
+  .and(
+    krambambouliPickupSchema
+      .omit({ deliveryOption: true, pickupLocation: true })
+      .extend({
+        pickupLocation: z.string(),
+      })
+      .partial(),
+  )
+  .superRefine((data, ctx) => {
+    if (data.deliveryOption === DeliveryOptions.PickUp)
+      if (isNullOrUndefined(data.pickupLocation))
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "pickupLocation is not optional when deliveryOption is pick up",
+          path: ["pickupLocation"],
+        });
+      else {
+        const n = Number(data.pickupLocation);
+        const ns = krambambouliPickupSchema.pick({ pickupLocation: true });
+        const result = ns.safeParse({ pickupLocation: n });
+        if (result.error) {
+          ctx.addIssue({
+            code: "custom",
+            message: result.error.message,
+            path: ["pickupLocation"],
+          });
+        }
+      }
+    if (data.deliveryOption === DeliveryOptions.Delivery) {
+      if (isNullOrUndefined(data.streetName))
+        ctx.addIssue({
+          code: "custom",
+          message: "streetName is not optional when deliveryOption is delivery",
+          path: ["streetName"],
+        });
+      else if (isNullOrUndefined(data.streetNumber))
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "streetNumber is not optional when deliveryOption is delivery",
+          path: ["streetNumber"],
+        });
+      if (isNullOrUndefined(data.post))
+        ctx.addIssue({
+          code: "custom",
+          message: "post is not optional when deliveryOption is delivery",
+          path: ["post"],
+        });
+      if (isNullOrUndefined(data.city))
+        ctx.addIssue({
+          code: "custom",
+          message: "city is not optional when deliveryOption is delivery",
+          path: ["city"],
+        });
+    }
+  });
+
+type KrambambouliForm = z.infer<typeof schema>;
 
 function createPickupStartDate(str: string) {
   const strplit = str.split("/");
@@ -66,8 +129,16 @@ export default function KrambambouliForm(props: Props) {
       .includes("krambamboulicantus");
   });
 
-  const baseForm = useForm<KrambambouliBaseOrder>({
-    resolver: zodResolver(krambambouliBaseOrderSchema),
+  const {
+    register,
+    watch,
+    setValue,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<KrambambouliForm>({
+    resolver: zodResolver(schema),
     defaultValues: {
       orders: props.products.map((p) => {
         return { productId: p.id, amount: 0 };
@@ -75,17 +146,9 @@ export default function KrambambouliForm(props: Props) {
     },
   });
 
-  const firstName = baseForm.watch("firstName");
-  const lastName = baseForm.watch("lastName");
-  const pickupForm = useForm<KrambambouliPickup>({
-    resolver: zodResolver(krambambouliPickupSchema),
-  });
-
-  const deliveryForm = useForm<KrambambouliDelivery>({
-    resolver: zodResolver(krambambouliDeliverySchema),
-  });
-
-  const deliveryOption = baseForm.watch("deliveryOption");
+  const firstName = watch("firstName");
+  const lastName = watch("lastName");
+  const deliveryOption = watch("deliveryOption");
 
   if (!krambambouliCantus)
     throw Error("No krambamboulicantus as pick up point");
@@ -122,13 +185,11 @@ export default function KrambambouliForm(props: Props) {
   }
 
   function calcTotalAmount() {
-    const total = baseForm
-      .getValues("orders")
-      .reduce(
-        (acc: Price, product, index) =>
-          acc.add(products[index].price.mult(product.amount)),
-        new Price(0),
-      );
+    const total = getValues("orders").reduce(
+      (acc: Price, product, index) =>
+        acc.add(products[index].price.mult(product.amount)),
+      new Price(0),
+    );
     if (deliveryOption === DeliveryOptions.Delivery)
       if (selectedDeliveryOption != null && deliveryLocations)
         return total.add(deliveryLocations[selectedDeliveryOption].price);
@@ -143,6 +204,20 @@ export default function KrambambouliForm(props: Props) {
       });
   }, []);
 
+  useEffect(() => {
+    if (deliveryOption === DeliveryOptions.PickUp) {
+      reset({
+        streetName: undefined,
+        streetNumber: undefined,
+        bus: undefined,
+        post: undefined,
+        city: undefined,
+      });
+    } else if (deliveryOption === DeliveryOptions.Delivery) {
+      reset({ pickupLocation: undefined });
+    }
+  }, []);
+
   function sanitize(input: any) {
     return DOMPurify.sanitize(input);
   }
@@ -151,21 +226,23 @@ export default function KrambambouliForm(props: Props) {
     setShowPopup(false);
   }
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function onSubmit(formData: KrambambouliForm) {
+    console.log(formData);
     const total = calcTotalAmount();
+    const data = {};
+    try {
+    } catch (e) {
+      console.error(e);
+    }
   }
-
-  const fieldForm = baseForm.watch("orders");
-  console.log(fieldForm);
 
   return (
     <div className="form-container">
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="products-container">
           {products.map((product, index) => {
             const fieldName = `orders.${index}.amount` as const;
-            const amount = baseForm.watch(fieldName);
+            const amount = watch(fieldName);
             return (
               <div key={product.id} className="product">
                 <picture className="product-image">
@@ -185,10 +262,7 @@ export default function KrambambouliForm(props: Props) {
                     <button
                       type="button"
                       onClick={() =>
-                        baseForm.setValue(
-                          fieldName,
-                          Math.max((amount || 0) - 1, 0),
-                        )
+                        setValue(fieldName, Math.max((amount || 0) - 1, 0))
                       }
                     >
                       -
@@ -196,7 +270,7 @@ export default function KrambambouliForm(props: Props) {
                     <input
                       type="number"
                       value={amount}
-                      {...baseForm.register(fieldName, {
+                      {...register(fieldName, {
                         valueAsNumber: true,
                         min: 0,
                       })}
@@ -204,10 +278,7 @@ export default function KrambambouliForm(props: Props) {
                     <button
                       type="button"
                       onClick={() =>
-                        baseForm.setValue(
-                          fieldName,
-                          Math.max((amount || 0) + 1, 0),
-                        )
+                        setValue(fieldName, Math.max((amount || 0) + 1, 0))
                       }
                     >
                       +
@@ -227,7 +298,7 @@ export default function KrambambouliForm(props: Props) {
                 type="text"
                 placeholder="John"
                 required
-                {...baseForm.register("firstName")}
+                {...register("firstName")}
               />
             </div>
             <div className="field-col">
@@ -237,7 +308,7 @@ export default function KrambambouliForm(props: Props) {
                 type="text"
                 placeholder="Doe"
                 required
-                {...baseForm.register("lastName")}
+                {...register("lastName")}
               />
             </div>
           </div>
@@ -248,7 +319,7 @@ export default function KrambambouliForm(props: Props) {
               type="email"
               required
               placeholder="john.doe@hotmail.com"
-              {...baseForm.register("email")}
+              {...register("email")}
             />
           </div>
           <div className="field-row radio-options-container">
@@ -258,8 +329,7 @@ export default function KrambambouliForm(props: Props) {
                 type="radio"
                 required
                 value={DeliveryOptions.PickUp}
-                checked={deliveryOption === DeliveryOptions.PickUp}
-                {...baseForm.register("deliveryOption")}
+                {...register("deliveryOption")}
               />
               {`Afhalen tussen ${dateToDDMM(krambambouliCantusDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
             </label>
@@ -269,8 +339,7 @@ export default function KrambambouliForm(props: Props) {
                   type="radio"
                   required
                   value={DeliveryOptions.Delivery}
-                  checked={deliveryOption === DeliveryOptions.Delivery}
-                  {...baseForm.register("deliveryOption")}
+                  {...register("deliveryOption")}
                 />
                 {`Leveren tussen ${dateToDDMM(deliveryStartDate)} en ${dateToDDMM(deliveryEndDate)}`}
               </label>
@@ -284,9 +353,11 @@ export default function KrambambouliForm(props: Props) {
                   <label key={index}>
                     <input
                       type="radio"
-                      value={index}
+                      value={loc.id}
                       required
-                      {...pickupForm.register("pickupLocation")}
+                      {...register("pickupLocation", {
+                        setValueAs: (v) => Number(v),
+                      })}
                     />
                     {krambambouliCantus.description === loc.description
                       ? krambambouliCantus.description
@@ -328,21 +399,17 @@ export default function KrambambouliForm(props: Props) {
                         id="streetName"
                         type="text"
                         required
-                        {...deliveryForm.register("streetName")}
+                        {...register("streetName")}
                       />
                       <label htmlFor="bus">Nummer</label>
                       <input
                         id="streetNumber"
                         type="number"
                         required
-                        {...deliveryForm.register("streetNumber")}
+                        {...register("streetNumber", { valueAsNumber: true })}
                       />
                       <label>Bus</label>
-                      <input
-                        id="bus"
-                        type="text"
-                        {...deliveryForm.register("bus")}
-                      />
+                      <input id="bus" type="text" {...register("bus")} />
                     </div>
                     <div className="field-row">
                       <label htmlFor="post">Postcode</label>
@@ -350,14 +417,14 @@ export default function KrambambouliForm(props: Props) {
                         id="post"
                         type="number"
                         required
-                        {...deliveryForm.register("post")}
+                        {...register("post", { valueAsNumber: true })}
                       />
                       <label htmlFor="city">Stad</label>
                       <input
                         id="city"
                         type="text"
                         required
-                        {...deliveryForm.register("city")}
+                        {...register("city")}
                       />
                     </div>
                   </div>
