@@ -5,11 +5,19 @@ export enum DeliveryOptions {
   Delivery = "delivery",
 }
 
+export const krambambouliProductSchema = z.object({
+  productId: z.number().int().nonnegative(),
+  amount: z.number().int().nonnegative(),
+});
+
+export type KrambambouliProduct = z.infer<typeof krambambouliProductSchema>;
+
 export const krambambouliBaseOrderSchema = z.object({
   firstName: z.string().min(1, "First name cannot be the empty string"),
   lastName: z.string().min(1, "Last name cannot be the empty string"),
   email: z.email("Invalid email"),
   deliveryOption: z.enum(Object.values(DeliveryOptions)),
+  orders: krambambouliProductSchema.array(),
 });
 
 export type KrambambouliBaseOrder = z.infer<typeof krambambouliBaseOrderSchema>;

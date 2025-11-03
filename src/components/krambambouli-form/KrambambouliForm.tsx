@@ -18,33 +18,19 @@ import { useForm } from "react-hook-form";
 import {
   DeliveryOptions,
   krambambouliBaseOrderSchema,
-  krambambouliDeliveryOrderSchema,
   krambambouliDeliverySchema,
-  krambambouliPickupOrderSchema,
   krambambouliPickupSchema,
   type KrambambouliBaseOrder,
   type KrambambouliDelivery,
   type KrambambouliPickup,
 } from "../../lib/krambambouli/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod/v4";
 
 interface Props {
   products: ProductInterface[];
   pickUpLocations: PickupLocationInterface[];
   deliveryLocations?: DeliveryZoneInterface[];
 }
-
-const initialForm = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  streetName: null,
-  streetNumber: null,
-  bus: null,
-  post: null,
-  city: null,
-};
 
 function createPickupStartDate(str: string) {
   const strplit = str.split("/");
@@ -82,6 +68,11 @@ export default function KrambambouliForm(props: Props) {
 
   const baseForm = useForm<KrambambouliBaseOrder>({
     resolver: zodResolver(krambambouliBaseOrderSchema),
+    defaultValues: {
+      orders: props.products.map((p) => {
+        return { productId: p.id, amount: 0 };
+      }),
+    },
   });
 
   const firstName = baseForm.watch("firstName");
@@ -116,10 +107,6 @@ export default function KrambambouliForm(props: Props) {
   const deliveryEndDate = new Date(deliveryStartDate);
   deliveryEndDate.setDate(deliveryEndDate.getDate() + 10);
 
-  const [amountList, setAmountList] = useState(products.map((_) => 0));
-  const [selectedPickUpOption, setSelectedPickUpOption] = useState<
-    null | number
-  >(null);
   const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<
     null | number
   >(null);
@@ -129,42 +116,19 @@ export default function KrambambouliForm(props: Props) {
     text: "",
   });
 
-  function makeHandleChangeAmount(idx: number) {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(e.target.value);
-      const copy = [...amountList];
-      copy[idx] = value <= 0 ? 0 : value;
-      setAmountList(copy);
-    };
-  }
-
-  function makeHandlePressAmount(func: (x: number) => number) {
-    return (idx: number) => {
-      return (_: React.MouseEvent<HTMLButtonElement>) => {
-        const value = func(amountList[idx]);
-        const copy = [...amountList];
-        copy[idx] = value <= 0 ? 0 : value;
-        setAmountList(copy);
-      };
-    };
-  }
-
-  const handlePressAmountDec = makeHandlePressAmount((x: number) =>
-    x <= 0 ? 0 : x - 1,
-  );
-  const handlePressAmountInc = makeHandlePressAmount((x: number) => x + 1);
-
   function makeHandleChangeDeliveryOption(idx: number) {
     return (_: React.ChangeEvent<HTMLInputElement>) =>
       setSelectedDeliveryOption(idx);
   }
 
   function calcTotalAmount() {
-    const total = amountList.reduce(
-      (acc: Price, amount: number, index: number) =>
-        acc.add(products[index].price.mult(amount)),
-      new Price(0),
-    );
+    const total = baseForm
+      .getValues("orders")
+      .reduce(
+        (acc: Price, product, index) =>
+          acc.add(products[index].price.mult(product.amount)),
+        new Price(0),
+      );
     if (deliveryOption === DeliveryOptions.Delivery)
       if (selectedDeliveryOption != null && deliveryLocations)
         return total.add(deliveryLocations[selectedDeliveryOption].price);
@@ -189,82 +153,19 @@ export default function KrambambouliForm(props: Props) {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData();
     const total = calcTotalAmount();
-    formData.append(
-      "owedAmount",
-      JSON.stringify({
-        euros: sanitize(total.euros),
-        cents: sanitize(total.cents),
-      }),
-    );
-    if (
-      deliveryOption === DeliveryOptions.PickUp &&
-      selectedPickUpOption != null
-    ) {
-      if (selectedPickUpOption >= 0)
-        formData.append(
-          "pickUpLocation",
-          sanitize(pickupLocations[selectedPickUpOption].id),
-        );
-    } else if (
-      deliveryOption === DeliveryOptions.Delivery &&
-      selectedDeliveryOption != null
-    ) {
-    }
-    if (amountList.every((a) => a === 0)) {
-      setPopupContent({
-        title: PopupEnum.ERROR,
-        text: "Voeg eerst producten toe aan je winkelmand",
-      });
-      setShowPopup(true);
-      return;
-    }
-    for (let i = 0; i < products.length; i++) {
-      if (amountList[i] > 0)
-        formData.append(
-          "order",
-          JSON.stringify({
-            id: sanitize(products[i].id),
-            amount: sanitize(amountList[i]),
-          }),
-        );
-    }
-    await fetch(
-      createUrl([
-        window.location.origin,
-        apiRoutes.krambambouli.url,
-        apiRoutes.krambambouli.order.url,
-      ]),
-      {
-        method: "POST",
-        body: formData,
-      },
-    ).then((response) => {
-      if (!response.ok) {
-        setPopupContent({
-          title: PopupEnum.ERROR,
-          text: "Er is iets misgegaan bij het opsturen van de gegevens, probeer het later op nieuw",
-        });
-        setShowPopup(true);
-      } else {
-        setPopupContent({
-          title: PopupEnum.SUCCESS,
-          text: "Dankje voor de bestelling, eenmaal dat we de betaling hebben ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering",
-        });
-        setShowPopup(true);
-        setAmountList(products.map((_) => 0));
-        setSelectedPickUpOption(null);
-        setSelectedDeliveryOption(null);
-      }
-    });
   }
+
+  const fieldForm = baseForm.watch("orders");
+  console.log(fieldForm);
 
   return (
     <div className="form-container">
       <form onSubmit={onSubmit}>
         <div className="products-container">
           {products.map((product, index) => {
+            const fieldName = `orders.${index}.amount` as const;
+            const amount = baseForm.watch(fieldName);
             return (
               <div key={product.id} className="product">
                 <picture className="product-image">
@@ -281,15 +182,34 @@ export default function KrambambouliForm(props: Props) {
                     <p>{product.price.toString()}</p>
                   </div>
                   <div className="product-button-container">
-                    <button type="button" onClick={handlePressAmountDec(index)}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        baseForm.setValue(
+                          fieldName,
+                          Math.max((amount || 0) - 1, 0),
+                        )
+                      }
+                    >
                       -
                     </button>
                     <input
                       type="number"
-                      value={amountList[index]}
-                      onChange={makeHandleChangeAmount(index)}
+                      value={amount}
+                      {...baseForm.register(fieldName, {
+                        valueAsNumber: true,
+                        min: 0,
+                      })}
                     />
-                    <button type="button" onClick={handlePressAmountInc(index)}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        baseForm.setValue(
+                          fieldName,
+                          Math.max((amount || 0) + 1, 0),
+                        )
+                      }
+                    >
                       +
                     </button>
                   </div>

@@ -8,7 +8,7 @@ const userDetailsSchema = z
   .object({
     firstName: z.string(),
     lastName: z.string(),
-    email: z.string().email(),
+    email: z.email(),
     deliveryOption: z.string(),
     owedAmount: z
       .string()
