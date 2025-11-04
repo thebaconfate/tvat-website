@@ -25,8 +25,9 @@ export class Price {
   }
 
   toString(): string {
-    const postComma = this.cents === 0 ? "-" : `${this.cents}`;
-    const result = `€${this.euros},` + postComma;
+    const postComma =
+      this.cents === 0 || isNaN(this.cents) ? "-" : `${this.cents}`;
+    const result = `€${isNaN(this.euros) ? 0 : this.euros},` + postComma;
     return result;
   }
 }

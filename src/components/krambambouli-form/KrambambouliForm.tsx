@@ -32,6 +32,8 @@ function isNullOrUndefined(value: any) {
   return value === null || value === undefined;
 }
 
+const sanitizedSchema = z.object({});
+
 const schema = krambambouliBaseOrderSchema
   .extend({ deliveryOption: z.enum(Object.values(DeliveryOptions)) })
   .and(krambambouliDeliverySchema.omit({ deliveryOption: true }).partial())
@@ -229,8 +231,44 @@ export default function KrambambouliForm(props: Props) {
   async function onSubmit(formData: KrambambouliForm) {
     console.log(formData);
     const total = calcTotalAmount();
-    const data = {};
+    const data = {
+      owed: total,
+      firstName: sanitize(formData.firstName),
+      lastName: sanitize(formData.lastName),
+      email: sanitize(formData.email),
+      orders: formData.orders.filter((order) => order.amount > 0),
+      ...((formData.pickupLocation && {
+        pickupLocation: Number(formData.pickupLocation),
+      }) ||
+        (formData.streetName &&
+          formData.streetNumber &&
+          formData.post &&
+          formData.city && {
+            streetName: sanitize(formData.streetName),
+            streetNumber: formData.streetNumber,
+            ...(formData.bus && { bus: sanitize(formData.bus) }),
+            post: formData.post,
+            city: sanitize(formData.city),
+          })),
+    };
     try {
+      const result = await fetch("/api/krambambouli/order", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      if (result.ok) {
+        setPopupContent({
+          title: PopupEnum.SUCCESS,
+          text: "Dankje voor de bestelling, eenmaal dat we de betaling hebben ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering",
+        });
+        setShowPopup(true);
+      } else {
+        setPopupContent({
+          title: PopupEnum.ERROR,
+          text: result.statusText,
+        });
+        setShowPopup(true);
+      }
     } catch (e) {
       console.error(e);
     }

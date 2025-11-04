@@ -1,6 +1,7 @@
 import { z } from "zod";
 import Database from "../../../lib/database";
 import type { KrambambouliCustomer } from "../../../lib/krambambouli";
+import type { APIContext } from "astro";
 
 export const prerender = false;
 
@@ -127,11 +128,14 @@ async function createPickupOrder(
     orders,
   );
 }
-export async function POST({
-  request,
-}: {
-  request: Request;
-}): Promise<Response> {
+export async function POST({ request }: APIContext): Promise<Response> {
+  try {
+    const body = await request.json();
+
+    return new Response();
+  } catch (e) {
+    return new Response();
+  }
   const formData = await request.formData();
   if (!isValidForm(formData)) return badResponse;
   const rawUserDetails = {
