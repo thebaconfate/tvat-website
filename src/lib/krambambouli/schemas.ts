@@ -6,8 +6,11 @@ export enum DeliveryOptions {
 }
 
 export const krambambouliProductSchema = z.object({
-  productId: z.number().int().nonnegative(),
-  amount: z.number().int().nonnegative(),
+  productId: z.number("Expected a product identifier").int().nonnegative(),
+  amount: z
+    .number("Expected at least one product in order")
+    .int()
+    .nonnegative(),
 });
 
 export type KrambambouliProduct = z.infer<typeof krambambouliProductSchema>;

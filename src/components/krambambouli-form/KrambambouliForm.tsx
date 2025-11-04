@@ -12,7 +12,7 @@ import {
   Price,
   Product,
 } from "../../lib/store";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import {
   DeliveryOptions,
   krambambouliBaseOrderSchema,
@@ -218,6 +218,23 @@ export default function KrambambouliForm(props: Props) {
     }
   }, []);
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      const extractMessages = (errObj: FieldErrors): string[] =>
+        Object.entries(errObj).flatMap(([key, val]) => {
+          if (val?.message) return [`${val.message}`];
+          if (typeof val === "object")
+            return extractMessages(val as FieldErrors);
+          return [];
+        });
+      setPopupContent({
+        title: PopupEnum.ERROR,
+        text: extractMessages(errors).join("\n"),
+      });
+      setShowPopup(true);
+    }
+  }, [errors]);
+
   function sanitize(input: any) {
     return DOMPurify.sanitize(input);
   }
@@ -261,6 +278,21 @@ export default function KrambambouliForm(props: Props) {
           text: "Dankje voor de bestelling, eenmaal dat we de betaling hebben ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering",
         });
         setShowPopup(true);
+        reset({
+          email: undefined,
+          firstName: undefined,
+          lastName: undefined,
+          orders: props.products.map((o) => {
+            return { productId: o.id, amount: 0 };
+          }),
+          deliveryOption: undefined,
+          streetName: undefined,
+          streetNumber: undefined,
+          bus: undefined,
+          post: undefined,
+          pickupLocation: undefined,
+          city: undefined,
+        });
       } else {
         setPopupContent({
           title: PopupEnum.ERROR,
@@ -306,10 +338,11 @@ export default function KrambambouliForm(props: Props) {
                     </button>
                     <input
                       type="number"
-                      value={amount}
                       {...register(fieldName, {
                         valueAsNumber: true,
                         min: 0,
+                        setValueAs: (v) =>
+                          v === "" || v == null ? 0 : Number(v),
                       })}
                     />
                     <button
