@@ -12,15 +12,15 @@ import {
   Price,
   Product,
 } from "../../lib/store";
-import { useForm, type FieldErrors } from "react-hook-form";
 import {
   DeliveryOptions,
   krambambouliBaseOrderSchema,
   krambambouliDeliverySchema,
+  krambambouliOrderSchema,
   krambambouliPickupSchema,
 } from "../../lib/krambambouli/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod/v4";
+import { useForm } from "@tanstack/react-form";
 
 interface Props {
   products: ProductInterface[];
@@ -129,26 +129,9 @@ export default function KrambambouliForm(props: Props) {
       .includes("krambamboulicantus");
   });
 
-  const {
-    register,
-    watch,
-    setValue,
-    getValues,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<KrambambouliForm>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      orders: props.products.map((p) => {
-        return { productId: p.id, amount: 0 };
-      }),
-    },
+  const form = useForm({
+    validators: { onSubmit: krambambouliOrderSchema },
   });
-
-  const firstName = watch("firstName");
-  const lastName = watch("lastName");
-  const deliveryOption = watch("deliveryOption");
 
   if (!krambambouliCantus)
     throw Error("No krambamboulicantus as pick up point");
@@ -184,17 +167,7 @@ export default function KrambambouliForm(props: Props) {
       setSelectedDeliveryOption(idx);
   }
 
-  function calcTotalAmount() {
-    const total = getValues("orders").reduce(
-      (acc: Price, product, index) =>
-        acc.add(products[index].price.mult(product.amount)),
-      new Price(0),
-    );
-    if (deliveryOption === DeliveryOptions.Delivery)
-      if (selectedDeliveryOption != null && deliveryLocations)
-        return total.add(deliveryLocations[selectedDeliveryOption].price);
-    return total;
-  }
+  function calcTotalAmount() {}
 
   useEffect(() => {
     if (window)
@@ -204,37 +177,6 @@ export default function KrambambouliForm(props: Props) {
       });
   }, []);
 
-  useEffect(() => {
-    if (deliveryOption === DeliveryOptions.PickUp) {
-      reset({
-        streetName: undefined,
-        streetNumber: undefined,
-        bus: undefined,
-        post: undefined,
-        city: undefined,
-      });
-    } else if (deliveryOption === DeliveryOptions.Delivery) {
-      reset({ pickupLocation: undefined });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      const extractMessages = (errObj: FieldErrors): string[] =>
-        Object.entries(errObj).flatMap(([key, val]) => {
-          if (val?.message) return [`${val.message}`];
-          if (typeof val === "object")
-            return extractMessages(val as FieldErrors);
-          return [];
-        });
-      setPopupContent({
-        title: PopupEnum.ERROR,
-        text: extractMessages(errors).join("\n"),
-      });
-      setShowPopup(true);
-    }
-  }, [errors]);
-
   function sanitize(input: any) {
     return DOMPurify.sanitize(input);
   }
@@ -243,75 +185,17 @@ export default function KrambambouliForm(props: Props) {
     setShowPopup(false);
   }
 
-  async function onSubmit(formData: KrambambouliForm) {
-    console.log(formData);
-    const total = calcTotalAmount();
-    const data = {
-      owed: total,
-      firstName: sanitize(formData.firstName),
-      lastName: sanitize(formData.lastName),
-      email: sanitize(formData.email),
-      deliveryOption: sanitize(formData.deliveryOption),
-      orders: formData.orders.filter((order) => order.amount > 0),
-      ...((formData.pickupLocation && {
-        pickupLocation: Number(formData.pickupLocation),
-      }) ||
-        (formData.streetName &&
-          formData.streetNumber &&
-          formData.post &&
-          formData.city && {
-            streetName: sanitize(formData.streetName),
-            streetNumber: formData.streetNumber,
-            ...(formData.bus && { bus: sanitize(formData.bus) }),
-            post: formData.post,
-            city: sanitize(formData.city),
-          })),
-    };
-    try {
-      const result = await fetch("/api/krambambouli/order", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      if (result.ok) {
-        setPopupContent({
-          title: PopupEnum.SUCCESS,
-          text: "Dankje voor de bestelling, eenmaal dat we de betaling hebben ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering",
-        });
-        setShowPopup(true);
-        reset({
-          email: undefined,
-          firstName: undefined,
-          lastName: undefined,
-          orders: props.products.map((o) => {
-            return { productId: o.id, amount: 0 };
-          }),
-          deliveryOption: undefined,
-          streetName: undefined,
-          streetNumber: undefined,
-          bus: undefined,
-          post: undefined,
-          pickupLocation: undefined,
-          city: undefined,
-        });
-      } else {
-        setPopupContent({
-          title: PopupEnum.ERROR,
-          text: result.statusText,
-        });
-        setShowPopup(true);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
   return (
     <div className="form-container">
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         <div className="products-container">
           {products.map((product, index) => {
             const fieldName = `orders.${index}.amount` as const;
-            const amount = watch(fieldName);
             return (
               <div key={product.id} className="product">
                 <picture className="product-image">
@@ -328,31 +212,9 @@ export default function KrambambouliForm(props: Props) {
                     <p>{product.price.toString()}</p>
                   </div>
                   <div className="product-button-container">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setValue(fieldName, Math.max((amount || 0) - 1, 0))
-                      }
-                    >
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      {...register(fieldName, {
-                        valueAsNumber: true,
-                        min: 0,
-                        setValueAs: (v) =>
-                          v === "" || v == null ? 0 : Number(v),
-                      })}
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setValue(fieldName, Math.max((amount || 0) + 1, 0))
-                      }
-                    >
-                      +
-                    </button>
+                    <button type="button">-</button>
+                    <input type="number" />
+                    <button type="button">+</button>
                   </div>
                 </div>
               </div>
@@ -363,23 +225,11 @@ export default function KrambambouliForm(props: Props) {
           <div className="field-row">
             <div className="field-col">
               <label htmlFor="firstName">Voornaam</label>
-              <input
-                id="firstName"
-                type="text"
-                placeholder="John"
-                required
-                {...register("firstName")}
-              />
+              <input id="firstName" type="text" placeholder="John" required />
             </div>
             <div className="field-col">
               <label form="lastName">Achternaam</label>
-              <input
-                id="lastName"
-                type="text"
-                placeholder="Doe"
-                required
-                {...register("lastName")}
-              />
+              <input id="lastName" type="text" placeholder="Doe" required />
             </div>
           </div>
           <div className="field-row">
@@ -389,33 +239,22 @@ export default function KrambambouliForm(props: Props) {
               type="email"
               required
               placeholder="john.doe@hotmail.com"
-              {...register("email")}
             />
           </div>
           <div className="field-row radio-options-container">
             <label>Leveringsopties</label>
             <label>
-              <input
-                type="radio"
-                required
-                value={DeliveryOptions.PickUp}
-                {...register("deliveryOption")}
-              />
+              <input type="radio" required value={DeliveryOptions.PickUp} />
               {`Afhalen tussen ${dateToDDMM(krambambouliCantusDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
             </label>
             {deliveryLocations && (
               <label>
-                <input
-                  type="radio"
-                  required
-                  value={DeliveryOptions.Delivery}
-                  {...register("deliveryOption")}
-                />
+                <input type="radio" required value={DeliveryOptions.Delivery} />
                 {`Leveren tussen ${dateToDDMM(deliveryStartDate)} en ${dateToDDMM(deliveryEndDate)}`}
               </label>
             )}
           </div>
-          {(deliveryOption === DeliveryOptions.PickUp && (
+          {/*(deliveryOption === DeliveryOptions.PickUp && (
             <div className="field-row">
               <label>Afhaallocatie</label>
               {pickupLocations.map((loc, index) => {
@@ -499,10 +338,10 @@ export default function KrambambouliForm(props: Props) {
                     </div>
                   </div>
                 </>
-              ))}
+              ))*/}
           <div className="information-container">
             <p>
-              Totaalbedrag <b>{calcTotalAmount().toString()}</b>
+              Totaalbedrag <b>{/*calcTotalAmount().toString()*/}</b>
             </p>
             <p>
               Over te schrijven naar de VATrekening: <b>BE60 7310 1732 4070</b>
@@ -511,17 +350,17 @@ export default function KrambambouliForm(props: Props) {
               Met mededeling:{" "}
               <b>
                 krambambouli +{" "}
-                {!firstName && !lastName
+                {/*!firstName && !lastName
                   ? "[Voornaam Achternaam]"
-                  : [firstName, lastName].join(" ")}
+                  : [firstName, lastName].join(" ")*/}
               </b>
             </p>
           </div>
-          {deliveryOption !== null && (
+          {/*deliveryOption !== null && (
             <div className="submit-button-container">
               <button type="submit">Bestellen</button>
             </div>
-          )}
+          )*/}
         </div>
       </form>
       {showPopup && (
