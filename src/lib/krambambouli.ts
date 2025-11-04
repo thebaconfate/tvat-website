@@ -16,8 +16,8 @@ export interface KrambambouliProduct {
 
 export interface KrambambouliCustomerAddress {
   streetName: string;
-  houseNumber: string;
-  bus: string;
+  houseNumber: number;
+  bus?: string;
   post: number;
   city: string;
 }

@@ -32,8 +32,6 @@ function isNullOrUndefined(value: any) {
   return value === null || value === undefined;
 }
 
-const sanitizedSchema = z.object({});
-
 const schema = krambambouliBaseOrderSchema
   .extend({ deliveryOption: z.enum(Object.values(DeliveryOptions)) })
   .and(krambambouliDeliverySchema.omit({ deliveryOption: true }).partial())
@@ -236,6 +234,7 @@ export default function KrambambouliForm(props: Props) {
       firstName: sanitize(formData.firstName),
       lastName: sanitize(formData.lastName),
       email: sanitize(formData.email),
+      deliveryOption: sanitize(formData.deliveryOption),
       orders: formData.orders.filter((order) => order.amount > 0),
       ...((formData.pickupLocation && {
         pickupLocation: Number(formData.pickupLocation),

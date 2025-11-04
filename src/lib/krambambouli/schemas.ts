@@ -28,9 +28,10 @@ export const krambambouliPickupSchema = z.object({
 
 export type KrambambouliPickup = z.infer<typeof krambambouliPickupSchema>;
 
-export const krambambouliPickupOrderSchema = krambambouliBaseOrderSchema.extend(
-  { ...krambambouliPickupSchema },
-);
+export const krambambouliPickupOrderSchema = z.object({
+  ...krambambouliBaseOrderSchema.shape,
+  ...krambambouliPickupSchema.shape,
+});
 
 export type KrambambouliPickupOrder = z.infer<
   typeof krambambouliPickupOrderSchema
@@ -47,16 +48,18 @@ export const krambambouliDeliverySchema = z.object({
 
 export type KrambambouliDelivery = z.infer<typeof krambambouliDeliverySchema>;
 
-export const krambambouliDeliveryOrderSchema =
-  krambambouliBaseOrderSchema.extend({ ...krambambouliDeliverySchema });
+export const krambambouliDeliveryOrderSchema = z.object({
+  ...krambambouliBaseOrderSchema.shape,
+  ...krambambouliDeliverySchema.shape,
+});
 
 export type KrambambouliDeliveryOrder = z.infer<
   typeof krambambouliDeliveryOrderSchema
 >;
 
 export const krambambouliOrderSchema = z.discriminatedUnion("deliveryOption", [
-  krambambouliPickupOrderSchema,
   krambambouliDeliveryOrderSchema,
+  krambambouliPickupOrderSchema,
 ]);
 
 export type KrambambouliOrder = z.infer<typeof krambambouliOrderSchema>;
