@@ -25,7 +25,7 @@ const initScores: Score = {
 };
 
 export default function CodexChallenge({
-        dutchSongs,
+  dutchSongs,
   frenchSongs,
   germanSongs,
   otherSongs,
@@ -117,7 +117,7 @@ export default function CodexChallenge({
               <p>Welkom tot de codex challenge. </p>
               <p>
                 Voor de challenge wordt gevraagd om de eerste strofe en het
-                refrein te zingen zonder codex, tenzij anders vermeld.
+                refrein te zingen met codex, tenzij anders vermeld.
               </p>
               <p>
                 Elk lied staat op 2 punten en er worden 10 liedjes gevraagd. Je
