@@ -6,18 +6,14 @@ import { PopupEnum } from "../../lib/popup";
 import type { ProductInterface } from "../../lib/interfaces/database/product";
 import type { PickupLocationInterface } from "../../lib/interfaces/database/pickupLocation";
 import type { DeliveryZoneInterface } from "../../lib/interfaces/database/deliveryZone";
-import {
-  DeliveryLocation,
-  PickupLocation,
-  Price,
-  Product,
-} from "../../lib/store";
+import { DeliveryLocation, PickupLocation, Product } from "../../lib/store";
 import {
   DeliveryOptions,
   krambambouliBaseOrderSchema,
   krambambouliDeliverySchema,
   krambambouliOrderSchema,
   krambambouliPickupSchema,
+  type KrambambouliOrder,
 } from "../../lib/krambambouli/schemas";
 import z from "zod/v4";
 import { useForm } from "@tanstack/react-form";
@@ -194,30 +190,39 @@ export default function KrambambouliForm(props: Props) {
         }}
       >
         <div className="products-container">
-          {products.map((product, index) => {
-            const fieldName = `orders.${index}.amount` as const;
+          {products.map((product) => {
             return (
-              <div key={product.id} className="product">
-                <picture className="product-image">
-                  {product.imageUrl ? (
-                    <img src={product.imageUrl} alt={product.name + "image"} />
-                  ) : (
-                    <img alt={product.name + "image"} />
-                  )}
-                </picture>
-                <div className="product-info">
-                  <h3 className="product-title">{product.name}</h3>
-                  <div className="product-details">
-                    <p>{product.description}</p>
-                    <p>{product.price.toString()}</p>
-                  </div>
-                  <div className="product-button-container">
-                    <button type="button">-</button>
-                    <input type="number" />
-                    <button type="button">+</button>
-                  </div>
-                </div>
-              </div>
+              <form.Field key={product.id} name={product.id.toString()}>
+                {(field) => {
+                  console.log(field.state);
+                  return (
+                    <div key={product.id} className="product">
+                      <picture className="product-image">
+                        {product.imageUrl ? (
+                          <img
+                            src={product.imageUrl}
+                            alt={product.name + "image"}
+                          />
+                        ) : (
+                          <img alt={product.name + "image"} />
+                        )}
+                      </picture>
+                      <div className="product-info">
+                        <h3 className="product-title">{product.name}</h3>
+                        <div className="product-details">
+                          <p>{product.description}</p>
+                          <p>{product.price.toString()}</p>
+                        </div>
+                        <div className="product-button-container">
+                          <button type="button">-</button>
+                          <input type="number" />
+                          <button type="button">+</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }}
+              </form.Field>
             );
           })}
         </div>
