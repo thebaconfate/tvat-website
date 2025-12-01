@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import { Auth } from "../../lib/auth/auth";
 import Database from "../../lib/database";
 import Checkbox from "../../components/krambambouli/dashboard/checkbox/Checkbox";
+import { Price } from "../../lib/store";
 
 export const prerender = false;
 const request = Astro.request;
@@ -49,6 +50,27 @@ function fmtLocation({
         " " +
         city;
 }
+
+const totals = page.content.reduce(
+  (acc, customer) => {
+    const newProducts = acc.products.map((p) => {
+      return {
+        ...p,
+        amount: customer.orders
+          .filter((o) => p.id === o.productId)
+          .reduce((total, o) => total + o, p.amount),
+      };
+    });
+    return {
+      products: newProducts,
+      yield: acc.yield.add(Price.from(customer.owed)),
+    };
+  },
+  {
+    products: products,
+    yield: new Price(0),
+  },
+);
 ---
 
 <Layout title={title}>
@@ -75,9 +97,21 @@ function fmtLocation({
       <th>Opgehaald?</th>
     </thead>
     <tbody>
+      <tr>
+        <td></td>
+        <td>Totaal</td>
+        <td></td>
+        {
+          products.map((p) => (
+            <td>{totals.products.find((_p) => _p.id === p.id)?.amount ?? 0}</td>
+          ))
+        }
+        <td></td>
+        <td>{totals.yield.toString()}</td>
+      </tr>
       {
         page.content.map((order, index) => (
-          <tr class={index % 2 === 1 ? "coloured" : ""}>
+          <tr class={index % 2 === 0 ? "coloured" : ""}>
             <td>{dateToDDMM(order.createdAt)}</td>
             <td class="name">{`${order.firstName} ${order.lastName}`}</td>
             <td>{order.email}</td>
