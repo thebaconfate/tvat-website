@@ -99,21 +99,9 @@ const totals = page.content.reduce(
       <th>Opgehaald?</th>
     </thead>
     <tbody>
-      <tr>
-        <td></td>
-        <td>Totaal</td>
-        <td></td>
-        {
-          products.map((p) => (
-            <td>{totals.products.find((_p) => _p.id === p.id)?.amount ?? 0}</td>
-          ))
-        }
-        <td></td>
-        <td>{totals.yield.toString()}</td>
-      </tr>
       {
         page.content.map((order, index) => (
-          <tr class={index % 2 === 0 ? "coloured" : ""}>
+          <tr class={index % 2 === 1 ? "coloured" : ""}>
             <td>{dateToDDMM(order.createdAt)}</td>
             <td class="name">{`${order.firstName} ${order.lastName}`}</td>
             <td>{order.email}</td>
@@ -154,6 +142,18 @@ const totals = page.content.reduce(
           </tr>
         ))
       }
+      <tr class={(page.content.length + 1) % 2 === 1 ? "coloured" : ""}>
+        <td></td>
+        <td class="name">Totaal</td>
+        <td></td>
+        {
+          products.map((p) => (
+            <td>{totals.products.find((_p) => _p.id === p.id)?.amount ?? 0}</td>
+          ))
+        }
+        <td></td>
+        <td>{totals.yield.toString()}</td>
+      </tr>
     </tbody>
   </table>
   <style>
