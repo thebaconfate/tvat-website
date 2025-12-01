@@ -55,10 +55,10 @@ const totals = page.content.reduce(
   (acc, customer) => {
     const newProducts = acc.products.map((p) => {
       return {
-        ...p,
+        id: p.id,
         amount: customer.orders
           .filter((o) => p.id === o.productId)
-          .reduce((total, o) => total + o, p.amount),
+          .reduce((total, o) => total + o.amount, p.amount),
       };
     });
     return {
@@ -67,7 +67,9 @@ const totals = page.content.reduce(
     };
   },
   {
-    products: products,
+    products: products.map((p) => {
+      return { id: p.id, amount: 0 };
+    }),
     yield: new Price(0),
   },
 );
