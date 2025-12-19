@@ -18,19 +18,21 @@ let products: undefined | ProductInterface[],
   error: any;
 
 try {
-  const database = await Database.getInstance();
-  [products, pickupLocations, deliveryLocations] = await Promise.all([
-    database?.getKrambambouliProducts(),
-    database?.getPickUpLocation(),
-    deliveryActive
-      ? database?.getDeliveryLocations()
-      : Promise.resolve(undefined),
-  ]);
-  deliveryLocations?.sort((loc1, loc2) =>
-    loc1.euros.euros === loc2.euros.euros
-      ? loc1.euros.cents - loc2.euros.cents
-      : loc1.euros.euros - loc2.euros.euros,
-  );
+  if (formActive) {
+    const database = await Database.getInstance();
+    [products, pickupLocations, deliveryLocations] = await Promise.all([
+      database?.getKrambambouliProducts(),
+      database?.getPickUpLocation(),
+      deliveryActive
+        ? database?.getDeliveryLocations()
+        : Promise.resolve(undefined),
+    ]);
+    deliveryLocations?.sort((loc1, loc2) =>
+      loc1.euros.euros === loc2.euros.euros
+        ? loc1.euros.cents - loc2.euros.cents
+        : loc1.euros.euros - loc2.euros.euros,
+    );
+  }
 } catch (e) {
   console.error(e);
   error = e;
