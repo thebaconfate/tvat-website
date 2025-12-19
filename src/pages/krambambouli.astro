@@ -10,7 +10,7 @@ import type { PickupLocationInterface } from "../lib/interfaces/database/pickupL
 import type { DeliveryZoneInterface } from "../lib/interfaces/database/deliveryZone";
 
 const title = "Krambambouli";
-const formActive = true;
+const formActive = false;
 const deliveryActive = true;
 let products: undefined | ProductInterface[],
   pickupLocations: undefined | PickupLocationInterface[],
@@ -27,9 +27,9 @@ try {
       : Promise.resolve(undefined),
   ]);
   deliveryLocations?.sort((loc1, loc2) =>
-    loc1.price.euros === loc2.price.euros
-      ? loc1.price.cents - loc2.price.cents
-      : loc1.price.euros - loc2.price.euros,
+    loc1.euros.euros === loc2.euros.euros
+      ? loc1.euros.cents - loc2.euros.cents
+      : loc1.euros.euros - loc2.euros.euros,
   );
 } catch (e) {
   console.error(e);
