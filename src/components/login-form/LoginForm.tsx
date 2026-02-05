@@ -30,7 +30,7 @@ export default function LoginForm({}) {
       method: "POST",
     })
       .then((response) => {
-        if (response.ok) navigate("/krambambouli/dashboard");
+        if (response.ok) navigate("/atlas");
         else setServerErrors("Invalid credentials");
       })
       .catch((e: any) => {
