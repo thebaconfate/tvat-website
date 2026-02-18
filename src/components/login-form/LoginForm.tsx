@@ -27,7 +27,7 @@ export default function LoginForm({}) {
     Object.entries(data).forEach(([key, value]) => formData.append(key, value));
     fetch(url, {
       body: formData,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "multipart/form-data" },
       method: "POST",
     })
       .then((response) => {
