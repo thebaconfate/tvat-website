@@ -1,20 +1,18 @@
 import { Auth } from "../../../lib/auth/auth";
 import Database from "../../../lib/database";
+import { z } from "zod/v4";
 
 const unAuthorizedResponse = new Response(null, {
   status: 402,
 });
 
 export async function POST({ request }: { request: Request }) {
-  const formData = await request.formData();
-  if (!formData.has("email") || !formData.has("password"))
-    return new Response(null, {
-      status: 400,
-    });
-  const credentials = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const data = await request.json();
+  const schema = z.object({
+    email: z.email(),
+    password: z.string().nonempty(),
+  });
+  const credentials = schema.parse(data);
   const user = await Database.getInstance().then((db) =>
     db.getUser(credentials.email),
   );
