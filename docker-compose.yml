@@ -1,0 +1,20 @@
+services:
+  database:
+    image: mysql:latest
+    env_file:
+      - .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  app:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+
+volumes:
+  mysql_data:

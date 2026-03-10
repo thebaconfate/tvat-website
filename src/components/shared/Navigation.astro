@@ -1,0 +1,21 @@
+---
+import Vatschild from "@/svgs/Vatschild.astro";
+import styles from "./Navigation.module.css";
+import { websiteRoutes } from "@/lib/routes";
+---
+
+<header class=`${styles.header}`>
+  <div class=`${styles.logo}`>
+    <Vatschild />
+  </div>
+  <nav>
+    <ul class={`${styles.navigation}`}>
+      <li>
+        <a href={websiteRoutes.home.url}>Home</a>
+      </li>
+      <li>
+        <a href={websiteRoutes.login.url}>login</a>
+      </li>
+    </ul>
+  </nav>
+</header>
