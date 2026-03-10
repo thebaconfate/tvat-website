@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./styles.css";
 import DOMPurify from "dompurify";
-import { apiRoutes } from "../../lib/routes";
+import { apiRoutes } from "../../lib/oldRoutes";
 import { createUrl } from "../../lib/utils";
 import { Popup } from "../popup/Popup";
 import { PopupEnum } from "../../lib/popup";

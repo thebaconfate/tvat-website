@@ -1,0 +1,14 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+ul {
+}
