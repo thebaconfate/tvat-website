@@ -14,13 +14,14 @@ class Database {
     this.config = config.database;
   }
 
-  private async connect(retries = 5, delay = 2000) {
+  private async connect(retries = 5, delay = 2000): Promise<Pool> {
     if (this.pool) return this.pool;
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         this.pool = new Pool(this.config);
         await this.pool.query("SELECT 1");
         console.log("Database connected");
+        return this.pool;
       } catch (err: any) {
         console.warn(
           `Database connection failed (attempt ${attempt}): ${err.message}`,
