@@ -2,7 +2,7 @@ import { z } from "zod/v4";
 import {
   newUserSchema,
   userSchema,
-  userService,
+  UserService,
   type NewUserData,
 } from "../users";
 
@@ -14,7 +14,7 @@ const credentialsSchema = z.object({
 type Credentials = z.infer<typeof credentialsSchema>;
 
 class AuthService {
-  private userService = userService;
+  private userService = new UserService();
 
   async register(newUser: NewUserData) {}
   async login(credentials: Credentials) {}
