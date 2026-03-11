@@ -1,20 +1,13 @@
 services:
   database:
-    image: mysql:latest
-    env_file:
-      - .env
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-
-  app:
-    build: .
+    image: postgres:18
     env_file:
       - .env
     ports:
-      - 8080:8080
-    depends_on:
-      - database
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./dev/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
 volumes:
-  mysql_data:
+  postgres_data:
