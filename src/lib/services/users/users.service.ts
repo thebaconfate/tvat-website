@@ -2,6 +2,17 @@ import { database } from "@/lib/database";
 import type { NewUserData, UserData } from "./users.types";
 
 class UserService {
+  async rootExists(): Promise<boolean> {
+    const query = `
+    SELECT 1
+    FROM users u
+    JOIN roles r ON u.role_id = r.id
+    WHERE r.name = 'root'
+    LIMIT 1
+    `;
+    const result = await database.query(query);
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
   async createUser(newUser: NewUserData) {
     const query = `
     WITH new_user AS (

@@ -12,11 +12,14 @@ export async function POST({ request }: APIContext) {
     const newRoot = newUserSchema
       .extend({ role: roleSchema.extract([RoleEnum.root]) })
       .parse({ ...data, role: RoleEnum.root });
-    const root = userService.createUser(newRoot);
-    return new Response(JSON.stringify(root), {
-      status: 201,
-      headers: { "Content-Type": "application/json" },
-    });
+    const rootExists = await userService.rootExists();
+    if (!rootExists) {
+      const root = await userService.createUser(newRoot);
+      return new Response(JSON.stringify(root), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
   } catch (err: any) {
     console.error(err);
     return new Response(JSON.stringify(err));
