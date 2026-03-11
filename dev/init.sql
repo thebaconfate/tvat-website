@@ -1,5 +1,15 @@
 /* For development purposes only */
 
+CREATE TABLE IF NOT EXISTS config (
+    config_key TEXT PRIMARY KEY,
+    config_value JSONB NOT NULL
+);
+
+INSERT INTO config (config_key, config_value) VALUES
+    ('krambambouli_enabled', true),
+    ('lustrumgalabal_enabled', false)
+ON CONFLICT (config_key) DO NOTHING;
+
 CREATE TABLE IF NOT EXISTS roles (
     id SERIAL PRIMARY KEY,
     name TEXT UNIQUE NOT NULL
