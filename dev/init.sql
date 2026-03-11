@@ -2,18 +2,15 @@
 
 CREATE TABLE IF NOT EXISTS roles (
     id SERIAL PRIMARY KEY,
-    value INT NOT NULL,
     name TEXT UNIQUE NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_roles_name ON roles(name);
 
-INSERT INTO roles (value, name) VALUES
-  (0, 'root')
-ON CONFLICT (name) DO NOTHING;
-
-INSERT INTO roles (value, name) VALUES
-  (1, 'admin')
+INSERT INTO roles (name) VALUES
+    ('root'),
+    ('admin'),
+    ('boardMember')
 ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS users (
