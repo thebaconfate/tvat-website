@@ -1,7 +1,7 @@
 import { database } from "@/lib/database";
 import type { NewUserData, UserData } from "./users.types";
 
-export class UserService {
+class UserService {
   async createUser(newUser: NewUserData) {
     const query = `
     WITH new_user AS (
@@ -85,3 +85,5 @@ export class UserService {
     // TODO: implement this
   }
 }
+
+export const userService = new UserService();
