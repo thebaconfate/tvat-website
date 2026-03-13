@@ -1,6 +1,8 @@
 import { database } from "@/lib/database";
 import type { NewUserData, UserData } from "./users.types";
 
+type UserDataWithPassword = UserData & { password: string };
+
 class UserService {
   async rootExists(): Promise<boolean> {
     const query = `
@@ -84,7 +86,7 @@ class UserService {
     JOIN roles r ON r.id = u.role_id
     WHERE email = $1
     LIMIT 1;`;
-    const result = await database.query(query, [email]);
+    const result = await database.query<UserDataWithPassword>(query, [email]);
     const [user] = result.rows;
     return user ?? null;
   }
