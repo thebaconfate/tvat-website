@@ -1,17 +1,30 @@
+import dotenv from "dotenv";
 import type { PoolConfig } from "pg";
+
+dotenv.config();
 
 type Config = {
   database: PoolConfig;
 };
+
+function getEnv(key: string, defaultValue: string | undefined = undefined) {
+  const value = process.env[key];
+  if (value) return value;
+  else if (!value && defaultValue) return defaultValue;
+  else throw Error(`Missing env variable: ${key}`);
+}
+
 export const config: Config = {
   database: {
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
+    host: getEnv("DB_HOST"),
+    port: parseInt(getEnv("DB_PORT")),
+    user: getEnv("DB_USER"),
+    password: getEnv("DB_PASSWORD"),
+    database: getEnv("DB_DATABASE"),
     max: 10,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 2_000,
   },
 };
+
+console.log(config);

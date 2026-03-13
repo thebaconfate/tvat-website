@@ -39,7 +39,7 @@ class UserService {
         u.id,
         u.email,
         u.first_name AS "firstName",
-        u.last_name AS "lastName"
+        u.last_name AS "lastName",
         r.name AS role
     FROM new_user u
     JOIN roles r ON r.id = u.role_id
