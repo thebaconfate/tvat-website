@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS config (
 );
 
 INSERT INTO config (config_key, config_value) VALUES
-    ('krambambouli_enabled', true),
-    ('lustrumgalabal_enabled', false)
+    ('krambambouli_enabled', to_jsonb(true)),
+    ('lustrumgalabal_enabled', to_jsonb(false))
 ON CONFLICT (config_key) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS roles (
