@@ -7,7 +7,10 @@ type Config = {
   database: PoolConfig;
 };
 
-function getEnv(key: string, defaultValue: string | undefined = undefined) {
+export function getEnv(
+  key: string,
+  defaultValue: string | undefined = undefined,
+) {
   const value = process.env[key];
   if (value) return value;
   else if (!value && defaultValue) return defaultValue;
