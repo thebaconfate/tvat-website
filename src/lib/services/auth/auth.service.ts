@@ -3,7 +3,8 @@ import { roleSchema, userService, type NewUserData } from "../users";
 import { getAuthToken, verifyPassword } from "./auth.utils";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import type { Credentials } from "./auth.types";
+import type { Credentials, JwtPayload } from "./auth.types";
+import { tokenPayloadSchema } from "./auth.schemas";
 
 class AuthService {
   private secretKey = crypto.randomBytes(64).toString("hex");
@@ -17,16 +18,12 @@ class AuthService {
       expiresIn: "1h",
     });
   }
-  private verifyToken(token: string) {
+  private verifyToken(token: string): JwtPayload | boolean {
     try {
       const decoded = jwt.verify(token, this.secretKey);
       if (typeof decoded === "string")
         throw Error("Payload was a string. Something went wrong");
-      const schema = z.object({
-        sub: z.int().nonnegative(),
-        role: roleSchema,
-      });
-      const parsed = schema.parse(decoded);
+      const parsed = tokenPayloadSchema.parse(decoded);
       return parsed;
     } catch (err) {
       return false;
