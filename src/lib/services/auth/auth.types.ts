@@ -1,10 +1,6 @@
-import type z4 from "zod/v4";
-import type { credentialsSchema } from "./auth.schemas";
-import type { Role } from "../users";
+import z from "zod/v4";
+import type { credentialsSchema, tokenPayloadSchema } from "./auth.schemas";
 
-export type Credentials = z4.infer<typeof credentialsSchema>;
+export type Credentials = z.infer<typeof credentialsSchema>;
 
-export type Claims = {
-  sub: number;
-  role: Role;
-};
+export type JwtPayload = z.infer<typeof tokenPayloadSchema>;
