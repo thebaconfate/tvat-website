@@ -1,5 +1,5 @@
+import type { UserData } from "../../services/users/users.types";
 import { RoleEnum } from "./role.schema";
-import type { UserData } from "./users.types";
 
 export class User {
   constructor(private data: UserData) {}

@@ -1,10 +1,15 @@
 import { z } from "zod/v4";
-import { roleSchema, userService, type NewUserData } from "../users";
-import { getAuthToken, verifyPassword } from "./auth.utils";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import type { Credentials, JwtPayload } from "./auth.types";
-import { tokenPayloadSchema } from "./auth.schemas";
+import { userService } from "../users";
+import type { NewUserData } from "@/lib/domain/users";
+import {
+  getAuthToken,
+  tokenPayloadSchema,
+  verifyPassword,
+  type Credentials,
+  type JwtPayload,
+} from "@/lib/domain/auth";
 
 class AuthService {
   private secretKey = crypto.randomBytes(64).toString("hex");
