@@ -14,6 +14,10 @@
   display: flex;
   align-items: center;
   border: solid red 1px;
+}
+
+.inputContainer,
+.submitButton {
   border-radius: 0.75rem;
   padding: 0.5rem 1rem;
 }
@@ -44,4 +48,8 @@
 
 button.inputIcon {
   cursor: pointer;
+}
+
+.submitButton {
+  font-size: 1rem;
 }
