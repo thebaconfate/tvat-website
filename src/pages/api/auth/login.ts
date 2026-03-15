@@ -1,6 +1,6 @@
-import { credentialsSchema } from "@/lib/services/auth/auth.schemas";
-import { authService } from "@/lib/services/auth/auth.service";
-import { setJwtCookie } from "@/lib/services/auth/auth.utils";
+import { credentialsSchema } from "@/lib/domain/auth";
+import { authService } from "@/lib/services/auth";
+import { setJwtCookie } from "@/lib/services/auth";
 
 export async function POST({ request }: { request: Request }) {
   try {

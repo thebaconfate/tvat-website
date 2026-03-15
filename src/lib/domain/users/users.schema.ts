@@ -9,6 +9,14 @@ export const userSchema = z.object({
   role: roleSchema,
 });
 
+const passwordSchema = z
+  .string()
+  .min(8)
+  .regex(/[a-z]/, "Password must contain a lowercase letter")
+  .regex(/[A-Z]/, "Password must contain an uppercase letter")
+  .regex(/[0-9]/, "Password must contain a number")
+  .regex(/[^A-Za-z0-9]/, "Password must contain a special character");
+
 export const newUserSchema = userSchema
   .omit({ id: true })
-  .extend({ password: z.string() });
+  .extend({ password: passwordSchema });

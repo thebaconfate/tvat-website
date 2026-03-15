@@ -6,8 +6,42 @@
 .form {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 }
 
 .inputContainer {
-  display: grid;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: solid red 1px;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+}
+
+.inputContainer > input {
+  border: transparent;
+  display: flex;
+  font-size: 1rem;
+}
+
+.inputContainer > input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.inputContainer:focus-within {
+  border-color: #4f46e5; /* change border when input focused */
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); /* optional glow */
+}
+
+.inputIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+}
+
+button.inputIcon {
+  cursor: pointer;
 }
