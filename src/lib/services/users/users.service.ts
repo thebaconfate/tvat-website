@@ -1,5 +1,5 @@
 import { database } from "@/lib/database";
-import type { NewUserData, UserData } from "./users.types";
+import type { NewUserData, UserData } from "@/lib/domain/users";
 
 type UserDataWithPassword = UserData & { password: string };
 

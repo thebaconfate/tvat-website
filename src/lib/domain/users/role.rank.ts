@@ -1,5 +1,5 @@
-import type { Role } from "./role.types";
 import { RoleEnum } from "./role.schema";
+import type { Role } from "./role.types";
 
 export const roleRank: Record<Role, number> = {
   [RoleEnum.root]: 0,

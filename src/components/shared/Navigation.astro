@@ -4,12 +4,12 @@ import styles from "./Navigation.module.css";
 import { websiteRoutes } from "@/lib/routes";
 ---
 
-<header class=`${styles.header}`>
-  <div class=`${styles.logo}`>
+<header class={styles.header}>
+  <div class={styles.logo}>
     <Vatschild />
   </div>
   <nav>
-    <ul class={`${styles.navigation}`}>
+    <ul class={styles.navigation}>
       <li>
         <a href={websiteRoutes.home.url}>Home</a>
       </li>

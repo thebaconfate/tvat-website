@@ -1,4 +1,4 @@
-import { credentialsSchema } from "@/lib/services/auth/auth.schemas";
+import { credentialsSchema } from "@/lib/domain/auth";
 import style from "./LoginForm.module.css";
 import { useForm } from "@tanstack/react-form";
 
@@ -20,6 +20,7 @@ export default function LoginForm() {
                 type="email"
                 value={field.state.value}
                 onChange={(e) => field.setValue(e.target.value)}
+                placeholder="Email"
               />
             </div>
           )}
@@ -30,6 +31,7 @@ export default function LoginForm() {
               <input
                 type="password"
                 value={field.state.value}
+                placeholder="password"
                 onChange={(e) => field.setValue(e.target.value)}
               />
             </div>

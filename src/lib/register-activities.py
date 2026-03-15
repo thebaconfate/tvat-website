@@ -20,7 +20,7 @@ activities = [
     },
     {title: defaultName, date: datetime(2025, 10, 20, 20), address: boj},
     {title: defaultName, date: datetime(2025, 11, 24, 20), address: boj},
-    {
+        {
         title: "Rouge-et-vert Cantus",
         date: datetime(2025, 12, 11, 20),
         address: bsg,
