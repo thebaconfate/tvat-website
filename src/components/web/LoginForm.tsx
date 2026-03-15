@@ -89,7 +89,9 @@ export default function LoginForm() {
             </>
           )}
         </form.Field>
-        <button type="submit">Inloggen</button>
+        <button className={style.submitButton} type="submit">
+          Inloggen
+        </button>
       </form>
     </div>
   );
