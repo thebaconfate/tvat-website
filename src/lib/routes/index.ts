@@ -1,1 +1,1 @@
-export * from "./websiteRoutes.ts";
+export * from "./websiteRoutes";

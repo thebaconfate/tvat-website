@@ -1,47 +1,41 @@
-import { z } from "zod/v4";
-import crypto from "crypto";
-import jwt from "jsonwebtoken";
-import { userService } from "../users";
-import type { NewUserData } from "@/lib/domain/users";
-import type { JwtPayload } from "@/lib/domain/auth";
-
-class AuthService {
-  private secretKey = crypto.randomBytes(64).toString("hex");
-
-  private userService = userService;
-
-  async register(newUser: NewUserData) {}
-
-  private generateToken(payload: any) {
-    return jwt.sign(payload, this.secretKey, {
-      expiresIn: "1h",
-    });
-  }
-  private verifyToken(token: string): JwtPayload | boolean {
-    try {
-      const decoded = jwt.verify(token, this.secretKey);
-      if (typeof decoded === "string")
-        throw Error("Payload was a string. Something went wrong");
-      const parsed = tokenPayloadSchema.parse(decoded);
-      return parsed;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  async login(credentials: Credentials) {
-    const user = await this.userService.getUserByEmail(credentials.email);
-    const verified = await verifyPassword(credentials.password, user.password);
-    if (!verified) return null;
-    const payload = { sub: user.id, role: user.role };
-    return this.generateToken(payload);
-  }
-
-  async authenticate(headers: Headers) {
-    const token = getAuthToken(headers);
-    if (!token) return false;
-    return this.verifyToken(token);
-  }
+.formContainer {
+  display: grid;
+  justify-content: center;
 }
 
-export const authService = new AuthService();
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: solid red 1px;
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+}
+
+.inputContainer > input {
+  border: transparent;
+  display: flex;
+  font-size: 1rem;
+}
+
+.inputContainer > input:focus {
+  outline: none;
+}
+
+.inputIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+}
+
+.inputIcon button {
+  cursor: pointer;
+}
