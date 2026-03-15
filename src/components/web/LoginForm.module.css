@@ -1,0 +1,8 @@
+.formContainer {
+  display: grid;
+  justify-content: center;
+}
+
+.inputContainer {
+  display: grid;
+}

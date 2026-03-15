@@ -29,5 +29,3 @@ export const config: Config = {
     connectionTimeoutMillis: 2_000,
   },
 };
-
-console.log(config);
