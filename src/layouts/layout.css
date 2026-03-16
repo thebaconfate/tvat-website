@@ -25,7 +25,6 @@ main {
 
 @media screen and (max-width: 767px) {
   body {
-    width: 95%;
     --standard-padding: 0.5rem;
   }
 }
