@@ -4,7 +4,9 @@ import Navigation from "@/components/shared/Navigation.astro";
 interface Props {
   title: string;
 }
-
+import style from "./Layout.module.css";
+import Vatschild from "@/svgs/Vatschild.astro";
+import { websiteRoutes } from "@/lib/oldRoutes";
 const { title } = Astro.props;
 ---
 
@@ -21,7 +23,12 @@ const { title } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
-    <header>
+    <header class={style.header}>
+      <div class={style.logo}>
+        <a href={websiteRoutes.home.url}>
+          <Vatschild />
+        </a>
+      </div>
       <Navigation />
     </header>
     <slot />
@@ -42,9 +49,5 @@ const { title } = Astro.props;
       "Open Sans",
       "Helvetica Neue",
       sans-serif;
-  }
-  svg {
-    width: 100%;
-    height: auto;
   }
 </style>

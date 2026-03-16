@@ -1,20 +1,26 @@
-.header {
+:root {
+  --main: rgb(100, 53, 152); /* purple */
+  --secondary: rgb(255, 239, 62); /* yellow */
+  --tertiary: rgb(54, 149, 34); /* green */
+}
+
+.navContainer {
+  margin-top: 1rem;
+}
+
+.navList {
+  list-style: none;
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin: 1rem 2rem;
+  gap: 0.5rem;
 }
 
-.logo {
-  width: 5%;
+.navList a {
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.4rem;
 }
 
-.navigation {
-  display: flex;
-  justify-content: space-around;
-  gap: 1rem;
-}
-
-ul {
-  list-style-type: none;
+.navList a:hover {
+  background-color: lightgrey;
 }
