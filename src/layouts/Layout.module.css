@@ -9,6 +9,7 @@
   --main: rgb(100, 53, 152); /* purple */
   --secondary: rgb(255, 239, 62); /* yellow */
   --tertiary: rgb(54, 149, 34); /* green */
+  --red: rgb(175, 36, 36); /* red*/
 }
 
 .header {
@@ -28,10 +29,6 @@ body {
   --standard-padding: 2rem;
   --text-colour: #585858;
   overflow-x: hidden;
-}
-
-main {
-  padding: var(--standard-padding);
 }
 
 @media screen and (max-width: 1000px) {
