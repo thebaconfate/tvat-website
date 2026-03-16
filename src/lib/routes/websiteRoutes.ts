@@ -7,5 +7,5 @@ export const websiteRoutes = {
   login: { url: "/login" },
   board: { url: "/board" },
   codex: { url: "/codex" },
-  codexChallenge: { url: "/codex-challenge" },
+  clubsong: { url: "/clubsong" },
 } as const;

@@ -1,21 +1,36 @@
 ---
-import Vatschild from "@/svgs/Vatschild.astro";
-import styles from "./Navigation.module.css";
+import style from "./Navigation.module.css";
 import { websiteRoutes } from "@/lib/routes";
 ---
 
-<header class={styles.header}>
-  <div class={styles.logo}>
-    <Vatschild />
-  </div>
-  <nav>
-    <ul class={styles.navigation}>
-      <li>
-        <a href={websiteRoutes.home.url}>Home</a>
-      </li>
-      <li>
-        <a href={websiteRoutes.login.url}>login</a>
-      </li>
-    </ul>
-  </nav>
-</header>
+<nav class={style.navContainer}>
+  <ul class={style.navList}>
+    <li>
+      <a href={websiteRoutes.home.url}>Home</a>
+    </li>
+    <li>
+      <a href={websiteRoutes.aboutUs.url}>Over ons</a>
+    </li>
+    <li>
+      <a href={websiteRoutes.contact.url}>Contact</a>
+    </li>
+    <li>
+      <a href={websiteRoutes.board.url}>Bestuur</a>
+    </li>
+    <li>
+      <a href={websiteRoutes.clubsong.url}>Clublied</a>
+    </li>
+    <li>
+      <a href={websiteRoutes.krambambouli.url}>Krambambouli</a>
+    </li>
+    <li>
+      <a href={websiteRoutes.lustrumgala.url}>Lustrumgalabal</a>
+    </li>
+    <li>
+      <a href={websiteRoutes.codex.url}>Codex</a>
+    </li>
+    <li>
+      <a href={websiteRoutes.login.url}>login</a>
+    </li>
+  </ul>
+</nav>

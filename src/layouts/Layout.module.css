@@ -1,0 +1,16 @@
+:root {
+  --main: rgb(100, 53, 152); /* purple */
+  --secondary: rgb(255, 239, 62); /* yellow */
+  --tertiary: rgb(54, 149, 34); /* green */
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 1rem 2rem;
+}
+
+.logo {
+  width: 5rem;
+}

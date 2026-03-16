@@ -5,6 +5,7 @@ import Vatschild from "../svgs/Vatschild.astro";
 import SaintVeCountdown from "../components/saint-ve-countdown/SaintVeCountdown";
 import { readFileSync } from "fs";
 import { Activity, type ActivityInterface } from "../lib/activity";
+import Monogrampaars from "@/svgs/Monogrampaars.astro";
 
 const rawActivities: ActivityInterface[] = JSON.parse(
   readFileSync("./public/activities.json", "utf-8"),
@@ -55,7 +56,7 @@ function formatActivityDate(activity: Activity) {
 <Layout title="Home">
   <main>
     <div class="shield-container">
-      <Vatschild />
+      <Monogrampaars />
     </div>
     <div class="main-content-container">
       <h1>Welkom</h1>
@@ -143,7 +144,7 @@ function formatActivityDate(activity: Activity) {
   <style>
     main {
       display: grid;
-      grid-template-columns: 20% 50% auto;
+      grid-template-columns: 10% 60% auto;
       gap: 2rem;
       padding-left: calc(var(--standard-padding) * 3);
     }
