@@ -1,6 +1,8 @@
 ---
-import "./layout.css";
 import Navigation from "@/components/shared/Navigation.astro";
+import { Mail } from "lucide-react";
+import Facebook from "@/svgs/Facebook.astro";
+import Instagram from "@/svgs/Instagram.astro";
 interface Props {
   title: string;
 }
@@ -32,7 +34,22 @@ const { title } = Astro.props;
       <Navigation />
     </header>
     <slot />
-    <footer></footer>
+    <footer>
+      <div>
+        <h2>'t VAT Brussel</h2>
+      </div>
+      <div class={style.socialsContainer}>
+        <a href="https://www.facebook.com/tvatbrussel/">
+          <Facebook />
+        </a>
+        <a href="https://www.instagram.com/tvat_brussel/?hl=en">
+          <Instagram />
+        </a>
+        <a href="mailto:tvatinfo@gmail.com">
+          <Mail />
+        </a>
+      </div>
+    </footer>
   </body>
 </html>
 <style is:global>
