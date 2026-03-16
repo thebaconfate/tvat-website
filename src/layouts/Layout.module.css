@@ -1,3 +1,10 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: var(--text-colour);
+}
+
 :root {
   --main: rgb(100, 53, 152); /* purple */
   --secondary: rgb(255, 239, 62); /* yellow */
@@ -13,4 +20,47 @@
 
 .logo {
   width: 5rem;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  --standard-padding: 2rem;
+  --text-colour: #585858;
+  overflow-x: hidden;
+}
+
+main {
+  padding: var(--standard-padding);
+}
+
+@media screen and (max-width: 1000px) {
+  body {
+    --standard-padding: 1rem;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  body {
+    --standard-padding: 0.5rem;
+  }
+}
+
+footer {
+  display: flex;
+  justify-content: space-around;
+  height: 5rem;
+  background-color: lightyellow;
+  align-items: center;
+}
+
+.socialsContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.socialsContainer a > * {
+  width: 1.5rem;
 }
