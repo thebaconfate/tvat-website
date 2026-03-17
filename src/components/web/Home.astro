@@ -6,7 +6,10 @@ import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
 import Activity from "@/components/web/Activity.tsx";
 
-const activities = await activityService.getFutureActivities();
+const activities = await activityService.fetchActivityPage(
+  new URLSearchParams(),
+);
+console.log(activities);
 const locale = getLocale(Astro.request);
 ---
 
@@ -26,7 +29,11 @@ const locale = getLocale(Astro.request);
     <div class={style.content}>
       <h2>Activiteiten</h2>
       <ul class={style.activityList}>
-        {activities.map((a) => <Activity activity={a} locale={locale} />)}
+        {
+          activities.content.map((a) => (
+            <Activity activity={a} locale={locale} />
+          ))
+        }
       </ul>
     </div>
     <div class={style.content}>
