@@ -48,17 +48,22 @@ h2 {
   gap: 2rem;
 }
 
-.content > :last-child {
-  display: grid;
-  align-items: center;
-}
-
-.content > div {
+.content > .countdownContainer,
+.content > .activityList {
   display: grid;
   gap: 1rem;
 }
 
-.activityList {
-  display: grid;
-  justify-content: center;
+.allActivitiesLink {
+  font-size: 1rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.4rem;
+}
+
+.allActivitiesLink:hover {
+  background-color: lightgrey;
+}
+
+.contentHeaderContainer > * {
+  text-align: center;
 }

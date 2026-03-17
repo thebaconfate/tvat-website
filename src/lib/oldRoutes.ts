@@ -17,6 +17,7 @@ const websiteRoutes = {
   membership: { url: "/lidkaarten" },
   contact: { url: "/contact" },
   login: { url: "/login" },
+  kalender: { url: "/kalender" },
 };
 
 const baseApiUrl = "/api";
