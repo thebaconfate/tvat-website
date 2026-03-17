@@ -20,35 +20,33 @@ export default function Activity({ activity, locale }: Props) {
           activity.name
         )}
       </h3>
-      <li>
-        <ul>
-          <li>
-            {capitalize(
-              formatDate(new Date(activity.date), locale, {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              }),
-            )}
-          </li>
-          <li>{activity.time}</li>
-          <li>
-            <a
-              href={
-                activity.location.url
-                  ? activity.location.url
-                  : activity.location.address
-                    ? createMapUrl(activity.location.address)
-                    : createMapUrl(activity.location.name)
-              }
-              target="_blank"
-            >
-              {activity.location.name}
-            </a>
-          </li>
-        </ul>
-      </li>
+      <ul>
+        <li>
+          {capitalize(
+            formatDate(new Date(activity.date), locale, {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            }),
+          )}
+        </li>
+        <li>{activity.time}</li>
+        <li>
+          <a
+            href={
+              activity.location.url
+                ? activity.location.url
+                : activity.location.address
+                  ? createMapUrl(activity.location.address)
+                  : createMapUrl(activity.location.name)
+            }
+            target="_blank"
+          >
+            {activity.location.name}
+          </a>
+        </li>
+      </ul>
     </>
   );
 }

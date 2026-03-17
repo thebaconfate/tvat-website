@@ -9,11 +9,13 @@ import Activity from "@/components/web/Activity.tsx";
 const activities = await activityService.fetchActivityPage(
   new URLSearchParams([
     ["dateAfter", new Date().toJSON()],
-    ["size", String(4)],
+    ["size", String(3)],
   ]),
 );
-console.log(activities);
 const locale = getLocale(Astro.request);
+/**
+ * NOTE: Maybe add 'De studentenverening voor de bieste folkloristen van Brussel en allen die daar naar streven'
+ */
 ---
 
 <main>
@@ -31,13 +33,13 @@ const locale = getLocale(Astro.request);
   <div class={style.homepageContentContainer}>
     <div class={style.content}>
       <h2>Activiteiten</h2>
-      <ul class={style.activityList}>
+      <div class={style.activityList}>
         {
           activities.content.map((a) => (
             <Activity activity={a} locale={locale} />
           ))
         }
-      </ul>
+      </div>
     </div>
     <div class={style.content}>
       <h2>Saint-Vé</h2>

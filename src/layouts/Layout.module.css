@@ -46,7 +46,7 @@ body {
 footer {
   display: flex;
   justify-content: space-around;
-  height: 5rem;
+  height: 10rem;
   background-color: lightyellow;
   align-items: center;
 }

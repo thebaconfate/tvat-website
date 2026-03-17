@@ -53,8 +53,7 @@ h2 {
   align-items: center;
 }
 
-.content > ul {
-  list-style: none;
+.content > div {
   display: grid;
   gap: 1rem;
 }
