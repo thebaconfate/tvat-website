@@ -7,8 +7,7 @@ export const activitySchema = z.object({
   location: z.object({
     name: z.string(),
     address: z.string().nullish(),
-    lng: z.number().min(-180).max(180).nullish(),
-    lat: z.number().min(-90).max(90).nullish(),
+    url: z.url().nullish(),
   }),
   facebook: z.url().nullish(),
 });
