@@ -1,5 +1,5 @@
 import { database } from "@/lib/database";
-import type { ActivityData } from "@/lib/domain/activities";
+import type { ActivityData, ActivityPageData } from "@/lib/domain/activities";
 import type { URLSearchParams } from "url";
 
 class ActivityService {
@@ -34,7 +34,9 @@ class ActivityService {
     ];
   }
 
-  async fetchActivityPage(urlSearchParams: URLSearchParams) {
+  async fetchActivityPage(
+    urlSearchParams: URLSearchParams,
+  ): Promise<ActivityPageData> {
     const page = parseInt(urlSearchParams.get("page") ?? "1");
     const size = parseInt(urlSearchParams.get("size") ?? "10");
     const offset = (page - 1) * size;
@@ -68,19 +70,34 @@ class ActivityService {
       filters.length > 0 ? `WHERE ${filters.join("AND ")}` : "";
     const countQuery = `SELECT COUNT(*) AS total from activities ${whereClause}`;
     const query = `
-    SELECT *,
-        COUNT(*) OVER() as total_count
+    SELECT
+        id,
+        name,
+        date,
+        time,
+        json_build_object(
+            'name', location_name,
+            'url', location_url,
+            'address', location_address
+        ) AS location
     FROM activities
     ${whereClause}
-    ORDER BY
+    ORDER BY date, time ASC
     LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
-
     const [countResult, contentResult] = await Promise.all([
-      database.query(countQuery),
-      database.query<ActivityData[]>(query, [...values, size, offset]),
+      database.query<{ total: number }>(countQuery),
+      database.query<ActivityData>(query, [...values, size, offset]),
     ]);
-    console.log(countResult);
-    console.log(contentResult);
+    const totalElements = Number(countResult.rows[0].total);
+    return {
+      content: contentResult.rows,
+      page: {
+        number: page,
+        totalElements: totalElements,
+        totalPages: Math.ceil(totalElements / size),
+        size: contentResult.rows.length,
+      },
+    };
   }
 }
 

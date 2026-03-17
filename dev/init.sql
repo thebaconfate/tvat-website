@@ -34,3 +34,14 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+CREATE TABLE IF NOT EXISTS activities (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    location_name TEXT NOT NULL,
+    location_address TEXT,
+    location_url TEXT
+    facebook_url TEXT,
+)
