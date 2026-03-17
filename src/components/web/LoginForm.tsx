@@ -17,6 +17,9 @@ export default function LoginForm() {
     },
   });
 
+  try {
+  } catch (e) {}
+
   return (
     <div className={style.formContainer}>
       <form

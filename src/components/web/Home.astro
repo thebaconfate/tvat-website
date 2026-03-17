@@ -5,6 +5,9 @@ import { readFileSync } from "fs";
 import Monogram from "@/svgs/Monogram.astro";
 import { Activity, type ActivityInterface } from "@/lib/activity";
 import style from "./Home.module.css";
+import { activityService } from "@/lib/services/activities";
+
+const activities = activityService.getFutureActivities();
 
 const rawActivities: ActivityInterface[] = JSON.parse(
   readFileSync("./public/activities.json", "utf-8"),
@@ -53,10 +56,33 @@ function formatActivityDate(activity: Activity) {
 ---
 
 <main>
-  <div class={style.test}>
-    <div class={style.monogramContainer}>
-      <Monogram />
+  <div class={style.introBanner}>
+    <div>
+      <div class={style.monogramContainer}>
+        <Monogram />
+      </div>
     </div>
-    <h1>'t VAT</h1>
+    <div class={style.introText}>
+      <h1>'t VAT</h1>
+      <h2>Pro ambiantia et joewissantia</h2>
+    </div>
+  </div>
+  <div class={style.homepageContentContainer}>
+    <div>
+      <h3>Activiteiten</h3>
+      <ul class={style.activityList}>
+        {
+          activitiesList.map((a, i) => (
+            <li>
+              <p>{`Activity: ${i}`}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div>
+      <h3>Saint-Vé</h3>
+      <SaintVeCountdown client:idle />
+    </div>
   </div>
 </main>
