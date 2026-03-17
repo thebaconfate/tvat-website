@@ -1,4 +1,4 @@
-.test {
+.introBanner {
   width: 100%;
   padding: 1rem 2rem;
   background: linear-gradient(
@@ -12,8 +12,35 @@
   );
   display: flex;
   align-items: center;
+  padding: 2rem;
+  justify-content: center;
+  gap: 3rem;
 }
 
 .monogramContainer {
   width: 10rem;
+  justify-content: flex-start;
+}
+
+h1,
+h2 {
+  color: black;
+}
+
+.homepageContentContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 45%);
+  margin: 3rem auto 3rem auto;
+  justify-content: center;
+  gap: 5rem;
+}
+
+.homepageContentContainer h3 {
+  display: flex;
+  justify-content: center;
+}
+
+.homepageContentContainer > :last-child {
+  display: grid;
+  justify-content: center;
 }
