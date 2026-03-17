@@ -5,17 +5,15 @@ import style from "./Home.module.css";
 import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
 import Activity from "@/components/web/Activity.tsx";
+import { websiteRoutes } from "@/lib/oldRoutes";
 
 const activities = await activityService.fetchActivityPage(
   new URLSearchParams([
     ["dateAfter", new Date().toJSON()],
-    ["size", String(3)],
+    ["size", String(2)],
   ]),
 );
 const locale = getLocale(Astro.request);
-/**
- * NOTE: Maybe add 'De studentenverening voor de bieste folkloristen van Brussel en allen die daar naar streven'
- */
 ---
 
 <main>
@@ -32,7 +30,10 @@ const locale = getLocale(Astro.request);
   </div>
   <div class={style.homepageContentContainer}>
     <div class={style.content}>
-      <h2>Activiteiten</h2>
+      <div class={style.contentHeaderContainer}>
+        <h2>Opkomende</h2>
+        <h2>Activiteiten</h2>
+      </div>
       <div class={style.activityList}>
         {
           activities.content.map((a) => (
@@ -40,10 +41,15 @@ const locale = getLocale(Astro.request);
           ))
         }
       </div>
+      <a class={style.allActivitiesLink} href={websiteRoutes.kalender.url}
+        >Alle activiteiten</a
+      >
     </div>
     <div class={style.content}>
-      <h2>Saint-Vé</h2>
-      <div>
+      <div class={style.contentHeaderContainer}>
+        <h2>Saint-Vé</h2>
+      </div>
+      <div class={style.countdownContainer}>
         <SaintVeCountdown client:idle />
       </div>
     </div>
