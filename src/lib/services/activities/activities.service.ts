@@ -1,4 +1,6 @@
+import { database } from "@/lib/database";
 import type { ActivityData } from "@/lib/domain/activities";
+import type { URLSearchParams } from "url";
 
 class ActivityService {
   constructor() {}
@@ -30,6 +32,55 @@ class ActivityService {
         },
       },
     ];
+  }
+
+  async fetchActivityPage(urlSearchParams: URLSearchParams) {
+    const page = parseInt(urlSearchParams.get("page") ?? "1");
+    const size = parseInt(urlSearchParams.get("size") ?? "10");
+    const offset = (page - 1) * size;
+
+    const filters: string[] = [];
+    const values: any[] = [];
+
+    if (urlSearchParams.has("nameLike")) {
+      values.push(`%${urlSearchParams.get("nameLike")}%`);
+      filters.push(`name ILIKE $${values.length}`);
+    } else if (urlSearchParams.has("name")) {
+      values.push(urlSearchParams.get("name"));
+      filters.push(`name = $${values.length}`);
+    }
+
+    if (urlSearchParams.has("dateBefore")) {
+      values.push(`${urlSearchParams.get("dateBefore")}`);
+      filters.push(`date <= $${values.length}`);
+    }
+
+    if (urlSearchParams.has("dateAfter")) {
+      values.push(`${urlSearchParams.get("dateAfter")}`);
+      filters.push(`date >= $${values.length}`);
+    }
+    if (urlSearchParams.has("location")) {
+      values.push(`%${urlSearchParams.get("location")}%`);
+      filters.push(`location_name ILIKE $${values.length}`);
+    }
+
+    const whereClause =
+      filters.length > 0 ? `WHERE ${filters.join("AND ")}` : "";
+    const countQuery = `SELECT COUNT(*) AS total from activities ${whereClause}`;
+    const query = `
+    SELECT *,
+        COUNT(*) OVER() as total_count
+    FROM activities
+    ${whereClause}
+    ORDER BY
+    LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
+
+    const [countResult, contentResult] = await Promise.all([
+      database.query(countQuery),
+      database.query<ActivityData[]>(query, [...values, size, offset]),
+    ]);
+    console.log(countResult);
+    console.log(contentResult);
   }
 }
 
