@@ -7,7 +7,10 @@ import { getLocale } from "@/lib/utils";
 import Activity from "@/components/web/Activity.tsx";
 
 const activities = await activityService.fetchActivityPage(
-  new URLSearchParams(),
+  new URLSearchParams([
+    ["dateAfter", new Date().toJSON()],
+    ["size", String(4)],
+  ]),
 );
 console.log(activities);
 const locale = getLocale(Astro.request);
