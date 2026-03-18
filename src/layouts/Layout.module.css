@@ -10,45 +10,59 @@
   --secondary: rgb(255, 239, 62); /* yellow */
   --tertiary: rgb(54, 149, 34); /* green */
   --red: rgb(175, 36, 36); /* red*/
+  --logo-width: 3rem;
 }
 
 .header {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin: 1rem 2rem;
+  padding: 1rem 2rem;
+  position: relative;
 }
 
 .logo {
-  width: 5rem;
+  width: var(--logo-width);
+  z-index: 1000;
+}
+
+.logo a {
+  display: flex;
 }
 
 body {
   display: flex;
   flex-direction: column;
-  --standard-padding: 2rem;
+  --standard-padding: 0.5rem;
   --text-colour: #585858;
   overflow-x: hidden;
 }
 
-@media screen and (max-width: 1000px) {
-  body {
-    --standard-padding: 1rem;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  body {
-    --standard-padding: 0.5rem;
-  }
-}
-
 footer {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   height: 10rem;
   background-color: lightyellow;
   align-items: center;
+  flex-direction: column;
+}
+
+@media (min-width: 1000px) {
+  body {
+    --standard-padding: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  body {
+    --logo-width: 4rem;
+    --standard-padding: 1rem;
+  }
+
+  footer {
+    justify-content: space-around;
+    flex-direction: row;
+  }
 }
 
 .socialsContainer {
