@@ -40,7 +40,7 @@ li ul {
   border-radius: 0.4rem;
 }
 
-.navList li a:hover {
+.navList > li a:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
@@ -129,16 +129,49 @@ li ul {
   }
 
   .dropdownToggleLabel {
-    display: block;
+    display: flex;
     position: relative;
   }
 
   .dropdownToggleLabel ~ ul {
     display: none;
+    position: absolute;
+    top: 100%;
+    gap: 0.2rem;
   }
 
-  .dropdownToggleLabel:hover ~ ul {
-    display: block;
-    position: absolute;
+  .dropdownToggleLabel:hover ~ ul,
+  .dropdownToggle:checked ~ ul,
+  .dropdownToggleLabel ~ ul:hover {
+    display: flex;
+    border: lightgray 1px solid;
+    z-index: 999;
+    background-color: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .dropdownToggleLabel ~ ul li {
+    display: flex;
+    width: 100%;
+  }
+
+  .dropdownToggleLabel ~ ul li:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+@media (min-width: 1440px) {
+  .dropdownToggleLabel {
+    display: none;
+  }
+
+  .dropdownToggleLabel ~ ul {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .dropdownToggleLabel ~ ul li a {
+    white-space: nowrap;
   }
 }
