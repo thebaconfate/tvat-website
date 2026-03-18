@@ -4,7 +4,7 @@ import { websiteRoutes } from "@/lib/routes";
 ---
 
 <nav class={style.navContainer}>
-  <input type="checkbox" id="nav-toggle" class={style.navToggle} />
+  <input type="checkbox" id="nav-toggle" class={style.navToggle} checked />
   <label for="nav-toggle" class={style.navToggleLabel}>
     <svg width="30" height="30" viewBox="0 0 30 30">
       <path
@@ -45,19 +45,30 @@ import { websiteRoutes } from "@/lib/routes";
           <a href={websiteRoutes.aboutUs.url}>Over ons</a>
         </li>
         <li>
-          <a href={websiteRoutes.contact.url}> Contact </a>
+          <a href={websiteRoutes.board.url}>Bestuur</a>
         </li>
         <li>
-          <a href={websiteRoutes.board.url}>Bestuur</a>
+          <a href={websiteRoutes.clubsong.url}>Clublied</a>
         </li>
       </ul>
     </li>
     <li>
-      <a href={websiteRoutes.activities.url}>Activiteiten</a>
+      <a href={websiteRoutes.contact.url}> Contact </a>
+    </li>
+    <li>
+      <a href={websiteRoutes.activities.url}>Kalender</a>
     </li>
     <li>
       <a href={websiteRoutes.krambambouli.url}>Krambambouli</a>
     </li>
+    <!-- <li>
+      <a
+        href={[
+          websiteRoutes.activities.url,
+          websiteRoutes.activities.lustrumgala.url,
+        ].join("")}>Lustrumgalabal</a
+      >
+      -->
     <li>
       <a href={websiteRoutes.codex.url}>Codex</a>
     </li>
