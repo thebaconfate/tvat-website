@@ -4,30 +4,62 @@ import { websiteRoutes } from "@/lib/routes";
 ---
 
 <nav class={style.navContainer}>
+  <input type="checkbox" id="nav-toggle" class={style.navToggle} />
+  <label for="nav-toggle" class={style.navToggleLabel}>
+    <svg width="30" height="30" viewBox="0 0 30 30">
+      <path
+        class={style.line1}
+        d="M5 7h20"
+        stroke="black"
+        stroke-width="3"
+        stroke-linecap="round"></path>
+      <path
+        class={style.line2}
+        d="M5 15h20"
+        stroke="black"
+        stroke-width="3"
+        stroke-linecap="round"></path>
+      <path
+        class={style.line3}
+        d="M5 23h20"
+        stroke="black"
+        stroke-width="3"
+        stroke-linecap="round"></path>
+    </svg>
+  </label>
   <ul class={style.navList}>
     <li>
       <a href={websiteRoutes.home.url}>Home</a>
     </li>
     <li>
-      <a href={websiteRoutes.aboutUs.url}>Over ons</a>
+      <input
+        type="checkbox"
+        id="about-us-toggle"
+        class={style.dropdownToggle}
+      />
+      <label for="about-us-toggle" class={style.dropdownToggleLabel}>
+        <a href="#">Over ons</a>
+      </label>
+      <ul>
+        <li>
+          <a href={websiteRoutes.aboutUs.url}>Over ons</a>
+        </li>
+        <li>
+          <a href={websiteRoutes.contact.url}> Contact </a>
+        </li>
+        <li>
+          <a href={websiteRoutes.board.url}>Bestuur</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href={websiteRoutes.contact.url}>Contact</a>
-    </li>
-    <li>
-      <a href={websiteRoutes.board.url}>Bestuur</a>
-    </li>
-    <li>
-      <a href={websiteRoutes.clubsong.url}>Clublied</a>
+      <a href={websiteRoutes.activities.url}>Activiteiten</a>
     </li>
     <li>
       <a href={websiteRoutes.krambambouli.url}>Krambambouli</a>
     </li>
     <li>
       <a href={websiteRoutes.codex.url}>Codex</a>
-    </li>
-    <li>
-      <a href={websiteRoutes.lustrumgala.url}>Lustrumgalabal</a>
     </li>
     <li>
       <a href={websiteRoutes.login.url}>login</a>
