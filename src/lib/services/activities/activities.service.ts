@@ -55,9 +55,6 @@ class ActivityService {
     ${whereClause}
     ORDER BY date, time ASC
     LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
-    console.log(query);
-    console.log(values);
-    console.log(filters);
     const [countResult, contentResult] = await Promise.all([
       database.query<{ total: number }>(countQuery, values),
       database.query<ActivityData>(query, [...values, size, offset]),
