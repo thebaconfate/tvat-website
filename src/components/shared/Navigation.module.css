@@ -31,6 +31,7 @@ li ul {
   pointer-events: none;
   opacity: 0;
   background: white;
+  padding-bottom: 100dvh;
 }
 
 .navList li a {
@@ -120,6 +121,7 @@ li ul {
     font-size: 1rem;
     flex-wrap: wrap;
     gap: 0.5rem;
+    padding-bottom: unset;
   }
 
   .navList li a {
