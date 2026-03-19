@@ -36,8 +36,8 @@ li ul {
 .navList li a {
   text-decoration: none;
   padding: 0.75rem 1.5rem;
-  font-size: 1.5rem;
   border-radius: 0.4rem;
+  font-size: 1.5rem;
 }
 
 .navList > li a:hover {
@@ -169,9 +169,22 @@ li ul {
     position: relative;
     display: flex;
     flex-direction: row;
+    gap: 0.5rem;
   }
 
   .dropdownToggleLabel ~ ul li a {
     white-space: nowrap;
+    border-radius: 0.4rem;
+  }
+
+  .dropdownToggleLabel ~ ul:hover {
+    border: unset;
+    box-shadow: unset;
+    background-color: unset;
+    z-index: unset;
+  }
+
+  .dropdownToggleLabel ~ ul li:hover {
+    background-color: unset;
   }
 }
