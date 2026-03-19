@@ -30,7 +30,6 @@ h2 {
 
 .homepageContentContainer {
   display: grid;
-  grid-template-columns: repeat(2, 45%);
   margin: 3rem auto 3rem auto;
   justify-content: center;
   gap: 5rem;
@@ -66,4 +65,10 @@ h2 {
 
 .contentHeaderContainer > * {
   text-align: center;
+}
+
+@media (min-width: 1044px) {
+  .homepageContentContainer {
+    grid-template-columns: repeat(2, 45%);
+  }
 }
