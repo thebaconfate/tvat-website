@@ -4,7 +4,7 @@ import Monogram from "@/svgs/Monogram.astro";
 import style from "./Home.module.css";
 import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
-import Activity from "@/components/web/Activity.tsx";
+import Activity from "@/components/web/Activity.astro";
 import { websiteRoutes } from "@/lib/oldRoutes";
 
 const activities = await activityService.fetchActivityPage(
