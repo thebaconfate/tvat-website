@@ -18,7 +18,7 @@ picture {
 }
 
 p,
-a {
+.krambambouliLink {
   display: inline;
   margin: 0 7%;
 }
@@ -38,6 +38,33 @@ a {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   padding: 0.5rem;
-  gap: 0.5rem;
   align-items: center;
+}
+
+@media screen and (min-width: 768px) {
+  .banner {
+    --max-height: 10rem;
+    max-height: var(--max-height);
+  }
+
+  .banner > picture {
+    height: calc(var(--max-height) * 0.8);
+  }
+  .banner > picture > img {
+    height: inherit;
+  }
+
+  .oldPins {
+    --height: 10rem;
+    height: calc(var(--height) * 0.9);
+  }
+  .oldPins > img {
+    height: inherit;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .banner {
+    display: none;
+  }
 }
