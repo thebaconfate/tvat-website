@@ -5,14 +5,15 @@ main {
   gap: 2rem;
 }
 
-img {
+.banner > picture > img,
+.oldPins > img {
   display: block;
   width: 100%;
   height: auto;
   object-fit: contain;
 }
 
-picture {
+.banner > picture {
   width: 100%;
   height: auto;
 }
@@ -41,6 +42,10 @@ p,
   align-items: center;
 }
 
+.laptopBanner {
+  display: none;
+}
+
 @media screen and (min-width: 768px) {
   .banner {
     --max-height: 10rem;
@@ -66,5 +71,19 @@ p,
 @media screen and (min-width: 1024px) {
   .banner {
     display: none;
+  }
+
+  .laptopBanner > picture > img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .laptopBanner {
+    display: grid;
+    grid-template-columns: repeat(5, 10rem);
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
   }
 }
