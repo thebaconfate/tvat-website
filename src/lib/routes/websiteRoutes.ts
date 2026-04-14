@@ -1,3 +1,9 @@
+import { terms } from "../../generated/terms.ts";
+import { sortByTerm } from "../board/board-year";
+
+terms.sort(sortByTerm);
+const latestTerm = terms[0];
+
 export const websiteRoutes = {
   home: { url: "/" },
   krambambouli: { url: "/krambambouli" },
@@ -6,7 +12,7 @@ export const websiteRoutes = {
   contact: { url: "/contact" },
   history: { url: "/history" },
   login: { url: "/login" },
-  board: { url: "/board" },
+  board: { url: `/board/${latestTerm}` },
   codex: { url: "/codex" },
   clubsong: { url: "/clubsong" },
 } as const;
