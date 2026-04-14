@@ -36,9 +36,13 @@ li ul {
 
 .navList li a {
   text-decoration: none;
-  padding: 0.75rem 1.5rem;
   border-radius: 0.4rem;
   font-size: 1.5rem;
+
+  padding: 0.75rem 1.5rem;
+}
+
+.navLink {
 }
 
 .navList > li a:hover {

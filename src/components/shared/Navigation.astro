@@ -29,7 +29,7 @@ import { websiteRoutes } from "@/lib/routes";
   </label>
   <ul class={style.navList}>
     <li>
-      <a href={websiteRoutes.home.url}>Home</a>
+      <a class={style.navLink} href={websiteRoutes.home.url}>Home</a>
     </li>
     <li>
       <input
@@ -42,24 +42,27 @@ import { websiteRoutes } from "@/lib/routes";
       </label>
       <ul>
         <li>
-          <a href={websiteRoutes.aboutUs.url}>Over ons</a>
+          <a class={style.navLink} href={websiteRoutes.aboutUs.url}>Over ons</a>
         </li>
         <li>
-          <a href={websiteRoutes.board.url}>Bestuur</a>
+          <a class={style.navLink} href={websiteRoutes.board.url}>Bestuur</a>
         </li>
         <li>
-          <a href={websiteRoutes.clubsong.url}>Clublied</a>
+          <a class={style.navLink} href={websiteRoutes.clubsong.url}>Clublied</a
+          >
         </li>
       </ul>
     </li>
     <li>
-      <a href={websiteRoutes.contact.url}> Contact </a>
+      <a class={style.navLink} href={websiteRoutes.contact.url}> Contact </a>
     </li>
     <li>
-      <a href={websiteRoutes.activities.url}>Kalender</a>
+      <a class={style.navLink} href={websiteRoutes.activities.url}>Kalender</a>
     </li>
     <li>
-      <a href={websiteRoutes.krambambouli.url}>Krambambouli</a>
+      <a class={style.navLink} href={websiteRoutes.krambambouli.url}
+        >Krambambouli</a
+      >
     </li>
     <!-- <li>
       <a

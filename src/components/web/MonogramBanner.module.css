@@ -16,6 +16,11 @@
   .monogramContainer {
     width: 10rem;
   }
+
+  .banner {
+    flex-direction: row;
+    gap: 3rem;
+  }
 }
 
 @media (min-width: 1024px) {
