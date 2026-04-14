@@ -1,0 +1,8 @@
+---
+import style from "./Banner.module.css";
+const { class: className = "", style: inlineStyle } = Astro.props;
+---
+
+<div class={`${style.banner} ${className}`} style={inlineStyle}>
+  <slot />
+</div>
