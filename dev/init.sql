@@ -42,6 +42,6 @@ CREATE TABLE IF NOT EXISTS activities (
     time TIME NOT NULL,
     location_name TEXT NOT NULL,
     location_address TEXT,
-    location_url TEXT
-    facebook_url TEXT,
+    location_url TEXT,
+    facebook_url TEXT
 )
