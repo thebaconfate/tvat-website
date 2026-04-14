@@ -18,7 +18,7 @@ main {
   height: auto;
 }
 
-p,
+.paragraph,
 .krambambouliLink {
   display: inline;
   margin: 0 7%;
@@ -38,10 +38,12 @@ p,
 .banner {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  padding: 0.5rem;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
   align-items: center;
 }
 
+.largeScreenPicture,
 .laptopBanner {
   display: none;
 }
@@ -50,6 +52,7 @@ p,
   .banner {
     --max-height: 10rem;
     max-height: var(--max-height);
+    padding: 1rem 1rem;
   }
 
   .banner > picture {
@@ -73,17 +76,41 @@ p,
     display: none;
   }
 
-  .laptopBanner > picture > img {
+  .laptopBanner > picture > img,
+  .largeScreenPicture > img {
     width: 100%;
     height: auto;
     object-fit: contain;
   }
 
+  .largeScreenPicture > img {
+    min-width: 15rem;
+    max-width: 25rem;
+  }
   .laptopBanner {
     display: grid;
     grid-template-columns: repeat(5, 10rem);
     justify-content: space-around;
     align-items: center;
     padding: 1rem;
+  }
+
+  .paragraph {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .reverse {
+    flex-direction: row-reverse;
+  }
+
+  .paragraph > .largeScreenPicture {
+    display: block;
+  }
+
+  .krambambouliParagraph {
+    display: grid;
+    gap: 2rem;
   }
 }
