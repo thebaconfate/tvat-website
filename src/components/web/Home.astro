@@ -1,6 +1,8 @@
 ---
 import SaintVeCountdown from "../saint-ve-countdown/SaintVeCountdown";
 import Monogram from "@/svgs/Monogram.astro";
+import Banner from "./Banner.astro";
+import MonogramBanner from "./MonogramBanner.astro";
 import style from "./Home.module.css";
 import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
@@ -17,17 +19,12 @@ const locale = getLocale(Astro.request);
 ---
 
 <main>
-  <div class={style.introBanner}>
-    <div>
-      <div class={style.monogramContainer}>
-        <Monogram />
-      </div>
-    </div>
+  <MonogramBanner>
     <div class={style.introText}>
       <h1>'t VAT</h1>
       <h2>Pro ambiantia et joewissantia</h2>
     </div>
-  </div>
+  </MonogramBanner>
   <div class={style.homepageContentContainer}>
     <div class={style.content}>
       <div class={style.contentHeaderContainer}>

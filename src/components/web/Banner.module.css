@@ -1,0 +1,19 @@
+.banner {
+  width: 100%;
+  background: linear-gradient(
+    135deg,
+    rgb(54, 149, 34, 0.6) 0%,
+    rgb(54, 149, 34, 0.6) 30%,
+    rgb(100, 53, 152, 0.6) 30%,
+    rgb(100, 53, 152, 0.6) 70%,
+    rgb(175, 36, 36, 0.6) 70%,
+    rgb(175, 36, 36, 0.6) 100%
+  );
+}
+
+@media (min-width: 768px) {
+  .banner {
+    flex-direction: row;
+    gap: 3rem;
+  }
+}
