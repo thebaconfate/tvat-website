@@ -7,16 +7,16 @@ import styles from "./ClubSong.module.css";
     <img src="/brussel.png" alt="Grote markt" />
   </picture>
   <div class={styles.shoutContainer}>
-    <h1 class="shout-title">Kreet</h1>
-    <p class="shout">GELIJK ALS DE...BIESTE!!! (TER)</p>
+    <h1>Kreet</h1>
+    <p>GELIJK ALS DE...BIESTE!!! (TER)</p>
   </div>
   <div class={styles.clubSongContainer}>
-    <h1 class="clubsong-title">Clublied</h1>
-    <div class="song-information-container">
-      <p class="text">T: De Wizze</p>
-      <p class="melody">M: 'Le grenadier de Flandre'</p>
+    <h1>Clublied</h1>
+    <div>
+      <p>T: De Wizze</p>
+      <p>M: 'Le grenadier de Flandre'</p>
     </div>
-    <p class="first verse">
+    <p class={styles.verse}>
       Dat nu tot boordevol <br />
       Men onze pint volschenke <br />
       Dat nu weer met een kol <br />
@@ -31,7 +31,7 @@ import styles from "./ClubSong.module.css";
       Discipels van Bacchus <br />
       En van de heer Gambrinus <br />
     </p>
-    <p class="second verse">
+    <p class={styles.verse}>
       We vrezen niet of nooit Zij die ons nu belagen <br />
       De flik of de kaloot <br />
       En al die and're zagen <br />
@@ -39,7 +39,7 @@ import styles from "./ClubSong.module.css";
       In 't goede bier behagen <br />
     </p>
     <p class={styles.chorus}>Refrein</p>
-    <p class="third verse">
+    <p class={styles.verse}>
       En wanneer de dag komt <br />
       Dat wij dan moeten gaan <br />
       Dat niemand dan verstomd <br />
@@ -48,7 +48,7 @@ import styles from "./ClubSong.module.css";
       In een vat bier vergaan <br />
     </p>
     <p class={styles.chorus}>Refrein</p>
-    <p class="fourth verse">
+    <p class={styles.verse}>
       En wanneer ik paraat <br />
       Sta voor de heer Sint Pietre <br />
       Dan zeg ik: "Beste maat <br />
@@ -67,8 +67,11 @@ import styles from "./ClubSong.module.css";
     </p>
   </div>
   <div class={styles.blueSongContainer}>
-    <h1 class="blue-song-title">Vatschachtenlied</h1>
-    <p class="first verse">
+    <h1>Vatschachtenlied</h1>
+    <div>
+      <p>M: 'The Wild Rover'</p>
+    </div>
+    <p class={styles.verse}>
       In de maand september liep ik door de stad, <br />
       Strandde in een café tot ik geen geld meer had. <br />
       Met een heel droge lever ging ik nog op zoek, <br />
@@ -80,21 +83,21 @@ import styles from "./ClubSong.module.css";
       Ja, we feesten als beesten <br />
       En zuipen ons zat <br />
     </p>
-    <p class="second verse">
+    <p class={styles.verse}>
       Tussen al die anciens voelde ik mij zo groen, <br />
       Dus dopen mochten ze met mij ook wel doen. <br />
       Ik ging naar de senior en stelde mij voor, <br />
       Hij gaf mij een pint een ik slikte ze door. <br />
     </p>
     <p class={styles.chorus}>Refrein</p>
-    <p class="third verse">
+    <p class={styles.verse}>
       En als we gedoopt zijn, dan zwijnen we mee. <br />
       We zingen en dansen en zuipen voor twee. <br />
       We brossen de lessen, gaan niet meer naar schol. <br />
       In onze aders geen bloed meer, alleen nog alcool. <br />
     </p>
     <p class={styles.chorus}>Refrein</p>
-    <p class="fourth verse">
+    <p class={styles.verse}>
       Wij zijn goede schachten, kunnen wij niets aan doen. <br />
       We fetchen en ditchen en smoren ons groen. <br />
       Het zit in de genen: een vent is een kwal. <br />
