@@ -1,0 +1,43 @@
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: var(--standard-padding);
+  padding-right: var(--standard-padding);
+  gap: 3rem;
+}
+picture {
+  display: flex;
+  justify-content: center;
+  margin: 1rem;
+}
+
+img {
+  width: 90%;
+}
+.clubsong-container,
+.shout-container,
+.blue-song-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.clubsong-container > *,
+.shout-container > *,
+.blue-song-container > * {
+  text-align: center;
+}
+
+.clubsong-container > p,
+.shout-container > p,
+.blue-song-container > p {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.chorus {
+  font-weight: 900;
+  letter-spacing: 0.02rem;
+}
