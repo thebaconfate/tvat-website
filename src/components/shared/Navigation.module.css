@@ -182,6 +182,7 @@ li ul {
     box-shadow: unset;
     background-color: unset;
     z-index: unset;
+    display: flex;
   }
 
   .dropdownToggleLabel ~ ul li:hover {
