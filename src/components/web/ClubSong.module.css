@@ -42,3 +42,18 @@
 .chorus {
   font-weight: 900;
 }
+
+@media (min-width: 768px) {
+  .contentContainer {
+    margin-top: 2rem;
+  }
+  .imgContainer {
+    width: 90%;
+    margin: auto;
+  }
+}
+@media (min-width: 1024px) {
+}
+
+@media (min-width: 1440px) {
+}
