@@ -38,14 +38,10 @@ li ul {
   text-decoration: none;
   border-radius: 0.4rem;
   font-size: 1.5rem;
-
   padding: 0.75rem 1.5rem;
 }
 
-.navLink {
-}
-
-.navList > li a:hover {
+.navLink:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
@@ -149,20 +145,18 @@ li ul {
   .dropdownToggleLabel:hover ~ ul,
   .dropdownToggle:checked ~ ul,
   .dropdownToggleLabel ~ ul:hover {
-    display: flex;
+    display: block;
     border: lightgray 1px solid;
     z-index: 999;
     background-color: white;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
 
   .dropdownToggleLabel ~ ul li {
-    display: flex;
-    width: 100%;
+    display: grid;
   }
 
-  .dropdownToggleLabel ~ ul li:hover {
-    background: rgba(0, 0, 0, 0.05);
+  .dropdownToggle ~ ul li .navLink:hover {
+    border-radius: 0;
   }
 }
 
@@ -178,7 +172,7 @@ li ul {
     gap: 0.5rem;
   }
 
-  .dropdownToggleLabel ~ ul li a {
+  .dropdownToggleLabel ~ ul li .navLink:hover {
     white-space: nowrap;
     border-radius: 0.4rem;
   }
