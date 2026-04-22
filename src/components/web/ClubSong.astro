@@ -2,15 +2,15 @@
 import styles from "./ClubSong.module.css";
 ---
 
-<main>
-  <picture>
+<main class={styles.contentContainer}>
+  <picture class={styles.imgContainer}>
     <img src="/brussel.png" alt="Grote markt" />
   </picture>
-  <div class="shout-container">
+  <div class={styles.shoutContainer}>
     <h1 class="shout-title">Kreet</h1>
     <p class="shout">GELIJK ALS DE...BIESTE!!! (TER)</p>
   </div>
-  <div class="clubsong-container">
+  <div class={styles.clubSongContainer}>
     <h1 class="clubsong-title">Clublied</h1>
     <div class="song-information-container">
       <p class="text">T: De Wizze</p>
@@ -23,7 +23,7 @@ import styles from "./ClubSong.module.css";
       Het bier ons blijve wenke <br />We blijven alle dol <br />
       Van het gerstegeschenke
     </p>
-    <p class="chorus">
+    <p class={styles.chorus}>
       We zijn van 't Vat <br />
       We zuipen ons zat <br />
       We zien de pint in 't groot, dedju <br />
@@ -38,7 +38,7 @@ import styles from "./ClubSong.module.css";
       We vinden totterdood <br />
       In 't goede bier behagen <br />
     </p>
-    <p class="chorus">Refrein</p>
+    <p class={styles.chorus}>Refrein</p>
     <p class="third verse">
       En wanneer de dag komt <br />
       Dat wij dan moeten gaan <br />
@@ -47,7 +47,7 @@ import styles from "./ClubSong.module.css";
       Ik wil als doodskist rond <br />
       In een vat bier vergaan <br />
     </p>
-    <p class="chorus">Refrein</p>
+    <p class={styles.chorus}>Refrein</p>
     <p class="fourth verse">
       En wanneer ik paraat <br />
       Sta voor de heer Sint Pietre <br />
@@ -56,8 +56,8 @@ import styles from "./ClubSong.module.css";
       En ook het bier van 't Vat <br />
       Stuur mij maar weer wat dieper" <br />
     </p>
-    <p class="chorus">Laatste refrein:</p>
-    <p class="chorus">
+    <p class={styles.chorus}>Laatste refrein:</p>
+    <p class={styles.chorus}>
       We blijven van 't Vat <br />
       We poepen ons nat <br />
       Een porreke in ons bed, dedju <br />
@@ -66,7 +66,7 @@ import styles from "./ClubSong.module.css";
       En van de heer Gambrinus <br />
     </p>
   </div>
-  <div class="blue-song-container">
+  <div class={styles.blueSongContainer}>
     <h1 class="blue-song-title">Vatschachtenlied</h1>
     <p class="first verse">
       In de maand september liep ik door de stad, <br />
@@ -74,7 +74,7 @@ import styles from "./ClubSong.module.css";
       Met een heel droge lever ging ik nog op zoek, <br />
       En toen vond ik de Vatters in 't café om de hoek. <br />
     </p>
-    <p class="chorus">
+    <p class={styles.chorus}>
       En we zijn de schachten, <br />
       De schachten van 't VAT. <br />
       Ja, we feesten als beesten <br />
@@ -86,20 +86,20 @@ import styles from "./ClubSong.module.css";
       Ik ging naar de senior en stelde mij voor, <br />
       Hij gaf mij een pint een ik slikte ze door. <br />
     </p>
-    <p class="chorus">Refrein</p>
+    <p class={styles.chorus}>Refrein</p>
     <p class="third verse">
       En als we gedoopt zijn, dan zwijnen we mee. <br />
       We zingen en dansen en zuipen voor twee. <br />
       We brossen de lessen, gaan niet meer naar schol. <br />
       In onze aders geen bloed meer, alleen nog alcool. <br />
     </p>
-    <p class="chorus">Refrein</p>
+    <p class={styles.chorus}>Refrein</p>
     <p class="fourth verse">
       Wij zijn goede schachten, kunnen wij niets aan doen. <br />
       We fetchen en ditchen en smoren ons groen. <br />
       Het zit in de genen: een vent is een kwal. <br />
       't Is beestig te leven, een toekomst fatal. <br />
     </p>
-    <p class="chorus">Refrein</p>
+    <p class={styles.chorus}>Refrein</p>
   </div>
 </main>
