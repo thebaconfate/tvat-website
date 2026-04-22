@@ -33,15 +33,12 @@
 .blueSongContainer > * {
   text-align: center;
 }
-
-.clubSongContainer > p,
-.shoutContainer > p,
-.blueSongContainer > p {
+.verse,
+.chorus {
   font-size: 1rem;
-  line-height: 1.75;
+  line-height: 1.5;
 }
 
 .chorus {
   font-weight: 900;
-  letter-spacing: 0.02rem;
 }
