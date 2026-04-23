@@ -53,6 +53,10 @@
   }
 }
 @media (min-width: 1024px) {
+  .imgContainer {
+    width: 70%;
+    max-width: 40rem;
+  }
 }
 
 @media (min-width: 1440px) {

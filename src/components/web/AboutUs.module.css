@@ -22,6 +22,7 @@ main {
 .krambambouliLink {
   display: inline;
   margin: 0 7%;
+  text-align: center;
 }
 
 .title {
@@ -68,6 +69,10 @@ main {
   }
   .oldPins > img {
     height: inherit;
+  }
+  .paragraph,
+  .krambambouliLink {
+    text-align: unset;
   }
 }
 
