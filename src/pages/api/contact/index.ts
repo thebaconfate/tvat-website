@@ -4,6 +4,7 @@ import sanitizeHtml from "sanitize-html";
 import type { APIContext } from "astro";
 import z4 from "zod/v4";
 import { config } from "@/lib/config";
+import { resendService } from "@/lib/services/resend/resend.service";
 
 /*
  * NOTE: Perhaps add some rate limiting to protect your resend api
@@ -39,6 +40,10 @@ export async function POST({ request }: APIContext) {
       replyTo: `${form.name} <${form.email}>`,
     });
     if (!error) return new Response(null, { status: 200 });
+    if (error.statusCode == 429) {
+      resendService.enqueue("contact", form, form.email);
+      return new Response(null, { status: 200 });
+    }
     console.error(error);
     return new Response(
       JSON.stringify("Something went wrong with the email server"),

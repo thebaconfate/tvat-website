@@ -95,7 +95,11 @@ class UserService {
     // TODO: implement this
   }
   async deleteUser(userId: number) {
-    // TODO: implement this
+    const sql = `
+      DELETE FROM users u WHERE u.id = $1
+      `;
+    const result = await database.query(sql, [userId]);
+    return result;
   }
 }
 

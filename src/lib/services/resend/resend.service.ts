@@ -1,16 +1,15 @@
 import { database } from "@/lib/database";
-import type { ContactFormType } from "@/lib/domain/contact";
 
 class ResendService {
-  async enqueue(
-    emailType: string,
-    payload: ContactFormType,
-    recipient: string,
-  ) {
+  async enqueue(jobType: string, payload: any, recipient: string) {
     const sql = `
-    INSERT INTO email_jobs (type, payload, recipient) values ($1, $2, $3)'
+    INSERT INTO email_jobs (job_type, payload, recipient)
+    values ($1, $2, $3)
+    RETURNING *
     `;
-    database.query(sql, [emailType, payload, recipient]);
+    const result = await database.query(sql, [jobType, payload, recipient]);
+    const [row] = result.rows;
+    return row ?? null;
   }
 }
 
