@@ -28,3 +28,4 @@ export function setJwtCookie(token: string, headers: Headers = new Headers()) {
     `Authorization=${token}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=3600`,
   );
   return headers;
+}

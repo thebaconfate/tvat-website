@@ -1,10 +1,6 @@
+import { newUserSchema, RoleEnum, roleSchema } from "@/lib/domain/users";
 import { hashPassword } from "@/lib/services/auth/auth.utils";
-import {
-  newUserSchema,
-  RoleEnum,
-  roleSchema,
-  userService,
-} from "@/lib/services/users";
+import { userService } from "@/lib/services/users";
 import type { APIContext } from "astro";
 
 export async function POST({ request }: APIContext) {

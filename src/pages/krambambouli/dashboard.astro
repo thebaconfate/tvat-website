@@ -1,7 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { Auth } from "../../lib/auth/auth";
-import Database from "../../lib/database";
 import Checkbox from "../../components/krambambouli/dashboard/checkbox/Checkbox";
 import { Price } from "../../lib/store";
 
@@ -15,7 +14,7 @@ const db = await Database.getInstance();
 const startDate = new Date(2025, 8, 1);
 const endDate = new Date();
 const [page, products] = await Promise.all([
- db.getKrambambouliOrdersByCustomer(startDate, endDate, undefined, 100),
+  db.getKrambambouliOrdersByCustomer(startDate, endDate, undefined, 100),
   db.getKrambambouliProducts(),
 ]);
 function fmtPrice(euros: number, cents: number) {

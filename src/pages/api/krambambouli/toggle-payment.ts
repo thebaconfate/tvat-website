@@ -1,7 +1,6 @@
 import type { APIContext } from "astro";
 import { Auth } from "../../../lib/auth/auth";
 import z from "zod";
-import Database from "../../../lib/database";
 
 const schema = z.object({
   customerId: z
@@ -12,6 +11,8 @@ const schema = z.object({
 });
 
 export async function PUT({ request }: APIContext) {
+  return new Response();
+  /*
   const auth = new Auth();
   const authorized = await auth.requestPassage(request);
   if (!authorized)
@@ -26,4 +27,5 @@ export async function PUT({ request }: APIContext) {
     console.error(e);
     return new Response(null, { status: 400 });
   }
+  */
 }
