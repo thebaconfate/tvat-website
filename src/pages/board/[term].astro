@@ -1,0 +1,46 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { readdir, readFile } from "fs/promises";
+import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
+import { sortByTerm } from "../../lib/board/board-year";
+import Board from "../../components/web/Board.astro";
+import path from "path";
+
+export const prerender = true;
+export async function getStaticPaths() {
+  const directoryPath = path.resolve("./public/boards");
+  const directoryPromise = readdir(directoryPath);
+  const termRegex = /^\d{4}-\d{4}\.json$/;
+  const directory = await directoryPromise;
+  const filenames = directory.filter((path) => termRegex.test(path));
+  const boardYears: BoardYearInterface[] = await Promise.all(
+    filenames.map(async (filename) => {
+      const filePath = path.join(directoryPath, filename);
+      const board = await readFile(filePath, "utf-8");
+      return JSON.parse(board);
+    }),
+  );
+  const terms = boardYears.map((d) => d.term);
+  terms.sort(sortByTerm);
+  return boardYears.map((d) => {
+    return {
+      params: { term: d.term },
+      props: { boardYear: new BoardYear(d), terms: terms },
+    };
+  });
+}
+
+const { boardYear, terms } = Astro.props;
+const termIndex = terms.findIndex((a) => a === boardYear.term);
+const nextTerm: string | undefined = terms[termIndex - 1];
+const previousTerm: string | undefined = terms[termIndex + 1];
+const title = "Bestuur";
+---
+
+<Layout title={title}>
+  <Board
+    boardYear={boardYear}
+    nextTerm={nextTerm}
+    previousTerm={previousTerm}
+  />
+</Layout>

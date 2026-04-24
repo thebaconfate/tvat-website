@@ -1,0 +1,47 @@
+/* For development purposes only */
+
+CREATE TABLE IF NOT EXISTS config (
+    config_key TEXT PRIMARY KEY,
+    config_value JSONB NOT NULL
+);
+
+INSERT INTO config (config_key, config_value) VALUES
+    ('krambambouli_enabled', to_jsonb(true)),
+    ('lustrumgalabal_enabled', to_jsonb(false))
+ON CONFLICT (config_key) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS roles (
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_roles_name ON roles(name);
+
+INSERT INTO roles (name) VALUES
+    ('root'),
+    ('admin'),
+    ('boardMember')
+ON CONFLICT (name) DO NOTHING;
+
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name TEXT,
+    role_id INT NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+CREATE TABLE IF NOT EXISTS activities (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    location_name TEXT NOT NULL,
+    location_address TEXT,
+    location_url TEXT,
+    facebook_url TEXT
+)

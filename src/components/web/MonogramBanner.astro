@@ -1,0 +1,14 @@
+---
+import style from "./MonogramBanner.module.css";
+import Banner from "./Banner.astro";
+import Monogram from "@/svgs/Monogram.astro";
+---
+
+<Banner class={style.banner}>
+  <div>
+    <div class={style.monogramContainer}>
+      <Monogram />
+    </div>
+  </div>
+  <slot />
+</Banner>

@@ -57,7 +57,7 @@ export default function CodexChallenge({
   }
 
   return (
-    <>
+    <main>
       <div className="content-container">
         <h1 className="title">Codex Challenge</h1>
         {mode === Mode.Randomizer ? (
@@ -146,6 +146,6 @@ export default function CodexChallenge({
           </>
         )}
       </div>
-    </>
+    </main>
   );
 }

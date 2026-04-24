@@ -1,0 +1,122 @@
+main {
+  display: grid;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+  gap: 2rem;
+  flex: 1;
+}
+
+.banner > picture > img,
+.oldPins > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.banner > picture {
+  width: 100%;
+  height: auto;
+}
+
+.paragraph,
+.krambambouliLink {
+  display: inline;
+  margin: 0 7%;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.textContainer {
+  display: grid;
+  gap: 1rem;
+  margin: 0 10%;
+}
+
+.banner {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  align-items: center;
+}
+
+.largeScreenPicture,
+.laptopBanner {
+  display: none;
+}
+
+@media screen and (min-width: 768px) {
+  .banner {
+    --max-height: 10rem;
+    max-height: var(--max-height);
+    padding: 1rem 1rem;
+  }
+
+  .banner > picture {
+    height: calc(var(--max-height) * 0.8);
+  }
+  .banner > picture > img {
+    height: inherit;
+  }
+
+  .oldPins {
+    --height: 10rem;
+    height: calc(var(--height) * 0.9);
+  }
+  .oldPins > img {
+    height: inherit;
+  }
+  .paragraph,
+  .krambambouliLink {
+    text-align: unset;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .banner {
+    display: none;
+  }
+
+  .laptopBanner > picture > img,
+  .largeScreenPicture > img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .largeScreenPicture > img {
+    min-width: 15rem;
+    max-width: 25rem;
+  }
+  .laptopBanner {
+    display: grid;
+    grid-template-columns: repeat(5, 10rem);
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .paragraph {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .reverse {
+    flex-direction: row-reverse;
+  }
+
+  .paragraph > .largeScreenPicture {
+    display: block;
+  }
+
+  .krambambouliParagraph {
+    display: grid;
+    gap: 2rem;
+  }
+}

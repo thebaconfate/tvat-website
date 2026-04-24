@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./styles.css";
 import DOMPurify from "dompurify";
-import { apiRoutes } from "../../lib/routes";
-import { createUrl } from "../../lib/utils";
+import { apiRoutes } from "../../lib/oldRoutes";
 import { Popup } from "../popup/Popup";
 import { PopupEnum } from "../../lib/popup";
 import type { ProductInterface } from "../../lib/interfaces/database/product";
@@ -248,11 +247,7 @@ export default function KrambambouliForm(props: Props) {
         );
     }
     await fetch(
-      createUrl([
-        window.location.origin,
-        apiRoutes.krambambouli.url,
-        apiRoutes.krambambouli.order.url,
-      ]),
+      `${apiRoutes.krambambouli.url}${apiRoutes.krambambouli.order.url}`,
       {
         method: "POST",
         body: formData,
