@@ -1,6 +1,7 @@
 main {
   flex: 1;
 }
+
 .boardContainer {
   padding-top: 2rem;
   padding-bottom: 2rem;
@@ -10,11 +11,6 @@ main {
   align-items: end;
 }
 
-@media (min-width: 768px) {
-  .multiple {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 .single {
   place-content: center;
 }
@@ -104,8 +100,9 @@ main {
 }
 
 @media (min-width: 768px) {
-  .boardContainer {
-    column-gap: 5rem;
+  .multiple {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 0 10%;
   }
 }
 

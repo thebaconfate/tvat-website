@@ -24,9 +24,6 @@ const navigatinContainerStyle = isFirstTerm
     : styles.spaceBetween;
 
 const boardSize = boardYear.boardMembers.length;
-// TODO: Wrap this component in a <main> and move the styles to a css file.
-// Adapt the styles accordingly as introducting main fucks up with the
-// spacing
 ---
 
 <main>
@@ -35,7 +32,7 @@ const boardSize = boardYear.boardMembers.length;
     class=`${styles.boardyearsNavigationContainer} ${navigatinContainerStyle}`
   >
     {
-      !isFirstTerm && previousTerm && (
+      !isFirstTerm && (
         <a class={styles.boardyearsNavigation} href={nextTerm}>
           <span class={`${styles.arrow} ${styles.previous}`}>{nextTerm}</span>
         </a>
