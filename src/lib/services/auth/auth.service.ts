@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { userService } from "../users";
-import type { NewUserData } from "@/lib/domain/users";
 import {
   tokenPayloadSchema,
   type Credentials,
@@ -13,8 +12,6 @@ class AuthService {
   private secretKey = crypto.randomBytes(64).toString("hex");
 
   private userService = userService;
-
-  //async register(newUser: NewUserData) {}
 
   private generateToken(payload: any) {
     return jwt.sign(payload, this.secretKey, {

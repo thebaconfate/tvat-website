@@ -18,7 +18,6 @@ let products: undefined | ProductInterface[],
 
 try {
   if (formActive) {
-    /*
     const database = await Database.getInstance();
     [products, pickupLocations, deliveryLocations] = await Promise.all([
       database?.getKrambambouliProducts(),
@@ -32,7 +31,6 @@ try {
         ? loc1.euros.cents - loc2.euros.cents
         : loc1.euros.euros - loc2.euros.euros,
     );
-  */
   }
 } catch (e) {
   console.error(e);
