@@ -4,6 +4,13 @@
   --tertiary: rgb(54, 149, 34);
 }
 
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
 .formContainer {
   display: grid;
   justify-content: center;
