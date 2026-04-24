@@ -9,8 +9,6 @@ export async function POST({ request }: APIContext) {
   // completely.
   const token = request.headers.get("x-bootstrap-token");
   const bootstrap_token = process.env.BOOTSTRAP_TOKEN;
-  console.log(`BOOTSTRAP_TOKEN=${bootstrap_token}`);
-  console.log(`token=${token}`);
   if (!bootstrap_token)
     return new Response(JSON.stringify("Bootstrap disabled"), { status: 403 });
   if (token !== bootstrap_token)

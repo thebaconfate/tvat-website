@@ -2,11 +2,15 @@ import { database } from "@/lib/database";
 import type { ContactFormType } from "@/lib/domain/contact";
 
 class ResendService {
-  async enqueue(email: ContactFormType) {
-    /*
-     * TODO: Implement this for enqueueing emails and retry later due to
-     * rate limits
-     */
+  async enqueue(
+    emailType: string,
+    payload: ContactFormType,
+    recipient: string,
+  ) {
+    const sql = `
+    INSERT INTO email_jobs (type, payload, recipient) values ($1, $2, $3)'
+    `;
+    database.query(sql, [emailType, payload, recipient]);
   }
 }
 

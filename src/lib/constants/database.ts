@@ -1,4 +1,3 @@
-import dotenv from "dotenv";
 import type { ConnectionOptions } from "mysql2/promise";
 
 export const Tables = Object.freeze({
