@@ -18,10 +18,10 @@
 
 .boardMemberPicture {
   width: 100%;
-  aspect-ratio: 1 /1;
+  aspect-ratio: 1 / 1;
   object-fit: cover;
   text-align: center;
-  max-width: 175px;
+  max-width: 200px;
   display: block;
 }
 
@@ -34,13 +34,6 @@ picture.boardMemberPicture {
 
 .boardMemberStars > img {
   max-width: 1rem;
-}
-
-@media (min-width: 375px) {
-  .boardMember picture,
-  .boardMember img {
-    max-width: 200px;
-  }
 }
 
 @media (min-width: 375px) {
