@@ -4,12 +4,11 @@ import jwt from "jsonwebtoken";
 import { userService } from "../users";
 import type { NewUserData } from "@/lib/domain/users";
 import {
-  getAuthToken,
   tokenPayloadSchema,
-  verifyPassword,
   type Credentials,
   type JwtPayload,
 } from "@/lib/domain/auth";
+import { getAuthToken, verifyPassword } from "./auth.utils";
 
 class AuthService {
   private secretKey = crypto.randomBytes(64).toString("hex");

@@ -4,7 +4,6 @@ import Cookbook from "../svgs/Cookbook.astro";
 import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
 import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
-import Database from "../lib/database";
 import type { ProductInterface } from "../lib/interfaces/database/product";
 import type { PickupLocationInterface } from "../lib/interfaces/database/pickupLocation";
 import type { DeliveryZoneInterface } from "../lib/interfaces/database/deliveryZone";
@@ -19,6 +18,7 @@ let products: undefined | ProductInterface[],
 
 try {
   if (formActive) {
+    /*
     const database = await Database.getInstance();
     [products, pickupLocations, deliveryLocations] = await Promise.all([
       database?.getKrambambouliProducts(),
@@ -32,6 +32,7 @@ try {
         ? loc1.euros.cents - loc2.euros.cents
         : loc1.euros.euros - loc2.euros.euros,
     );
+  */
   }
 } catch (e) {
   console.error(e);
