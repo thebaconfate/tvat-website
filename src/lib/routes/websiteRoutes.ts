@@ -13,6 +13,6 @@ export const websiteRoutes = {
   history: { url: "/history" },
   login: { url: "/login" },
   board: { url: `/board/${latestTerm}` },
-  codex: { url: "/codex" },
+  codex: { url: "/codex", codexChallenge: { url: "/challenge" } },
   clubsong: { url: "/clubsong" },
 } as const;
