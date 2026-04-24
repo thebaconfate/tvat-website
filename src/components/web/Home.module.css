@@ -1,3 +1,7 @@
+.contentContainer {
+  flex: 1;
+}
+
 .introBanner {
   width: 100%;
   background: linear-gradient(

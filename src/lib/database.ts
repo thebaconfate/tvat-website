@@ -36,7 +36,7 @@ class Database {
   }
 
   public async query<T extends QueryResultRow = QueryResultRow>(
-    text: string,
+    sql: string,
     params?: any[],
     retries = 3,
     delay = 1000,
@@ -44,7 +44,7 @@ class Database {
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
         const pool = await this.connect();
-        return pool.query<T>(text, params);
+        return pool.query<T>(sql, params);
       } catch (err: any) {
         console.warn(`Query attempt ${attempt} failed: ${err.message}`);
         this.pool = null; // force reconnect next try

@@ -1,9 +1,7 @@
 ---
 import SaintVeCountdown from "../saint-ve-countdown/SaintVeCountdown";
-import Monogram from "@/svgs/Monogram.astro";
-import Banner from "./Banner.astro";
 import MonogramBanner from "./MonogramBanner.astro";
-import style from "./Home.module.css";
+import styles from "./Home.module.css";
 import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
 import Activity from "@/components/web/Activity.astro";
@@ -18,35 +16,35 @@ const activities = await activityService.fetchActivityPage(
 const locale = getLocale(Astro.request);
 ---
 
-<main>
+<main class={styles.contentContainer}>
   <MonogramBanner>
-    <div class={style.introText}>
+    <div class={styles.introText}>
       <h1>'t VAT</h1>
       <h2>Pro ambiantia et joewissantia</h2>
     </div>
   </MonogramBanner>
-  <div class={style.homepageContentContainer}>
-    <div class={style.content}>
-      <div class={style.contentHeaderContainer}>
+  <div class={styles.homepageContentContainer}>
+    <div class={styles.content}>
+      <div class={styles.contentHeaderContainer}>
         <h2>Opkomende</h2>
         <h2>Activiteiten</h2>
       </div>
-      <div class={style.activityList}>
+      <div class={styles.activityList}>
         {
           activities.content.map((a) => (
             <Activity activity={a} locale={locale} />
           ))
         }
       </div>
-      <a class={style.allActivitiesLink} href={websiteRoutes.kalender.url}
+      <a class={styles.allActivitiesLink} href={websiteRoutes.kalender.url}
         >Meer activiteiten</a
       >
     </div>
-    <div class={style.content}>
-      <div class={style.contentHeaderContainer}>
+    <div class={styles.content}>
+      <div class={styles.contentHeaderContainer}>
         <h2>Saint-Vé</h2>
       </div>
-      <div class={style.countdownContainer}>
+      <div class={styles.countdownContainer}>
         <SaintVeCountdown client:idle />
       </div>
     </div>

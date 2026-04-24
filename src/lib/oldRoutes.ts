@@ -34,5 +34,8 @@ const apiRoutes = {
     url: `${baseApiUrl}/store`,
     products: { url: "/products", krambambouli: { url: "/krambambouli" } },
   },
+  contact: {
+    url: `${baseApiUrl}/contact`,
+  },
 };
 export { websiteRoutes, apiRoutes };

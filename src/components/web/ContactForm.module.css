@@ -1,0 +1,108 @@
+:root {
+  --main: rgb(100, 53, 152);
+  --secondary: rgb(255, 239, 62);
+  --tertiary: rgb(54, 149, 34);
+}
+
+.contentContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.formContainer {
+  display: grid;
+  gap: 1rem;
+}
+
+.inputContainer {
+  display: grid;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.messageContainer {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.title {
+  text-align: center;
+}
+
+button {
+  border-radius: 0.4rem;
+}
+
+.submitButton {
+  background: var(--main);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 4px 10px rgba(100, 53, 152, 0.35);
+}
+
+.submitButton:hover {
+  background: var(--tertiary);
+  box-shadow: 0 6px 14px rgba(54, 149, 34, 0.35);
+  transform: translateY(-1px);
+}
+.submitButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid rgb(255, 239, 62);
+  outline-offset: 2px;
+}
+
+input,
+textarea {
+  width: 100%;
+  font-size: 1rem;
+  outline: none;
+  border-radius: 0.3rem;
+  border: solid lightgray 1px;
+  display: flex;
+  padding: 0.2rem 0.5rem;
+}
+
+input::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+input:focus-within,
+input:hover,
+textarea:focus-within,
+textarea:hover {
+  border-color: var(--main); /* change border when input focused */
+  box-shadow: 0 0 0 3px rgba(100, 53, 152, 0.15);
+}
+
+textarea {
+  resize: vertical;
+}
+
+main {
+  flex: 1;
+}
+
+@media (min-width: 425px) {
+  .inputContainer {
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+  }
+
+  .messageContainer {
+    gap: 1rem;
+  }
+}
