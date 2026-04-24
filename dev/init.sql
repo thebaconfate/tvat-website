@@ -44,4 +44,15 @@ CREATE TABLE IF NOT EXISTS activities (
     location_address TEXT,
     location_url TEXT,
     facebook_url TEXT
-)
+);
+
+CREATE TABLE IF NOT EXISTS email_jobs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_type TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    recipient TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    retries INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+

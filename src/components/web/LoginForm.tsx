@@ -1,7 +1,7 @@
 import { credentialsSchema } from "@/lib/domain/auth";
 import style from "./LoginForm.module.css";
 import { useForm } from "@tanstack/react-form";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Eye, EyeClosed, Mail } from "lucide-react";
 
 export default function LoginForm() {
