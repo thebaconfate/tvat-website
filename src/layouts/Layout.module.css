@@ -21,6 +21,7 @@ header {
   position: sticky;
   top: 0px;
   background-color: white;
+  z-index: 1;
 }
 
 .logo {
@@ -49,9 +50,16 @@ footer {
   flex-direction: column;
 }
 
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 @media (min-width: 768px) {
   header {
     position: relative;
+    z-index: unset;
   }
 }
 

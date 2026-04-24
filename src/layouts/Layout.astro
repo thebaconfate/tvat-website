@@ -6,7 +6,7 @@ import Instagram from "@/svgs/Instagram.astro";
 interface Props {
   title: string;
 }
-import style from "./Layout.module.css";
+import styles from "./Layout.module.css";
 import Vatschild from "@/svgs/Vatschild.astro";
 import { websiteRoutes } from "@/lib/oldRoutes";
 const { title } = Astro.props;
@@ -24,9 +24,9 @@ const { title } = Astro.props;
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>{title}</title>
   </head>
-  <body>
+  <body class={styles.page}>
     <header>
-      <div class={style.logo}>
+      <div class={styles.logo}>
         <a href={websiteRoutes.home.url}>
           <Vatschild />
         </a>
@@ -38,7 +38,7 @@ const { title } = Astro.props;
       <div>
         <h2>'t VAT Brussel</h2>
       </div>
-      <div class={style.socialsContainer}>
+      <div class={styles.socialsContainer}>
         <a href="https://www.facebook.com/tvatbrussel/">
           <Facebook />
         </a>

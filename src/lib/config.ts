@@ -3,8 +3,13 @@ import type { PoolConfig } from "pg";
 
 dotenv.config();
 
+type ResendConfig = {
+  apiKey: string;
+};
 type Config = {
   database: PoolConfig;
+  resend: ResendConfig;
+  email: string;
 };
 
 export function getEnv(
@@ -28,4 +33,8 @@ export const config: Config = {
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 2_000,
   },
+  resend: {
+    apiKey: getEnv("RESEND_API_KEY"),
+  },
+  email: getEnv("VATMAIL"),
 };
