@@ -1,19 +1,17 @@
 ---
-import Navigation from "@/components/shared/Navigation.astro";
-import { Mail } from "lucide-react";
-import Facebook from "@/svgs/Facebook.astro";
-import Instagram from "@/svgs/Instagram.astro";
+import Monogrampaars from "../svgs/Monogrampaars.astro";
+import Navigation from "../components/navigation/Navigation.astro";
+import "./layout.css";
 interface Props {
   title: string;
 }
-import styles from "./Layout.module.css";
-import Vatschild from "@/svgs/Vatschild.astro";
-import { websiteRoutes } from "@/lib/oldRoutes";
+import { websiteRoutes } from "../lib/routes.ts";
+
 const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="nl-BE">
+<html lang="nl">
   <head>
     <meta charset="UTF-8" />
     <meta name="author" content="Gérard Lichtert" />
@@ -24,32 +22,16 @@ const { title } = Astro.props;
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>{title}</title>
   </head>
-  <body class={styles.page}>
+  <body>
     <header>
-      <div class={styles.logo}>
-        <a href={websiteRoutes.home.url}>
-          <Vatschild />
-        </a>
-      </div>
+      <span class="logo-container">
+        <Monogrampaars />
+        <a href={websiteRoutes.home.url}>'t VAT Brussel!</a>
+      </span>
       <Navigation />
     </header>
     <slot />
-    <footer>
-      <div>
-        <h2>'t VAT Brussel</h2>
-      </div>
-      <div class={styles.socialsContainer}>
-        <a href="https://www.facebook.com/tvatbrussel/">
-          <Facebook />
-        </a>
-        <a href="https://www.instagram.com/tvat_brussel/?hl=en">
-          <Instagram />
-        </a>
-        <a href="mailto:tvatinfo@gmail.com">
-          <Mail />
-        </a>
-      </div>
-    </footer>
+    <footer></footer>
   </body>
 </html>
 <style is:global>
@@ -66,5 +48,9 @@ const { title } = Astro.props;
       "Open Sans",
       "Helvetica Neue",
       sans-serif;
+  }
+  svg {
+    width: 100%;
+    height: auto;
   }
 </style>

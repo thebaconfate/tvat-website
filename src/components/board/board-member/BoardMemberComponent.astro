@@ -2,7 +2,7 @@
 import type { BoardMember } from "../../../lib/board/board-member";
 import { Boulon } from "../../../lib/board/boulon";
 import { Star } from "../../../lib/board/star";
-import styles from "./BoardMemberComponent.module.css";
+import "./board-member.css";
 import { access } from "fs/promises";
 
 interface Props {
@@ -32,25 +32,21 @@ const [pngExists, jpgExists] = await Promise.all([
   fileExists(pngPath),
   fileExists(jpgPath),
 ]);
-const rgbColors = [styles.purple, styles.red, styles.green];
-const rgbaColors = [styles.purpleA, styles.redA, styles.greenA];
-const borderColors = [
-  styles.borderPurple,
-  styles.borderRed,
-  styles.borderGreen,
-];
+const rgbColors = ["purple", "red", "green"];
+const rgbaColors = ["purple-a", "red-a", "green-a"];
+const borderColors = ["border-purple", "border-red", "border-green"];
 const i = index % 3;
 ---
 
-<div class={styles.boardMember}>
-  <h2 class={styles.boardRole}>{boardMember.boardRole}</h2>
+<div class="board-member">
+  <h2 class="board-role">{boardMember.boardRole}</h2>
   {
     (pngExists || jpgExists) && (
-      <div class={styles.boardMemberPictureContainer}>
-        <picture class={`${styles.boardMemberPicture} ${borderColors[i]}`}>
+      <div class={"board-member-picture-container"}>
+        <picture class={`board-member-picture ${borderColors[i]}`}>
           {pngExists && <source srcset={src + ".png"} type="image/png" />}
           <img
-            class={styles.boardMemberPicture}
+            class="board-member-picture"
             src={src + ".jpg"}
             alt={
               jpgExists
@@ -59,20 +55,14 @@ const i = index % 3;
             }
           />
         </picture>
-        <div class={`${styles.boardMemberOverlay} ${rgbaColors[i]}`}>
-          <div class={styles.barsContainer}>
-            <div class={`${styles.leftTopBar} ${styles.bar} ${rgbColors[i]}`} />
-            <div
-              class={`${styles.rightTopBar} ${styles.bar} ${rgbColors[i]}`}
-            />
-            <div
-              class={`${styles.leftBottomBar} ${styles.bar} ${rgbColors[i]}`}
-            />
-            <div
-              class={`${styles.rightBottomBar} ${styles.bar} ${rgbColors[i]}`}
-            />
+        <div class={`board-member-overlay ${rgbaColors[i]}`}>
+          <div class="bars-container">
+            <div class={`left-top-bar bar ${rgbColors[i]}`} />
+            <div class={`right-top-bar bar ${rgbColors[i]}`} />
+            <div class={`left-bottom-bar bar ${rgbColors[i]}`} />
+            <div class={`right-bottom-bar bar ${rgbColors[i]}`} />
           </div>
-          <div class={styles.boardMemberStars}>
+          <div class="board-member-stars">
             {boardMember.stars
               ? boardMember.stars.map((s) =>
                   s === Star.Gold ? (
