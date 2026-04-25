@@ -4,6 +4,16 @@ import type { DeliveryZoneInterface } from "@/lib/interfaces/database/deliveryZo
 import type { PickupLocationInterface } from "@/lib/interfaces/database/pickupLocation";
 
 class KrambambouliService {
+  async formActive(): Promise<boolean> {
+    const sql = `
+        SELECT config_value AS "configValue"
+        FROM config WHERE key = krambambouli_enabled
+        `;
+    const result = await database.query<{ configValue: boolean }>(sql);
+    const [row] = result.rows;
+    return row.configValue ?? false;
+  }
+
   async getKrambambouliProducts(): Promise<KrambambouliProductData[] | null> {
     const sql = `
     SELECT
@@ -27,11 +37,11 @@ class KrambambouliService {
     // TODO: Wrong query, fix this
     const sql = `
     SELECT
-        d.order_id AS orderId,
-        d.street_name AS streetName,
-        d.house_number AS houseNumber,
+        d.order_id AS "orderId",
+        d.street_name AS "streetName",
+        d.house_number AS "houseNumber",
         d.bus,
-        d.postal_code AS postalCode,
+        d.postal_code AS "postalCode",
         d.city
     FROM krambambouli_delivery_locations d
     WHERE d.active = TRUE
@@ -44,13 +54,13 @@ class KrambambouliService {
     const sql = `
     SELECT
         p.id,
-        p.postal_code_from as postalCodeFrom,
-        p.postal_code_to as postalCodeTo,
-        p.name as name,
+        p.postal_code_from AS "postalCodeFrom",
+        p.postal_code_to AS "postalCodeTo",
+        p.name,
         json_build_object(
             'euros', p.euros,
             'cents', p.cents
-        ) as price
+        ) AS "price"
     FROM krambambouli_delivery_zones p WHERE p.active = TRUE
     `;
     const result = await database.query<PickupLocationInterface>(sql);
