@@ -1,10 +1,10 @@
 import { database } from "@/lib/database";
+import type { KrambambouliProductData } from "@/lib/domain/krambambouli";
 import type { DeliveryZoneInterface } from "@/lib/interfaces/database/deliveryZone";
 import type { PickupLocationInterface } from "@/lib/interfaces/database/pickupLocation";
-import type { ProductInterface } from "@/lib/interfaces/database/product";
 
 class KrambambouliService {
-  async getKrambambouliProducts(): Promise<ProductInterface[] | null> {
+  async getKrambambouliProducts(): Promise<KrambambouliProductData[] | null> {
     const sql = `
     SELECT
         p.id,
@@ -19,23 +19,41 @@ class KrambambouliService {
     WHERE p.active = TRUE
         AND p.category ILIKE '%krambambouli%'
     `;
-    const result = await database.query<ProductInterface>(sql, []);
+    const result = await database.query<KrambambouliProductData>(sql);
     return result.rows;
-    // TODO: Implement this
   }
-  async getDeliveryLocations(): Promise<DeliveryZoneInterface[] | null> {
-    const sql = `
 
+  async getDeliveryLocations(): Promise<DeliveryZoneInterface[] | null> {
+    // TODO: Wrong query, fix this
+    const sql = `
+    SELECT
+        d.order_id AS orderId,
+        d.street_name AS streetName,
+        d.house_number AS houseNumber,
+        d.bus,
+        d.postal_code AS postalCode,
+        d.city
+    FROM krambambouli_delivery_locations d
+    WHERE d.active = TRUE
     `;
-    const result = await database.query<DeliveryZoneInterface>(sql, []);
+    const result = await database.query<DeliveryZoneInterface>(sql);
     return result.rows;
     // TODO: Implement this
   }
   async getPickupLocations(): Promise<PickupLocationInterface[] | null> {
     const sql = `
-
+    SELECT
+        p.id,
+        p.postal_code_from as postalCodeFrom,
+        p.postal_code_to as postalCodeTo,
+        p.name as name,
+        json_build_object(
+            'euros', p.euros,
+            'cents', p.cents
+        ) as price
+    FROM krambambouli_delivery_zones p WHERE p.active = TRUE
     `;
-    const result = await database.query<PickupLocationInterface>(sql, []);
+    const result = await database.query<PickupLocationInterface>(sql);
     return result.rows;
     // TODO: Implement this
   }
