@@ -1,13 +1,15 @@
 import { database } from "@/lib/database";
-import type { KrambambouliProductData } from "@/lib/domain/krambambouli";
-import type { DeliveryZoneInterface } from "@/lib/interfaces/database/deliveryZone";
+import type {
+  DeliveryZoneData,
+  KrambambouliProductData,
+} from "@/lib/domain/krambambouli";
 import type { PickupLocationInterface } from "@/lib/interfaces/database/pickupLocation";
 
 class KrambambouliService {
   async formActive(): Promise<boolean> {
     const sql = `
-        SELECT config_value AS "configValue"
-        FROM config WHERE key = krambambouli_enabled
+        SELECT c.config_value AS "configValue"
+        FROM config c WHERE c.config_key ILIKE 'krambambouli_enabled'
         `;
     const result = await database.query<{ configValue: boolean }>(sql);
     const [row] = result.rows;
@@ -24,7 +26,7 @@ class KrambambouliService {
         json_build_object(
             'euros', p.euros,
             'cents', p.cents
-        ) as price
+        ) as "price"
     FROM products p
     WHERE p.active = TRUE
         AND p.category ILIKE '%krambambouli%'
@@ -33,22 +35,22 @@ class KrambambouliService {
     return result.rows;
   }
 
-  async getDeliveryLocations(): Promise<DeliveryZoneInterface[] | null> {
-    // TODO: Wrong query, fix this
+  async getDeliveryLocations(): Promise<DeliveryZoneData[] | null> {
     const sql = `
     SELECT
-        d.order_id AS "orderId",
-        d.street_name AS "streetName",
-        d.house_number AS "houseNumber",
-        d.bus,
-        d.postal_code AS "postalCode",
-        d.city
-    FROM krambambouli_delivery_locations d
-    WHERE d.active = TRUE
+        dz.id,
+        dz.name,
+        dz.postal_code_to AS "postalCodeTo",
+        dz.postal_code_from AS "postalCodeFrom",
+        json_build_object(
+            'euros', dz.euros,
+            'cents', dz.cents
+        ) AS "price"
+    FROM krambambouli_delivery_zones dz
+    WHERE dz.active = TRUE
     `;
-    const result = await database.query<DeliveryZoneInterface>(sql);
+    const result = await database.query<DeliveryZoneData>(sql);
     return result.rows;
-    // TODO: Implement this
   }
   async getPickupLocations(): Promise<PickupLocationInterface[] | null> {
     const sql = `
@@ -65,7 +67,6 @@ class KrambambouliService {
     `;
     const result = await database.query<PickupLocationInterface>(sql);
     return result.rows;
-    // TODO: Implement this
   }
 }
 
