@@ -26,3 +26,5 @@ pnpm-debug.log*
 # Random stuff due to mistyping
 >
 :
+
+populate-*.sql

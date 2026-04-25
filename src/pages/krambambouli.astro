@@ -4,27 +4,19 @@ import Cookbook from "../svgs/Cookbook.astro";
 import Expertise from "../svgs/Expertise.astro";
 import Wine from "../svgs/Wine.astro";
 import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
-import type { ProductInterface } from "../lib/interfaces/database/product";
-import type { PickupLocationInterface } from "../lib/interfaces/database/pickupLocation";
-import type { DeliveryZoneInterface } from "../lib/interfaces/database/deliveryZone";
+import { krambambouliService } from "@/lib/services/krambambouli";
 
 const title = "Krambambouli";
 const formActive = false;
 const deliveryActive = true;
-let products: undefined | ProductInterface[],
-  pickupLocations: undefined | PickupLocationInterface[],
-  deliveryLocations: undefined | DeliveryZoneInterface[],
-  error: any;
+let products, pickupLocations, deliveryLocations, error: any;
 
 try {
-  if (formActive) {
-    const database = await Database.getInstance();
+  if (!formActive) {
     [products, pickupLocations, deliveryLocations] = await Promise.all([
-      database?.getKrambambouliProducts(),
-      database?.getPickUpLocation(),
-      deliveryActive
-        ? database?.getDeliveryLocations()
-        : Promise.resolve(undefined),
+      krambambouliService.getKrambambouliProducts(),
+      krambambouliService.getPickupLocations(),
+      krambambouliService.getDeliveryLocations(),
     ]);
     deliveryLocations?.sort((loc1, loc2) =>
       loc1.euros.euros === loc2.euros.euros
@@ -32,7 +24,11 @@ try {
         : loc1.euros.euros - loc2.euros.euros,
     );
   }
+  console.log(products);
+  console.log(pickupLocations);
+  console.log(deliveryLocations);
 } catch (e) {
+  console.log(products);
   console.error(e);
   error = e;
 }

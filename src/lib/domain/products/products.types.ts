@@ -1,6 +1,4 @@
 import type z4 from "zod/v4";
-import type { krambambouliProductSchema } from "./products.schema";
+import type { productSchema } from "./products.schema";
 
-export type KrambambouliProductData = z4.infer<
-  typeof krambambouliProductSchema
->;
+export type ProductSchema = z4.infer<typeof productSchema>;
