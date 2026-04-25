@@ -7,30 +7,23 @@ import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
 import { krambambouliService } from "@/lib/services/krambambouli";
 
 const title = "Krambambouli";
-const formActive = false;
-const deliveryActive = true;
-let products, pickupLocations, deliveryLocations, error: any;
+let formActive, products, pickupLocations, deliveryLocations, errors;
 
 try {
-  if (!formActive) {
-    [products, pickupLocations, deliveryLocations] = await Promise.all([
+  [formActive, products, pickupLocations, deliveryLocations] =
+    await Promise.all([
+      krambambouliService.formActive(),
       krambambouliService.getKrambambouliProducts(),
       krambambouliService.getPickupLocations(),
       krambambouliService.getDeliveryLocations(),
     ]);
-    deliveryLocations?.sort((loc1, loc2) =>
-      loc1.euros.euros === loc2.euros.euros
-        ? loc1.euros.cents - loc2.euros.cents
-        : loc1.euros.euros - loc2.euros.euros,
-    );
-  }
-  console.log(products);
-  console.log(pickupLocations);
-  console.log(deliveryLocations);
+  deliveryLocations?.sort((loc1, loc2) =>
+    loc1.euros.euros === loc2.euros.euros
+      ? loc1.euros.cents - loc2.euros.cents
+      : loc1.euros.euros - loc2.euros.euros,
+  );
 } catch (e) {
-  console.log(products);
-  console.error(e);
-  error = e;
+  errors = e;
 }
 ---
 
@@ -57,7 +50,7 @@ try {
       </li>
     </ul>
     {
-      error ? (
+      errors ? (
         "Something went wrong...."
       ) : products && deliveryLocations && pickupLocations && formActive ? (
         <KrambambouliForm
