@@ -1,48 +1,25 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./KrambambouliForm.module.css";
 import DOMPurify from "dompurify";
-import { apiRoutes } from "@/lib/oldRoutes";
 import { Popup } from "@/components/popup/Popup";
 import { PopupEnum } from "@/lib/popup";
-import { type PriceData } from "@/lib/domain/price";
-import type {
-  DeliveryZoneData,
-  KrambambouliProductData,
-  PickupLocationData,
+import {
+  DeliveryOptionEnum,
+  deliveryOptionEnumSchema,
+  type DeliveryZoneData,
+  type KrambambouliProductData,
+  type PickupLocationData,
 } from "@/lib/domain/krambambouli";
+import { useForm } from "@tanstack/react-form";
+import z4 from "zod/v4";
+import { productSchema } from "@/lib/domain/products";
+import { fromCents } from "@/lib/domain/price/price.utils";
 
 interface Props {
   products: KrambambouliProductData[];
   pickupLocations: PickupLocationData[];
   deliveryLocations?: DeliveryZoneData[];
 }
-
-enum DeliveryOption {
-  Delivery = "delivery",
-  PickUp = "pick up",
-}
-
-interface Form {
-  firstName: string;
-  lastName: string;
-  email: string;
-  streetName: null | string;
-  streetNumber: null | string;
-  bus: null | string;
-  post: null | number;
-  city: null | string;
-}
-
-const initialForm = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  streetName: null,
-  streetNumber: null,
-  bus: null,
-  post: null,
-  city: null,
-};
 
 function createPickupStartDate(str: string) {
   const strplit = str.split("/");
@@ -67,6 +44,71 @@ export default function KrambambouliForm({
   pickupLocations,
   deliveryLocations,
 }: Props) {
+  const form = useForm({
+    defaultValues: {
+      cart: products.map((p) => {
+        return { ...p, amount: 0 };
+      }),
+      firstName: "",
+      lastName: "",
+      email: "",
+      deliveryOption: "",
+      pickupLocation: 0,
+      deliveryZone: 0,
+      streetName: "",
+      streetNumber: "",
+      bus: "",
+      postcode: "",
+      city: "",
+    },
+    validators: {
+      onSubmit: z4
+        .object({
+          cart: z4.array(
+            productSchema.extend({ amount: z4.int().nonnegative() }),
+          ),
+          firstName: z4.string().nonempty(),
+          lastName: z4.string().nonempty(),
+          email: z4.email().nonempty(),
+          deliveryOption: deliveryOptionEnumSchema,
+          pickupLocation: z4.int(),
+          deliveryZone: z4.int(),
+          streetName: z4.string(),
+          streetNumber: z4.string(),
+          bus: z4.string(),
+          postcode: z4.string(),
+          city: z4.string(),
+        })
+        .refine(
+          (val) =>
+            val.deliveryOption === DeliveryOptionEnum.delivery ||
+            pickupLocations.find((e) => e.id === val.pickupLocation),
+          { error: "Invalid pickup location" },
+        )
+        .refine(
+          (val) =>
+            val.deliveryOption === DeliveryOptionEnum.pickup ||
+            ([
+              val.deliveryZone,
+              val.streetName,
+              val.streetNumber,
+              val.postcode,
+              val.city,
+            ].every((v) => v !== "") &&
+              val.deliveryZone !== 0),
+          { error: "Invalid delivery location" },
+        ),
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value);
+    },
+
+    onSubmitInvalid: async (values) => {
+      console.log("Invalid");
+      console.log(values.value);
+      console.log(values.formApi.getAllErrors());
+    },
+  });
   const krambambouliCantus = pickupLocations.find((l) => {
     return l.name
       .toLowerCase()
@@ -74,8 +116,6 @@ export default function KrambambouliForm({
       .includes("krambamboulicantus");
   });
 
-  console.log("PickupLocations: ");
-  console.log(pickupLocations);
   if (!krambambouliCantus)
     throw Error("No krambamboulicantus as pick up point");
   const match = krambambouliCantus.name.match(/\b(\d{1,2}\/\d{1,2})\b/);
@@ -96,76 +136,12 @@ export default function KrambambouliForm({
   const deliveryEndDate = new Date(deliveryStartDate);
   deliveryEndDate.setDate(deliveryEndDate.getDate() + 10);
 
-  const [amountList, setAmountList] = useState(products.map((_) => 0));
-  const [selectedOption, setSelectedOption] = useState<null | DeliveryOption>(
-    null,
-  );
-  const [selectedPickUpOption, setSelectedPickUpOption] = useState<
-    null | number
-  >(null);
-  const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<
-    null | number
-  >(null);
-  const [form, setForm] = useState<Form>(initialForm);
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [popupContent, setPopupContent] = useState({
     title: PopupEnum.SUCCESS,
     text: "",
   });
 
-  function handleChangeOption(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value;
-    setSelectedOption(value as DeliveryOption);
-  }
-
-  function handleChangePickUpOption(e: React.ChangeEvent<HTMLInputElement>) {
-    setSelectedPickUpOption(parseInt(e.target.value));
-  }
-
-  function makeHandleChangeAmount(idx: number) {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = parseInt(e.target.value);
-      const copy = [...amountList];
-      copy[idx] = value <= 0 ? 0 : value;
-      setAmountList(copy);
-    };
-  }
-
-  function makeHandlePressAmount(func: (x: number) => number) {
-    return (idx: number) => {
-      return (_: React.MouseEvent<HTMLButtonElement>) => {
-        const value = func(amountList[idx]);
-        const copy = [...amountList];
-        copy[idx] = value <= 0 ? 0 : value;
-        setAmountList(copy);
-      };
-    };
-  }
-
-  const handlePressAmountDec = makeHandlePressAmount((x: number) =>
-    x <= 0 ? 0 : x - 1,
-  );
-  const handlePressAmountInc = makeHandlePressAmount((x: number) => x + 1);
-
-  function makeHandleChangeDeliveryOption(idx: number) {
-    return (_: React.ChangeEvent<HTMLInputElement>) =>
-      setSelectedDeliveryOption(idx);
-  }
-
-  function calcTotalAmount(): PriceData {
-    const total: PriceData = { euros: 0, cents: 0 };
-    return total;
-  }
-
-  function handleTextInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  }
-
-  function handleNumberInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: parseInt(value) });
-  }
   useEffect(() => {
     if (window)
       DOMPurify.setConfig({
@@ -174,320 +150,395 @@ export default function KrambambouliForm({
       });
   }, []);
 
-  function sanitize(input: any) {
-    return DOMPurify.sanitize(input);
-  }
-
   function closePopup() {
     setShowPopup(false);
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("firstName", sanitize(form.firstName));
-    formData.append("lastName", sanitize(form.lastName));
-    formData.append("email", sanitize(form.email));
-    formData.append("deliveryOption", sanitize(selectedOption));
-    const total = calcTotalAmount();
-    formData.append(
-      "owedAmount",
-      JSON.stringify({
-        euros: sanitize(total.euros),
-        cents: sanitize(total.cents),
-      }),
-    );
-    if (
-      selectedOption === DeliveryOption.PickUp &&
-      selectedPickUpOption != null
-    ) {
-      if (selectedPickUpOption >= 0)
-        formData.append(
-          "pickUpLocation",
-          sanitize(pickupLocations[selectedPickUpOption].id),
-        );
-    } else if (
-      selectedOption === DeliveryOption.Delivery &&
-      selectedDeliveryOption != null
-    ) {
-      formData.append("deliveryStreetName", sanitize(form.streetName));
-      formData.append("deliveryStreetNumber", sanitize(form.streetNumber));
-      formData.append("deliveryBus", sanitize(form.bus ?? ""));
-      formData.append("deliveryPost", sanitize(form.post));
-      formData.append("deliveryCity", sanitize(form.city));
-    }
-    if (amountList.every((a) => a === 0)) {
-      setPopupContent({
-        title: PopupEnum.ERROR,
-        text: "Voeg eerst producten toe aan je winkelmand",
-      });
-      setShowPopup(true);
-      return;
-    }
-    for (let i = 0; i < products.length; i++) {
-      if (amountList[i] > 0)
-        formData.append(
-          "order",
-          JSON.stringify({
-            id: sanitize(products[i].id),
-            amount: sanitize(amountList[i]),
-          }),
-        );
-    }
-    await fetch(
-      `${apiRoutes.krambambouli.url}${apiRoutes.krambambouli.order.url}`,
-      {
-        method: "POST",
-        body: formData,
-      },
-    ).then((response) => {
-      if (!response.ok) {
-        setPopupContent({
-          title: PopupEnum.ERROR,
-          text: "Er is iets misgegaan bij het opsturen van de gegevens, probeer het later op nieuw",
-        });
-        setShowPopup(true);
-      } else {
-        setPopupContent({
-          title: PopupEnum.SUCCESS,
-          text: "Dankje voor de bestelling, eenmaal dat we de betaling hebben ontvangen zullen we dit zo snel mogelijk behandelen en brouwen. Je zult nog een mail krijgen ivm afhaling of levering",
-        });
-        setShowPopup(true);
-        setAmountList(products.map((_) => 0));
-        setSelectedPickUpOption(null);
-        setSelectedDeliveryOption(null);
-        setSelectedOption(null);
-        setForm(initialForm);
-      }
-    });
-  }
-
   return (
     <div className={styles.formContainer}>
-      <form onSubmit={handleSubmit}>
-        <div className={styles.productsContainer}>
-          {products.map((product, index) => {
-            return (
-              <div key={product.id} className={styles.product}>
-                <picture className={styles.productImage}>
-                  {product.imageUrl ? (
-                    <img src={product.imageUrl} alt={product.name + "image"} />
-                  ) : (
-                    <img alt={product.name + "image"} />
-                  )}
-                </picture>
-                <div className={styles.productInfo}>
-                  <h3 className={styles.productTitle}>{product.name}</h3>
-                  <div className={styles.productDetails}>
-                    <p>{product.description}</p>
-                    <p>{`€${product.price.euros},${product.price.cents === 0 ? "-" : product.price.cents}`}</p>
-                  </div>
-                  <div className={styles.productButtonContainer}>
-                    <button type="button" onClick={handlePressAmountDec(index)}>
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      value={amountList[index]}
-                      onChange={makeHandleChangeAmount(index)}
-                      name={`${product.id}-quantity`}
-                    />
-                    <button type="button" onClick={handlePressAmountInc(index)}>
-                      +
-                    </button>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+        method="POST"
+      >
+        <form.Field name="cart" mode="array">
+          {(fields) => (
+            <div className={styles.productsContainer}>
+              {fields.state.value.map((product, i) => (
+                <div key={i} className={styles.product}>
+                  <picture className={styles.productImage}>
+                    {product.imageUrl ? (
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name + "image"}
+                      />
+                    ) : (
+                      <img alt={product.name + "image"} />
+                    )}
+                  </picture>
+                  <div className={styles.productInfo}>
+                    <h3 className={styles.productTitle}>{product.name}</h3>
+                    <div className={styles.productDetails}>
+                      <p>{product.description}</p>
+                      <p>{`€${product.price.euros},${product.price.cents === 0 ? "-" : product.price.cents}`}</p>
+                    </div>
+                    <form.Field name={`cart[${i}].amount`}>
+                      {(field) => (
+                        <div className={styles.productButtonContainer}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              field.handleChange((old) => Math.max(0, old - 1))
+                            }
+                          >
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            value={field.state.value}
+                            onChange={(e) =>
+                              field.handleChange(
+                                Math.max(0, Math.trunc(Number(e.target.value))),
+                              )
+                            }
+                            name={`${product.id}-quantity`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              field.handleChange((old) => Math.max(0, old + 1))
+                            }
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
+                    </form.Field>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className={styles.fieldsContainer}>
-          <div className={styles.fieldRow}>
-            <div className={styles.fieldCol}>
-              <label htmlFor="firstName">Voornaam</label>
-              <input
-                id="firstName"
-                type="text"
-                placeholder="John"
-                name="firstName"
-                required
-                value={form.firstName}
-                onChange={handleTextInput}
-              />
-            </div>
-            <div className={styles.fieldCol}>
-              <label form="lastName">Achternaam</label>
-              <input
-                id="lastName"
-                type="text"
-                placeholder="Doe"
-                name="lastName"
-                required
-                value={form.lastName}
-                onChange={handleTextInput}
-              />
-            </div>
-          </div>
-          <div className={styles.fieldRow}>
-            <label form="email">E-mail</label>
-            <input
-              id="email"
-              type="email"
-              required
-              placeholder="john.doe@hotmail.com"
-              value={form.email}
-              onChange={handleTextInput}
-              name="email"
-            />
-          </div>
-          <div className={`${styles.fieldRow} ${styles.radioOptionsContainer}`}>
-            <label>Leveringsopties</label>
-            <label>
-              <input
-                type="radio"
-                name="option"
-                required
-                value={DeliveryOption.PickUp}
-                checked={selectedOption === DeliveryOption.PickUp}
-                onChange={handleChangeOption}
-              />
-              {`Afhalen tussen ${dateToDDMM(krambambouliCantusDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
-            </label>
-            {deliveryLocations && (
-              <label>
-                <input
-                  type="radio"
-                  name="option"
-                  required
-                  value={DeliveryOption.Delivery}
-                  checked={selectedOption === DeliveryOption.Delivery}
-                  onChange={handleChangeOption}
-                />
-                {`Leveren tussen ${dateToDDMM(deliveryStartDate)} en ${dateToDDMM(deliveryEndDate)}`}
-              </label>
-            )}
-          </div>
-          {(selectedOption === DeliveryOption.PickUp && (
-            <div className={styles.fieldRow}>
-              <label>Afhaallocatie</label>
-              {pickupLocations.map((loc, index) => {
-                return (
-                  <label key={index}>
-                    <input
-                      type="radio"
-                      name="pick-up-option"
-                      value={index}
-                      required
-                      checked={index == selectedPickUpOption}
-                      onChange={handleChangePickUpOption}
-                    />
-                    {krambambouliCantus.name === loc.name
-                      ? krambambouliCantus.name
-                      : `Bij ${loc.name} vanaf ${pickupStartDate.getDate()}/${pickupStartDate.getMonth() + 1}`}
-                  </label>
-                );
-              })}
-            </div>
-          )) ||
-            (selectedOption === DeliveryOption.Delivery &&
-              deliveryLocations && (
-                <>
-                  <div className={styles.fieldRow}>
-                    <label form="delivery-option">Leveroptie</label>
-                    {deliveryLocations.map((loc, idx) => {
-                      return (
-                        <span key={idx} className={styles.deliveryRow}>
-                          <label htmlFor={`delivery-option-${idx}`}>
-                            <input
-                              id={`delivery-option-${idx}`}
-                              type="radio"
-                              name="delivery-option"
-                              value={idx}
-                              required
-                              checked={idx === selectedDeliveryOption}
-                              onChange={makeHandleChangeDeliveryOption(idx)}
-                            />
-                            {`Levering ${loc.name}`}
-                          </label>
-                          <p>{loc.price.toString()}</p>
-                        </span>
-                      );
-                    })}
-                  </div>
-                  <div className={styles.addressRow}>
-                    <div className={styles.fieldRow}>
-                      <label htmlFor="streetName">Straatnaam</label>
-                      <input
-                        id="streetName"
-                        type="text"
-                        value={form.streetName ?? ""}
-                        name="streetName"
-                        required
-                        onChange={handleTextInput}
-                      />
-                      <label htmlFor="bus">Nummer</label>
-                      <input
-                        id="streetNumber"
-                        type="text"
-                        name="streetNumber"
-                        required
-                        value={form.streetNumber ?? ""}
-                        onChange={handleTextInput}
-                      />
-                      <label>Bus</label>
-                      <input
-                        id="bus"
-                        type="text"
-                        name="bus"
-                        value={form.bus ?? ""}
-                        onChange={handleTextInput}
-                      />
-                    </div>
-                    <div className={styles.fieldRow}>
-                      <label htmlFor="post">Postcode</label>
-                      <input
-                        id="post"
-                        type="number"
-                        name="post"
-                        value={form.post ?? ""}
-                        onChange={handleNumberInput}
-                        required
-                      />
-                      <label htmlFor="city">Stad</label>
-                      <input
-                        id="city"
-                        type="text"
-                        required
-                        value={form.city ?? ""}
-                        name="city"
-                        onChange={handleTextInput}
-                      />
-                    </div>
-                  </div>
-                </>
               ))}
-          <div className={styles.informationContainer}>
-            <p>
-              Totaalbedrag <b>{calcTotalAmount().toString()}</b>
-            </p>
-            <p>
-              Over te schrijven naar de VATrekening: <b>BE60 7310 1732 4070</b>
-            </p>
-            <p>
-              Met mededeling:{" "}
-              <b>
-                krambambouli +{" "}
-                {!form.firstName && !form.lastName
-                  ? "[Voornaam Achternaam]"
-                  : [form.firstName, form.lastName].join(" ")}
-              </b>
-            </p>
-          </div>
-          {selectedOption !== null && (
-            <div className={styles.submitButtonContainer}>
-              <button type="submit">Bestellen</button>
             </div>
           )}
+        </form.Field>
+        <div className={styles.fieldsContainer}>
+          <div className={styles.fieldRow}>
+            <form.Field name="firstName">
+              {(field) => (
+                <div className={styles.fieldCol}>
+                  <label htmlFor={field.name}>Voornaam</label>
+                  <input
+                    id={field.name}
+                    type="text"
+                    placeholder="John"
+                    name={field.name}
+                    required
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                </div>
+              )}
+            </form.Field>
+            <form.Field name="lastName">
+              {(field) => (
+                <div className={styles.fieldCol}>
+                  <label htmlFor={field.name}>Achternaam</label>
+                  <input
+                    id={field.name}
+                    type="text"
+                    placeholder="Doe"
+                    name={field.name}
+                    required
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                </div>
+              )}
+            </form.Field>
+          </div>
+          <form.Field name="email">
+            {(field) => (
+              <div className={styles.fieldRow}>
+                <label htmlFor={field.name}>E-mail</label>
+                <input
+                  id={field.name}
+                  type="email"
+                  required
+                  placeholder="john.doe@hotmail.com"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  name={field.name}
+                  autoComplete="email"
+                />
+              </div>
+            )}
+          </form.Field>
+          <form.Field name="deliveryOption">
+            {(field) => (
+              <div>
+                <p>Leveringsopties</p>
+                <label htmlFor={`${field.name}-${DeliveryOptionEnum.pickup}`}>
+                  <input
+                    type="radio"
+                    name={field.name}
+                    id={`${field.name}-${DeliveryOptionEnum.pickup}`}
+                    required
+                    value={DeliveryOptionEnum.pickup}
+                    checked={field.state.value === DeliveryOptionEnum.pickup}
+                    onChange={() =>
+                      field.handleChange(DeliveryOptionEnum.pickup)
+                    }
+                  />
+                  {`Afhalen tussen ${dateToDDMM(krambambouliCantusDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
+                </label>
+                {deliveryLocations && (
+                  <label
+                    htmlFor={`${field.name}-${DeliveryOptionEnum.delivery}`}
+                  >
+                    <input
+                      type="radio"
+                      id={`${field.name}-${DeliveryOptionEnum.delivery}`}
+                      name={field.name}
+                      required
+                      value={DeliveryOptionEnum.delivery}
+                      checked={
+                        field.state.value === DeliveryOptionEnum.delivery
+                      }
+                      onChange={() =>
+                        field.handleChange(DeliveryOptionEnum.delivery)
+                      }
+                    />
+                    {`Leveren tussen ${dateToDDMM(deliveryStartDate)} en ${dateToDDMM(deliveryEndDate)}`}
+                  </label>
+                )}
+              </div>
+            )}
+          </form.Field>
+          <form.Subscribe selector={(state) => state.values.deliveryOption}>
+            {(deliveryOption) => {
+              return (
+                (deliveryOption === DeliveryOptionEnum.pickup && (
+                  <form.Field name="pickupLocation">
+                    {(field) => (
+                      <div className={styles.fieldRow}>
+                        <label>Afhaallocatie</label>
+                        {pickupLocations.map((loc, index) => {
+                          return (
+                            <label
+                              key={index}
+                              htmlFor={`${field.name}-${index}`}
+                            >
+                              <input
+                                type="radio"
+                                name={field.name}
+                                id={`${field.name}-${index}`}
+                                value={index}
+                                required
+                                checked={field.state.value === loc.id}
+                                onChange={() => field.handleChange(loc.id)}
+                              />
+                              {krambambouliCantus.name === loc.name
+                                ? krambambouliCantus.name
+                                : `Bij ${loc.name} vanaf ${pickupStartDate.getDate()}/${pickupStartDate.getMonth() + 1}`}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </form.Field>
+                )) ||
+                (deliveryLocations &&
+                  deliveryOption === DeliveryOptionEnum.delivery && (
+                    <>
+                      <div className={styles.fieldRow}>
+                        <label>Leveroptie</label>
+                        {deliveryLocations.map((loc, idx) => {
+                          return (
+                            <form.Field key={loc.id} name="deliveryZone">
+                              {(field) => (
+                                <span className={styles.deliveryRow}>
+                                  <label htmlFor={`${field.name}-${idx}`}>
+                                    <input
+                                      id={`${field.name}-${idx}`}
+                                      type="radio"
+                                      name={field.name}
+                                      value={loc.name}
+                                      required
+                                      checked={loc.id === field.state.value}
+                                      onChange={() =>
+                                        field.handleChange(loc.id)
+                                      }
+                                    />
+                                    {`Levering ${loc.name}`}
+                                  </label>
+                                  <p>{`€${loc.price.euros},${loc.price.cents === 0 ? "-" : loc.price.cents}`}</p>
+                                </span>
+                              )}
+                            </form.Field>
+                          );
+                        })}
+                      </div>
+                      <div className={styles.addressRow}>
+                        <div className={styles.fieldRow}>
+                          <form.Field name="streetName">
+                            {(field) => (
+                              <>
+                                <label htmlFor={field.name}>Straatnaam</label>
+                                <input
+                                  id={field.name}
+                                  type="text"
+                                  value={field.state.value}
+                                  name="streetName"
+                                  required
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                />
+                              </>
+                            )}
+                          </form.Field>
+                          <form.Field name="streetNumber">
+                            {(field) => (
+                              <>
+                                <label htmlFor={field.name}>Nummer</label>
+                                <input
+                                  id={field.name}
+                                  type="text"
+                                  name={field.name}
+                                  required
+                                  value={field.state.value}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                />
+                              </>
+                            )}
+                          </form.Field>
+                          <form.Field name="bus">
+                            {(field) => (
+                              <>
+                                <label htmlFor={field.name}>Bus</label>
+                                <input
+                                  id={field.name}
+                                  type="text"
+                                  name={field.name}
+                                  value={field.state.value}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                />
+                              </>
+                            )}
+                          </form.Field>
+                        </div>
+                        <div className={styles.fieldRow}>
+                          <form.Field name="postcode">
+                            {(field) => (
+                              <>
+                                <label htmlFor={field.name}>Postcode</label>
+                                <input
+                                  id={field.name}
+                                  type="number"
+                                  name={field.name}
+                                  value={field.state.value}
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                  required
+                                />
+                              </>
+                            )}
+                          </form.Field>
+                          <form.Field name="city">
+                            {(field) => (
+                              <>
+                                <label htmlFor="city">Stad</label>
+                                <input
+                                  id="city"
+                                  type="text"
+                                  required
+                                  value={field.state.value}
+                                  name="city"
+                                  onChange={(e) =>
+                                    field.handleChange(e.target.value)
+                                  }
+                                />
+                              </>
+                            )}
+                          </form.Field>
+                        </div>
+                      </div>
+                    </>
+                  ))
+              );
+            }}
+          </form.Subscribe>
+          <form.Subscribe
+            selector={(state) => {
+              return {
+                cart: state.values.cart,
+                deliveryOption: state.values.deliveryOption,
+                deliveryZone: state.values.deliveryZone,
+              };
+            }}
+          >
+            {(observable) => {
+              let totalCents = observable.cart.reduce((acc, current) => {
+                const amount = current.amount;
+                if (amount === 0) return acc;
+                return (
+                  acc +
+                  amount * (current.price.euros * 100 + current.price.cents)
+                );
+              }, 0);
+              if (observable.deliveryOption === DeliveryOptionEnum.delivery) {
+                const deliveryZone = deliveryLocations?.find(
+                  (l) => l.id === observable.deliveryZone,
+                );
+                if (deliveryZone)
+                  totalCents +=
+                    deliveryZone.price.euros * 100 + deliveryZone.price.cents;
+              }
+              const total = fromCents(totalCents);
+              return (
+                <div className={styles.informationContainer}>
+                  <p>
+                    Totaalbedrag{" "}
+                    <b>{`€${total.euros},${total.cents === 0 ? "-" : total.cents}`}</b>
+                  </p>
+                  <p>
+                    Over te schrijven naar de VATrekening:{" "}
+                    <b>BE60 7310 1732 4070</b>
+                  </p>
+                  <p>
+                    Met mededeling:{" "}
+                    <b>
+                      krambambouli +{" "}
+                      <form.Subscribe
+                        selector={(state) => {
+                          return {
+                            firstName: state.values.firstName,
+                            lastName: state.values.lastName,
+                          };
+                        }}
+                      >
+                        {(names) =>
+                          !names.firstName && !names.lastName
+                            ? "[Voornaam Achternaam]"
+                            : `${names.firstName} ${names.lastName}`
+                        }
+                      </form.Subscribe>
+                    </b>
+                  </p>
+                </div>
+              );
+            }}
+          </form.Subscribe>
+          <div className={styles.submitButtonContainer}>
+            <button type="submit">Bestellen</button>
+          </div>
         </div>
       </form>
       {showPopup && (
