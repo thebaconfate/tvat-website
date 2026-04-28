@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./KrambambouliForm.module.css";
 import DOMPurify from "dompurify";
 import { Popup } from "@/components/popup/Popup";
 import { PopupEnum } from "@/lib/popup";
+import { type PriceData } from "@/lib/domain/price";
 import {
   DeliveryOptionEnum,
   deliveryOptionEnumSchema,
@@ -20,6 +21,28 @@ interface Props {
   pickupLocations: PickupLocationData[];
   deliveryLocations?: DeliveryZoneData[];
 }
+
+interface Form {
+  firstName: string;
+  lastName: string;
+  email: string;
+  streetName: null | string;
+  streetNumber: null | string;
+  bus: null | string;
+  post: null | number;
+  city: null | string;
+}
+
+const initialForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  streetName: null,
+  streetNumber: null,
+  bus: null,
+  post: null,
+  city: null,
+};
 
 function createPickupStartDate(str: string) {
   const strplit = str.split("/");
@@ -53,8 +76,8 @@ export default function KrambambouliForm({
       lastName: "",
       email: "",
       deliveryOption: "",
-      pickupLocation: 0,
-      deliveryZone: 0,
+      pickupLocation: "",
+      deliveryZone: "",
       streetName: "",
       streetNumber: "",
       bus: "",
@@ -71,8 +94,10 @@ export default function KrambambouliForm({
           lastName: z4.string().nonempty(),
           email: z4.email().nonempty(),
           deliveryOption: deliveryOptionEnumSchema,
-          pickupLocation: z4.int(),
-          deliveryZone: z4.int(),
+          pickupLocation: z4.string(),
+          deliveryZone: z4
+            .string()
+            .transform((v) => z4.coerce.number().int().parse(v)),
           streetName: z4.string(),
           streetNumber: z4.string(),
           bus: z4.string(),
@@ -82,31 +107,24 @@ export default function KrambambouliForm({
         .refine(
           (val) =>
             val.deliveryOption === DeliveryOptionEnum.delivery ||
-            pickupLocations.find((e) => e.id === val.pickupLocation),
+            pickupLocations.find((e) => e.name == val.pickupLocation),
           { error: "Invalid pickup location" },
         )
         .refine(
           (val) =>
             val.deliveryOption === DeliveryOptionEnum.pickup ||
-            ([
+            [
               val.deliveryZone,
               val.streetName,
               val.streetNumber,
               val.postcode,
               val.city,
-            ].every((v) => v !== "") &&
-              val.deliveryZone !== 0),
+            ].every((v) => v !== ""),
           { error: "Invalid delivery location" },
         ),
     },
     onSubmit: async ({ value }) => {
       console.log(value);
-    },
-
-    onSubmitInvalid: async (values) => {
-      console.log("Invalid");
-      console.log(values.value);
-      console.log(values.formApi.getAllErrors());
     },
   });
   const krambambouliCantus = pickupLocations.find((l) => {
@@ -162,7 +180,6 @@ export default function KrambambouliForm({
           e.stopPropagation();
           form.handleSubmit();
         }}
-        method="POST"
       >
         <form.Field name="cart" mode="array">
           {(fields) => (
@@ -244,7 +261,7 @@ export default function KrambambouliForm({
             <form.Field name="lastName">
               {(field) => (
                 <div className={styles.fieldCol}>
-                  <label htmlFor={field.name}>Achternaam</label>
+                  <label form={field.name}>Achternaam</label>
                   <input
                     id={field.name}
                     type="text"
@@ -261,7 +278,7 @@ export default function KrambambouliForm({
           <form.Field name="email">
             {(field) => (
               <div className={styles.fieldRow}>
-                <label htmlFor={field.name}>E-mail</label>
+                <label form={field.name}>E-mail</label>
                 <input
                   id={field.name}
                   type="email"
@@ -270,15 +287,16 @@ export default function KrambambouliForm({
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   name={field.name}
-                  autoComplete="email"
                 />
               </div>
             )}
           </form.Field>
           <form.Field name="deliveryOption">
             {(field) => (
-              <div>
-                <p>Leveringsopties</p>
+              <div
+                className={`${styles.fieldRow} ${styles.radioOptionsContainer}`}
+              >
+                <label>Leveringsopties</label>
                 <label htmlFor={`${field.name}-${DeliveryOptionEnum.pickup}`}>
                   <input
                     type="radio"
@@ -332,12 +350,12 @@ export default function KrambambouliForm({
                             >
                               <input
                                 type="radio"
-                                name={field.name}
+                                name={`${field.name}-${index}`}
                                 id={`${field.name}-${index}`}
                                 value={index}
                                 required
-                                checked={field.state.value === loc.id}
-                                onChange={() => field.handleChange(loc.id)}
+                                checked={field.state.value === loc.name}
+                                onChange={() => field.handleChange(loc.name)}
                               />
                               {krambambouliCantus.name === loc.name
                                 ? krambambouliCantus.name
@@ -353,22 +371,22 @@ export default function KrambambouliForm({
                   deliveryOption === DeliveryOptionEnum.delivery && (
                     <>
                       <div className={styles.fieldRow}>
-                        <label>Leveroptie</label>
+                        <label form="delivery-option">Leveroptie</label>
                         {deliveryLocations.map((loc, idx) => {
                           return (
-                            <form.Field key={loc.id} name="deliveryZone">
+                            <form.Field name="deliveryZone">
                               {(field) => (
-                                <span className={styles.deliveryRow}>
+                                <span key={idx} className={styles.deliveryRow}>
                                   <label htmlFor={`${field.name}-${idx}`}>
                                     <input
                                       id={`${field.name}-${idx}`}
                                       type="radio"
-                                      name={field.name}
+                                      name={`${field.name}-${idx}`}
                                       value={loc.name}
                                       required
-                                      checked={loc.id === field.state.value}
+                                      checked={loc.name === field.state.value}
                                       onChange={() =>
-                                        field.handleChange(loc.id)
+                                        field.handleChange(loc.name)
                                       }
                                     />
                                     {`Levering ${loc.name}`}
@@ -434,40 +452,24 @@ export default function KrambambouliForm({
                           </form.Field>
                         </div>
                         <div className={styles.fieldRow}>
-                          <form.Field name="postcode">
-                            {(field) => (
-                              <>
-                                <label htmlFor={field.name}>Postcode</label>
-                                <input
-                                  id={field.name}
-                                  type="number"
-                                  name={field.name}
-                                  value={field.state.value}
-                                  onChange={(e) =>
-                                    field.handleChange(e.target.value)
-                                  }
-                                  required
-                                />
-                              </>
-                            )}
-                          </form.Field>
-                          <form.Field name="city">
-                            {(field) => (
-                              <>
-                                <label htmlFor="city">Stad</label>
-                                <input
-                                  id="city"
-                                  type="text"
-                                  required
-                                  value={field.state.value}
-                                  name="city"
-                                  onChange={(e) =>
-                                    field.handleChange(e.target.value)
-                                  }
-                                />
-                              </>
-                            )}
-                          </form.Field>
+                          <label htmlFor="post">Postcode</label>
+                          <input
+                            id="post"
+                            type="number"
+                            name="post"
+                            value={oldForm.post ?? ""}
+                            onChange={handleNumberInput}
+                            required
+                          />
+                          <label htmlFor="city">Stad</label>
+                          <input
+                            id="city"
+                            type="text"
+                            required
+                            value={oldForm.city ?? ""}
+                            name="city"
+                            onChange={handleTextInput}
+                          />
                         </div>
                       </div>
                     </>
@@ -495,7 +497,7 @@ export default function KrambambouliForm({
               }, 0);
               if (observable.deliveryOption === DeliveryOptionEnum.delivery) {
                 const deliveryZone = deliveryLocations?.find(
-                  (l) => l.id === observable.deliveryZone,
+                  (l) => l.name === observable.deliveryZone,
                 );
                 if (deliveryZone)
                   totalCents +=
@@ -516,20 +518,9 @@ export default function KrambambouliForm({
                     Met mededeling:{" "}
                     <b>
                       krambambouli +{" "}
-                      <form.Subscribe
-                        selector={(state) => {
-                          return {
-                            firstName: state.values.firstName,
-                            lastName: state.values.lastName,
-                          };
-                        }}
-                      >
-                        {(names) =>
-                          !names.firstName && !names.lastName
-                            ? "[Voornaam Achternaam]"
-                            : `${names.firstName} ${names.lastName}`
-                        }
-                      </form.Subscribe>
+                      {!oldForm.firstName && !oldForm.lastName
+                        ? "[Voornaam Achternaam]"
+                        : [oldForm.firstName, oldForm.lastName].join(" ")}
                     </b>
                   </p>
                 </div>
