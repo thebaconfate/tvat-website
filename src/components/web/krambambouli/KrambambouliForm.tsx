@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
-import "./styles.css";
+import styles from "./KrambambouliForm.module.css";
 import DOMPurify from "dompurify";
-import { apiRoutes } from "../../lib/oldRoutes";
-import { Popup } from "../popup/Popup";
-import { PopupEnum } from "../../lib/popup";
-import {
-  DeliveryLocation,
-  PickupLocation,
-  Price,
-  Product,
-} from "../../lib/store";
+import { apiRoutes } from "@/lib/oldRoutes";
+import { Popup } from "@/components/popup/Popup";
+import { PopupEnum } from "@/lib/popup";
+import { type PriceData } from "@/lib/domain/price";
 import type {
   DeliveryZoneData,
   KrambambouliProductData,
@@ -79,6 +74,8 @@ export default function KrambambouliForm({
       .includes("krambamboulicantus");
   });
 
+  console.log("PickupLocations: ");
+  console.log(pickupLocations);
   if (!krambambouliCantus)
     throw Error("No krambamboulicantus as pick up point");
   const match = krambambouliCantus.name.match(/\b(\d{1,2}\/\d{1,2})\b/);
@@ -155,15 +152,8 @@ export default function KrambambouliForm({
       setSelectedDeliveryOption(idx);
   }
 
-  function calcTotalAmount() {
-    const total = amountList.reduce(
-      (acc: Price, amount: number, index: number) =>
-        acc.add(products[index].price.mult(amount)),
-      new Price(0),
-    );
-    if (selectedOption === DeliveryOption.Delivery)
-      if (selectedDeliveryOption != null && deliveryLocations)
-        return total.add(deliveryLocations[selectedDeliveryOption].price);
+  function calcTotalAmount(): PriceData {
+    const total: PriceData = { euros: 0, cents: 0 };
     return total;
   }
 
@@ -273,26 +263,26 @@ export default function KrambambouliForm({
   }
 
   return (
-    <div className="form-container">
+    <div className={styles.formContainer}>
       <form onSubmit={handleSubmit}>
-        <div className="products-container">
+        <div className={styles.productsContainer}>
           {products.map((product, index) => {
             return (
-              <div key={product.id} className="product">
-                <picture className="product-image">
+              <div key={product.id} className={styles.product}>
+                <picture className={styles.productImage}>
                   {product.imageUrl ? (
                     <img src={product.imageUrl} alt={product.name + "image"} />
                   ) : (
                     <img alt={product.name + "image"} />
                   )}
                 </picture>
-                <div className="product-info">
-                  <h3 className="product-title">{product.name}</h3>
-                  <div className="product-details">
+                <div className={styles.productInfo}>
+                  <h3 className={styles.productTitle}>{product.name}</h3>
+                  <div className={styles.productDetails}>
                     <p>{product.description}</p>
-                    <p>{product.price.toString()}</p>
+                    <p>{`€${product.price.euros},${product.price.cents === 0 ? "-" : product.price.cents}`}</p>
                   </div>
-                  <div className="product-button-container">
+                  <div className={styles.productButtonContainer}>
                     <button type="button" onClick={handlePressAmountDec(index)}>
                       -
                     </button>
@@ -300,6 +290,7 @@ export default function KrambambouliForm({
                       type="number"
                       value={amountList[index]}
                       onChange={makeHandleChangeAmount(index)}
+                      name={`${product.id}-quantity`}
                     />
                     <button type="button" onClick={handlePressAmountInc(index)}>
                       +
@@ -310,9 +301,9 @@ export default function KrambambouliForm({
             );
           })}
         </div>
-        <div className="fields-container">
-          <div className="field-row">
-            <div className="field-col">
+        <div className={styles.fieldsContainer}>
+          <div className={styles.fieldRow}>
+            <div className={styles.fieldCol}>
               <label htmlFor="firstName">Voornaam</label>
               <input
                 id="firstName"
@@ -324,7 +315,7 @@ export default function KrambambouliForm({
                 onChange={handleTextInput}
               />
             </div>
-            <div className="field-col">
+            <div className={styles.fieldCol}>
               <label form="lastName">Achternaam</label>
               <input
                 id="lastName"
@@ -337,7 +328,7 @@ export default function KrambambouliForm({
               />
             </div>
           </div>
-          <div className="field-row">
+          <div className={styles.fieldRow}>
             <label form="email">E-mail</label>
             <input
               id="email"
@@ -349,7 +340,7 @@ export default function KrambambouliForm({
               name="email"
             />
           </div>
-          <div className="field-row radio-options-container">
+          <div className={`${styles.fieldRow} ${styles.radioOptionsContainer}`}>
             <label>Leveringsopties</label>
             <label>
               <input
@@ -377,7 +368,7 @@ export default function KrambambouliForm({
             )}
           </div>
           {(selectedOption === DeliveryOption.PickUp && (
-            <div className="field-row">
+            <div className={styles.fieldRow}>
               <label>Afhaallocatie</label>
               {pickupLocations.map((loc, index) => {
                 return (
@@ -390,9 +381,9 @@ export default function KrambambouliForm({
                       checked={index == selectedPickUpOption}
                       onChange={handleChangePickUpOption}
                     />
-                    {krambambouliCantus.description === loc.description
-                      ? krambambouliCantus.description
-                      : `Bij ${loc.description} vanaf ${pickupStartDate.getDate()}/${pickupStartDate.getMonth() + 1}`}
+                    {krambambouliCantus.name === loc.name
+                      ? krambambouliCantus.name
+                      : `Bij ${loc.name} vanaf ${pickupStartDate.getDate()}/${pickupStartDate.getMonth() + 1}`}
                   </label>
                 );
               })}
@@ -401,11 +392,11 @@ export default function KrambambouliForm({
             (selectedOption === DeliveryOption.Delivery &&
               deliveryLocations && (
                 <>
-                  <div className="field-row">
+                  <div className={styles.fieldRow}>
                     <label form="delivery-option">Leveroptie</label>
                     {deliveryLocations.map((loc, idx) => {
                       return (
-                        <span key={idx} className="delivery-row">
+                        <span key={idx} className={styles.deliveryRow}>
                           <label htmlFor={`delivery-option-${idx}`}>
                             <input
                               id={`delivery-option-${idx}`}
@@ -416,15 +407,15 @@ export default function KrambambouliForm({
                               checked={idx === selectedDeliveryOption}
                               onChange={makeHandleChangeDeliveryOption(idx)}
                             />
-                            {`Levering ${loc.area}`}
+                            {`Levering ${loc.name}`}
                           </label>
                           <p>{loc.price.toString()}</p>
                         </span>
                       );
                     })}
                   </div>
-                  <div className="address-row">
-                    <div className="field-row">
+                  <div className={styles.addressRow}>
+                    <div className={styles.fieldRow}>
                       <label htmlFor="streetName">Straatnaam</label>
                       <input
                         id="streetName"
@@ -452,7 +443,7 @@ export default function KrambambouliForm({
                         onChange={handleTextInput}
                       />
                     </div>
-                    <div className="field-row">
+                    <div className={styles.fieldRow}>
                       <label htmlFor="post">Postcode</label>
                       <input
                         id="post"
@@ -475,7 +466,7 @@ export default function KrambambouliForm({
                   </div>
                 </>
               ))}
-          <div className="information-container">
+          <div className={styles.informationContainer}>
             <p>
               Totaalbedrag <b>{calcTotalAmount().toString()}</b>
             </p>
@@ -493,7 +484,7 @@ export default function KrambambouliForm({
             </p>
           </div>
           {selectedOption !== null && (
-            <div className="submit-button-container">
+            <div className={styles.submitButtonContainer}>
               <button type="submit">Bestellen</button>
             </div>
           )}
