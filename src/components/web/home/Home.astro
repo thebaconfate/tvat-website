@@ -1,10 +1,10 @@
 ---
-import SaintVeCountdown from "../saint-ve-countdown/SaintVeCountdown";
-import MonogramBanner from "./MonogramBanner.astro";
+import SaintVeCountdown from "@/components/saint-ve-countdown/SaintVeCountdown";
+import MonogramBanner from "../shared/MonogramBanner.astro";
 import styles from "./Home.module.css";
 import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
-import Activity from "@/components/web/Activity.astro";
+import ActivityItem from "./ActivityItem.astro";
 import { websiteRoutes } from "@/lib/oldRoutes";
 
 const activities = await activityService.fetchActivityPage(
@@ -32,7 +32,7 @@ const locale = getLocale(Astro.request);
       <div class={styles.activityList}>
         {
           activities.content.map((a) => (
-            <Activity activity={a} locale={locale} />
+            <ActivityItem activity={a} locale={locale} />
           ))
         }
       </div>

@@ -3,7 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import { readdir, readFile } from "fs/promises";
 import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
 import { sortByTerm } from "../../lib/board/board-year";
-import Board from "../../components/web/Board.astro";
+import BoardPage from "@/components/web/board/BoardPage.astro";
 import path from "path";
 
 export const prerender = true;
@@ -38,7 +38,7 @@ const title = "Bestuur";
 ---
 
 <Layout title={title}>
-  <Board
+  <BoardPage
     boardYear={boardYear}
     nextTerm={nextTerm}
     previousTerm={previousTerm}

@@ -1,8 +1,8 @@
 ---
-import { compareBoardRoles } from "../../lib/board/board-role";
-import { BoardYear } from "../../lib/board/board-year";
-import BoardMemberComponent from "../board/board-member/BoardMemberComponent.astro";
-import styles from "./Board.module.css";
+import { compareBoardRoles } from "@/lib/board/board-role";
+import { BoardYear } from "@/lib/board/board-year";
+import BoardMemberItem from "./BoardMemberItem.astro";
+import styles from "./BoardPage.module.css";
 
 interface Props {
   boardYear: BoardYear;
@@ -51,11 +51,7 @@ const boardSize = boardYear.boardMembers.length;
   >
     {
       boardYear.boardMembers.map((m, index) => (
-        <BoardMemberComponent
-          boardMember={m}
-          term={boardYear.term}
-          index={index}
-        />
+        <BoardMemberItem boardMember={m} term={boardYear.term} index={index} />
       ))
     }
   </div>

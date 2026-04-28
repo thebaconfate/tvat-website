@@ -1,10 +1,10 @@
 ---
 export const prerender = true;
 import Layout from "../layouts/Layout.astro";
-import ContactForm from "@/components/web/ContactForm.tsx";
+import ContactFormPage from "@/components/web/contact/ContactFormPage";
 const title = "Contact";
 ---
 
 <Layout title={title}>
-  <ContactForm client:load />
+  <ContactFormPage client:load />
 </Layout>

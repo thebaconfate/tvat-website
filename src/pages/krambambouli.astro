@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import KrambambouliPage from "@/components/web/KrambambouliPage.astro";
+import KrambambouliPage from "@/components/web/krambambouli/KrambambouliPage.astro";
 import { krambambouliService } from "@/lib/services/krambambouli";
 import type {
   DeliveryZoneData,
@@ -62,7 +62,7 @@ try {
     errors={errors}
     formActive={formActive || false}
     products={products}
-    pickupLocations={deliveryLocations}
+    pickupLocations={pickupLocations}
     deliveryLocations={deliveryLocations}
   />
 </Layout>

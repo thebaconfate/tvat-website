@@ -1,5 +1,5 @@
 import { apiRoutes } from "@/lib/oldRoutes";
-import styles from "./ContactForm.module.css";
+import styles from "./ContactFormPage.module.css";
 import { useForm } from "@tanstack/react-form";
 import { contactFormSchema } from "@/lib/domain/contact";
 
@@ -15,7 +15,6 @@ export default function ContactForm() {
       onSubmit: contactFormSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
       fetch(apiRoutes.contact.url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

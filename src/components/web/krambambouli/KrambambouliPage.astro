@@ -3,7 +3,7 @@ import Cookbook from "@/svgs/Cookbook.astro";
 import Expertise from "@/svgs/Expertise.astro";
 import Wine from "@/svgs/Wine.astro";
 import styles from "./KrambambouliPage.module.css";
-import KrambambouliForm from "@/components/krambambouli-form/KrambambouliForm";
+import KrambambouliForm from "./KrambambouliForm";
 import type {
   DeliveryZoneData,
   KrambambouliProductData,
@@ -51,7 +51,11 @@ const { errors, products, deliveryLocations, pickupLocations, formActive } =
       errors ? (
         <div>Something went wrong, contact the administrator...</div>
       ) : products && deliveryLocations && pickupLocations && formActive ? (
-        "formulier in onderhoudt"
+        <KrambambouliForm
+          products={products}
+          pickupLocations={pickupLocations}
+          deliveryLocations={deliveryLocations}
+        />
       ) : (
         "De form is niet langer beschikbaar. Indien u een bestelling heeft geplaatst zal er contact opgenomen worden"
       )
