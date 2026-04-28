@@ -4,20 +4,22 @@ import DOMPurify from "dompurify";
 import { apiRoutes } from "../../lib/oldRoutes";
 import { Popup } from "../popup/Popup";
 import { PopupEnum } from "../../lib/popup";
-import type { ProductInterface } from "../../lib/interfaces/database/product";
-import type { PickupLocationInterface } from "../../lib/interfaces/database/pickupLocation";
-import type { DeliveryZoneInterface } from "../../lib/interfaces/database/deliveryZone";
 import {
   DeliveryLocation,
   PickupLocation,
   Price,
   Product,
 } from "../../lib/store";
+import type {
+  DeliveryZoneData,
+  KrambambouliProductData,
+  PickupLocationData,
+} from "@/lib/domain/krambambouli";
 
 interface Props {
-  products: ProductInterface[];
-  pickUpLocations: PickupLocationInterface[];
-  deliveryLocations?: DeliveryZoneInterface[];
+  products: KrambambouliProductData[];
+  pickupLocations: PickupLocationData[];
+  deliveryLocations?: DeliveryZoneData[];
 }
 
 enum DeliveryOption {
@@ -65,17 +67,13 @@ function dateToDDMM(date: Date) {
 function dateToDDMMYYYY(date: Date) {
   return [dateToDDMM(date), `${String(date.getFullYear())}`].join("/");
 }
-export default function KrambambouliForm(props: Props) {
-  const products = props.products.map((product) => Product.from(product));
-  const pickupLocations = props.pickUpLocations.map((l) =>
-    PickupLocation.from(l),
-  );
-  const deliveryLocations = props.deliveryLocations?.map((loc) =>
-    DeliveryLocation.from(loc),
-  );
-
+export default function KrambambouliForm({
+  products,
+  pickupLocations,
+  deliveryLocations,
+}: Props) {
   const krambambouliCantus = pickupLocations.find((l) => {
-    return l.description
+    return l.name
       .toLowerCase()
       .replaceAll(" ", "")
       .includes("krambamboulicantus");
@@ -83,7 +81,7 @@ export default function KrambambouliForm(props: Props) {
 
   if (!krambambouliCantus)
     throw Error("No krambamboulicantus as pick up point");
-  const match = krambambouliCantus.description.match(/\b(\d{1,2}\/\d{1,2})\b/);
+  const match = krambambouliCantus.name.match(/\b(\d{1,2}\/\d{1,2})\b/);
   if (!match) throw Error("No pick up start date");
 
   const krambambouliCantusDate = createPickupStartDate(match[0]);

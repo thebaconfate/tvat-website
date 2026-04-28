@@ -1,109 +1,68 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Cookbook from "../svgs/Cookbook.astro";
-import Expertise from "../svgs/Expertise.astro";
-import Wine from "../svgs/Wine.astro";
-import KrambambouliForm from "../components/krambambouli-form/KrambambouliForm";
+import Layout from "@/layouts/Layout.astro";
+import KrambambouliPage from "@/components/web/KrambambouliPage.astro";
 import { krambambouliService } from "@/lib/services/krambambouli";
+import type {
+  DeliveryZoneData,
+  KrambambouliProductData,
+  PickupLocationData,
+} from "@/lib/domain/krambambouli";
 
 const title = "Krambambouli";
-let formActive, products, pickupLocations, deliveryLocations, errors;
 
+const [
+  formActivePromise,
+  productsPromise,
+  pickupLocationsPromise,
+  deliveryLocationsPromise,
+] = [
+  krambambouliService.formActive(),
+  krambambouliService.getKrambambouliProducts(),
+  krambambouliService.getPickupLocations(),
+  krambambouliService.getDeliveryLocations(),
+];
+
+let formActive, errors;
+let products: KrambambouliProductData[] | null,
+  pickupLocations: PickupLocationData[] | null,
+  deliveryLocations: DeliveryZoneData[] | null;
 try {
-  [formActive, products, pickupLocations, deliveryLocations] =
-    await Promise.all([
-      krambambouliService.formActive(),
-      krambambouliService.getKrambambouliProducts(),
-      krambambouliService.getPickupLocations(),
-      krambambouliService.getDeliveryLocations(),
+  formActive = await formActivePromise;
+  if (formActive) {
+    [products, pickupLocations, deliveryLocations] = await Promise.all([
+      productsPromise,
+      pickupLocationsPromise,
+      deliveryLocationsPromise,
     ]);
+  } else {
+    // Empty arrays have to be created otherwise you use the reference to the same
+    // array => unexpected behavior
+    [products, pickupLocations, deliveryLocations] = Array.from(
+      { length: 3 },
+      () => [],
+    );
+  }
   deliveryLocations?.sort((loc1, loc2) =>
     loc1.price.euros === loc2.price.euros
       ? loc1.price.cents - loc2.price.cents
       : loc1.price.euros - loc2.price.euros,
   );
 } catch (e) {
-  console.error(e);
   errors = e;
+  [products, pickupLocations, deliveryLocations] = Array.from(
+    { length: 3 },
+    () => [],
+  );
+  console.log(e);
 }
 ---
 
 <Layout title={title}>
-  <main>
-    <picture class="brouwers-image-container">
-      <img src="/banner.jpg" alt="brouwers aan het werk" class="brouwers" />
-    </picture>
-    <ul class="intro-text">
-      <li class="row-container">
-        <Cookbook />
-        <p>
-          Krambambouli is een drank op basis van wijn, rum, en een heleboel
-          geheime ingrediënten.
-        </p>
-      </li>
-      <li class="row-container">
-        <Expertise />
-        <p>Wordt met liefde en expertise door 't VAT gebrouwen.</p>
-      </li>
-      <li class="row-container">
-        <Wine />
-        <p>Bevat meer dan 15% procent alcohol en wordt warm gedronken.</p>
-      </li>
-    </ul>
-    {
-      errors ? (
-        "Something went wrong...."
-      ) : products && deliveryLocations && pickupLocations && formActive ? (
-        <KrambambouliForm
-          client:visible
-          products={products}
-          deliveryLocations={deliveryLocations}
-          pickUpLocations={pickupLocations}
-        />
-      ) : (
-        "De form is niet langer beschikbaar. Indien u een bestelling heeft geplaatst zal er contact opgenomen worden"
-      )
-    }
-
-    <style>
-      main {
-        padding: var(--standard-padding) calc(var(--standard-padding) * 3);
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .brouwers-image-container {
-        display: flex;
-        justify-content: center;
-      }
-
-      .brouwers {
-        width: 90%;
-      }
-
-      .intro-text {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .row-container {
-        display: grid;
-        grid-template-columns: 1.5rem auto;
-        align-items: center;
-        gap: calc(1rem / 2);
-      }
-
-      .row-container > p {
-        font-size: 1rem;
-      }
-
-      @media screea and (max-width: 767px) {
-        main {
-          padding: 1rem 0.5rem;
-        }
-      }
-    </style>
-  </main>
+  <KrambambouliPage
+    errors={errors}
+    formActive={formActive || false}
+    products={products}
+    pickupLocations={deliveryLocations}
+    deliveryLocations={deliveryLocations}
+  />
 </Layout>

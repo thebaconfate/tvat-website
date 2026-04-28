@@ -2,8 +2,8 @@ import { database } from "@/lib/database";
 import type {
   DeliveryZoneData,
   KrambambouliProductData,
+  PickupLocationData,
 } from "@/lib/domain/krambambouli";
-import type { PickupLocationInterface } from "@/lib/interfaces/database/pickupLocation";
 
 class KrambambouliService {
   async formActive(): Promise<boolean> {
@@ -52,20 +52,15 @@ class KrambambouliService {
     const result = await database.query<DeliveryZoneData>(sql);
     return result.rows;
   }
-  async getPickupLocations(): Promise<PickupLocationInterface[] | null> {
+  async getPickupLocations(): Promise<PickupLocationData[] | null> {
     const sql = `
     SELECT
         p.id,
-        p.postal_code_from AS "postalCodeFrom",
-        p.postal_code_to AS "postalCodeTo",
-        p.name,
-        json_build_object(
-            'euros', p.euros,
-            'cents', p.cents
-        ) AS "price"
-    FROM krambambouli_delivery_zones p WHERE p.active = TRUE
+        p.name
+    FROM krambambouli_pickup_locations p
+    WHERE p.active = TRUE
     `;
-    const result = await database.query<PickupLocationInterface>(sql);
+    const result = await database.query<PickupLocationData>(sql);
     return result.rows;
   }
 }
