@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./KrambambouliForm.module.css";
 import DOMPurify from "dompurify";
 import { Popup } from "@/components/popup/Popup";
@@ -39,11 +39,34 @@ function dateToDDMM(date: Date) {
 function dateToDDMMYYYY(date: Date) {
   return [dateToDDMM(date), `${String(date.getFullYear())}`].join("/");
 }
+
+type ZoneUI = {
+  name: string;
+  price: { euros: number; cents: number };
+  ranges: { from: number; to: number }[];
+};
 export default function KrambambouliForm({
   products,
   pickupLocations,
   deliveryLocations,
 }: Props) {
+  const uniqueDeliveryOptions = useMemo(() => {
+    if (!deliveryLocations) return deliveryLocations;
+    const map = new Map<string, ZoneUI>();
+    for (const loc of deliveryLocations) {
+      if (!map.has(loc.name))
+        map.set(loc.name, {
+          name: loc.name,
+          price: loc.price,
+          ranges: [],
+        });
+      map.get(loc.name)!.ranges.push({
+        from: loc.postalCodeFrom,
+        to: loc.postalCodeTo,
+      });
+    }
+    return Array.from(map.values());
+  }, [deliveryLocations]);
   const form = useForm({
     defaultValues: {
       cart: products.map((p) => {
@@ -54,7 +77,7 @@ export default function KrambambouliForm({
       email: "",
       deliveryOption: "",
       pickupLocation: 0,
-      deliveryZone: 0,
+      deliveryZone: "",
       streetName: "",
       streetNumber: "",
       bus: "",
@@ -72,7 +95,9 @@ export default function KrambambouliForm({
           email: z4.email().nonempty(),
           deliveryOption: deliveryOptionEnumSchema,
           pickupLocation: z4.int(),
-          deliveryZone: z4.int(),
+          deliveryZone: uniqueDeliveryOptions
+            ? z4.enum(uniqueDeliveryOptions.map((l) => l.name))
+            : z4.string(),
           streetName: z4.string(),
           streetNumber: z4.string(),
           bus: z4.string(),
@@ -95,7 +120,14 @@ export default function KrambambouliForm({
               val.postcode,
               val.city,
             ].every((v) => v !== "") &&
-              val.deliveryZone !== 0),
+              uniqueDeliveryOptions &&
+              uniqueDeliveryOptions.some((o) =>
+                o.ranges.some(
+                  (r) =>
+                    r.from <= parseInt(val.postcode) &&
+                    r.to >= parseInt(val.postcode),
+                ),
+              )),
           { error: "Invalid delivery location" },
         ),
     },
@@ -278,7 +310,7 @@ export default function KrambambouliForm({
           <form.Field name="deliveryOption">
             {(field) => (
               <div>
-                <p>Leveringsopties</p>
+                <h4>Leveringsopties</h4>
                 <label htmlFor={`${field.name}-${DeliveryOptionEnum.pickup}`}>
                   <input
                     type="radio"
@@ -293,7 +325,7 @@ export default function KrambambouliForm({
                   />
                   {`Afhalen tussen ${dateToDDMM(krambambouliCantusDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
                 </label>
-                {deliveryLocations && (
+                {uniqueDeliveryOptions && (
                   <label
                     htmlFor={`${field.name}-${DeliveryOptionEnum.delivery}`}
                   >
@@ -323,7 +355,7 @@ export default function KrambambouliForm({
                   <form.Field name="pickupLocation">
                     {(field) => (
                       <div className={styles.fieldRow}>
-                        <label>Afhaallocatie</label>
+                        <h4>Afhaallocatie</h4>
                         {pickupLocations.map((loc, index) => {
                           return (
                             <label
@@ -349,14 +381,14 @@ export default function KrambambouliForm({
                     )}
                   </form.Field>
                 )) ||
-                (deliveryLocations &&
+                (uniqueDeliveryOptions &&
                   deliveryOption === DeliveryOptionEnum.delivery && (
                     <>
                       <div className={styles.fieldRow}>
-                        <label>Leveroptie</label>
-                        {deliveryLocations.map((loc, idx) => {
+                        <h4>Leveroptie</h4>
+                        {uniqueDeliveryOptions.map((loc, idx) => {
                           return (
-                            <form.Field key={loc.id} name="deliveryZone">
+                            <form.Field key={loc.name} name="deliveryZone">
                               {(field) => (
                                 <span className={styles.deliveryRow}>
                                   <label htmlFor={`${field.name}-${idx}`}>
@@ -366,9 +398,9 @@ export default function KrambambouliForm({
                                       name={field.name}
                                       value={loc.name}
                                       required
-                                      checked={loc.id === field.state.value}
+                                      checked={loc.name === field.state.value}
                                       onChange={() =>
-                                        field.handleChange(loc.id)
+                                        field.handleChange(loc.name)
                                       }
                                     />
                                     {`Levering ${loc.name}`}
@@ -481,6 +513,7 @@ export default function KrambambouliForm({
                 cart: state.values.cart,
                 deliveryOption: state.values.deliveryOption,
                 deliveryZone: state.values.deliveryZone,
+                postcode: state.values.postcode,
               };
             }}
           >
@@ -494,9 +527,17 @@ export default function KrambambouliForm({
                 );
               }, 0);
               if (observable.deliveryOption === DeliveryOptionEnum.delivery) {
-                const deliveryZone = deliveryLocations?.find(
-                  (l) => l.id === observable.deliveryZone,
-                );
+                const deliveryZone =
+                  uniqueDeliveryOptions?.find((l) =>
+                    l.ranges.find(
+                      (r) =>
+                        r.from <= parseInt(observable.postcode) &&
+                        r.to >= parseInt(observable.postcode),
+                    ),
+                  ) ||
+                  uniqueDeliveryOptions?.find(
+                    (l) => l.name === observable.deliveryZone,
+                  );
                 if (deliveryZone)
                   totalCents +=
                     deliveryZone.price.euros * 100 + deliveryZone.price.cents;
