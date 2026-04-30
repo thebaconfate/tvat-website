@@ -50,3 +50,23 @@
     width: 90%;
   }
 }
+
+@media (min-width: 1024px) {
+  .brouwers {
+    width: 75%;
+  }
+
+  .contentContainer {
+    gap: 2rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .brouwers {
+    width: 60%;
+  }
+
+  .contentContainer {
+    gap: 3rem;
+  }
+}

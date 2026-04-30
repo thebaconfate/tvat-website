@@ -132,6 +132,7 @@ input[type="radio"] {
   display: grid;
   justify-content: space-between;
   grid-auto-flow: column;
+  gap: 0.5rem;
 }
 
 .deliveryRow > * {
@@ -238,6 +239,11 @@ input[type="radio"] {
   .fieldsContainer > :first-child {
     grid-template-columns: repeat(2, 1fr);
   }
+  .deliveryRow {
+    justify-content: unset;
+    grid-template-columns: 3fr 1fr;
+    gap: unset;
+  }
   .deliveryRow > * {
     display: unset;
     gap: unset;
@@ -253,6 +259,13 @@ input[type="radio"] {
   .submitButtonContainer {
     display: flex;
     justify-content: flex-end;
+  }
+}
+
+@media (min-width: 1024px) {
+  .deliveryRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
 }
 /*
