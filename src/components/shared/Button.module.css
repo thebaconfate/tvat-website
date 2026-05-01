@@ -1,0 +1,79 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font: inherit;
+  font-weight: 500;
+
+  border: none;
+  border-radius: 8px;
+
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.05s ease;
+
+  user-select: none;
+  text-decoration: none;
+}
+
+/* Optional active press feedback */
+.button:active {
+  transform: translateY(1px);
+}
+
+/* Disabled state */
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* PRIMARY */
+.primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+.primary:hover:not(:disabled) {
+  background-color: var(--btn-primary-hover-bg);
+}
+
+/* SECONDARY */
+.secondary {
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: var(--btn-secondary-hover-bg);
+}
+
+/* TERTIARY */
+.tertiary {
+  background-color: var(--btn-tertiary-bg);
+  color: var(--btn-tertiary-text);
+}
+
+.stepper {
+  background-color: #f5f5f5;
+  color: var(--color-primary);
+}
+
+.tertiary:hover:not(:disabled) {
+  background-color: var(--btn-tertiary-hover-bg);
+}
+
+/* DANGER */
+.danger {
+  background-color: var(--color-danger);
+  color: var(--color-danger-text);
+}
+
+.danger:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
