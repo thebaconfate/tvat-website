@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./KrambambouliForm.module.css";
-import DOMPurify from "dompurify";
 import { Popup } from "@/components/popup/Popup";
 import { PopupEnum } from "@/lib/popup";
 import {
@@ -67,6 +66,11 @@ export default function KrambambouliForm({
     }
     return Array.from(map.values());
   }, [deliveryLocations]);
+  const [popup, setPopup] = useState({
+    title: PopupEnum.SUCCESS,
+    text: "",
+    show: false,
+  });
   const form = useForm({
     defaultValues: {
       cart: products.map((p) => {
@@ -95,15 +99,34 @@ export default function KrambambouliForm({
           email: z4.email().nonempty(),
           deliveryOption: deliveryOptionEnumSchema,
           pickupLocation: z4.int(),
-          deliveryZone: uniqueDeliveryOptions
-            ? z4.enum(uniqueDeliveryOptions.map((l) => l.name))
-            : z4.string(),
+          deliveryZone: z4.string(),
           streetName: z4.string(),
           streetNumber: z4.string(),
           bus: z4.string(),
           postcode: z4.string(),
           city: z4.string(),
         })
+        .superRefine((val, ctx) => {
+          if (val.cart.reduce((acc, product) => acc + product.amount, 0) <= 0)
+            ctx.addIssue({
+              code: "custom",
+              path: ["cart"],
+              message:
+                "Je moet minstens één product aan je winkelmand toevoegen",
+            });
+          if (val.deliveryOption === DeliveryOptionEnum.pickup) {
+            if (!pickupLocations.find((e) => e.id === val.pickupLocation))
+              ctx.addIssue({
+                code: "invalid_value",
+                values: pickupLocations.map((l) => l.id),
+                input: val.pickupLocation,
+                path: ["pickupLocation"],
+                message: "pickupLocation must be a valid location",
+              });
+          } else if (val.deliveryOption === DeliveryOptionEnum.delivery) {
+          }
+        }),
+      /*
         .refine(
           (val) =>
             val.deliveryOption === DeliveryOptionEnum.delivery ||
@@ -130,15 +153,21 @@ export default function KrambambouliForm({
               )),
           { error: "Invalid delivery location" },
         ),
+        */
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      alert(`Success! : ${JSON.stringify(value, null, 2)}`);
+      console.log(JSON.stringify(value, null, 2));
     },
-
-    onSubmitInvalid: async (values) => {
-      console.log("Invalid");
-      console.log(values.value);
-      console.log(values.formApi.getAllErrors());
+    onSubmitInvalid: ({ formApi }) => {
+      const errors = Object.values(formApi.state.fieldMeta)
+        .flatMap((f) => f?.errors ?? [])
+        .map((e) => e.message);
+      setPopup({
+        title: PopupEnum.ERROR,
+        text: errors[0] ?? "Er is iets misgegaan, probeer het later opnieuw",
+        show: true,
+      });
     },
   });
   const krambambouliCantus = pickupLocations.find((l) => {
@@ -168,22 +197,8 @@ export default function KrambambouliForm({
   const deliveryEndDate = new Date(deliveryStartDate);
   deliveryEndDate.setDate(deliveryEndDate.getDate() + 10);
 
-  const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [popupContent, setPopupContent] = useState({
-    title: PopupEnum.SUCCESS,
-    text: "",
-  });
-
-  useEffect(() => {
-    if (window)
-      DOMPurify.setConfig({
-        ALLOWED_TAGS: [],
-        ALLOWED_ATTR: [],
-      });
-  }, []);
-
   function closePopup() {
-    setShowPopup(false);
+    setPopup({ ...popup, show: false });
   }
 
   return (
@@ -586,16 +601,19 @@ export default function KrambambouliForm({
             }}
           </form.Subscribe>
           <div className={styles.submitButtonContainer}>
-            <button className={styles.submitButton} type="submit">
+            <button
+              className={`${styles.submitButton} ${!form.state.isValid && styles.submitError}`}
+              type="submit"
+            >
               Bestellen
             </button>
           </div>
         </div>
       </form>
-      {showPopup && (
+      {popup.show && (
         <Popup
-          title={popupContent.title}
-          message={popupContent.text}
+          title={popup.title}
+          message={popup.text}
           onClose={closePopup}
         ></Popup>
       )}
