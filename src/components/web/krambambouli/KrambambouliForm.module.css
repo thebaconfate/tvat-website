@@ -27,7 +27,7 @@
   padding: 0.5rem;
 }
 
-picture > img {
+.formContainer picture > img {
   width: 100%;
 }
 
@@ -48,37 +48,26 @@ picture > img {
 .productButtonContainer {
   display: flex;
   justify-content: space-evenly;
-  --button-color: hsl(0, 0%, 85%);
 }
 
-button,
-select,
-input {
+.formContainer button,
+.formContainer select,
+.formContainer input {
   font-size: 1rem;
 }
 
 .productButtonContainer > * {
-  border: 1px solid var(--button-color);
   border-radius: 5px;
   text-align: center;
-}
-
-.productButtonContainer > input:hover {
-  border-color: gray;
 }
 
 .productButtonContainer > button {
   width: 2.5rem;
   height: 2.5rem;
-  background: var(--button-color);
   font-weight: 900;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.productButtonContainer > button:hover {
-  background: lightgray;
 }
 
 .productButtonContainer > input {
@@ -98,7 +87,7 @@ input {
   /* Remove default styling */
 }
 
-form {
+.formContainer form {
   display: grid;
   gap: 3rem;
   margin: 0 10%;
@@ -124,7 +113,7 @@ form {
   grid-template-rows: repeat(2, 1fr);
 }
 
-input[type="radio"] {
+.radioButton {
   margin-right: 5px;
 }
 
@@ -208,6 +197,7 @@ input[type="radio"] {
   margin-top: 1rem;
 }
 
+/*
 .submitButtonContainer > * {
   padding: 0.5rem 1rem;
   background-color: rgb(104, 41, 154);
@@ -216,6 +206,7 @@ input[type="radio"] {
   border-radius: 5px;
   cursor: pointer;
 }
+*/
 
 #post::-webkit-outer-spin-button,
 #post::-webkit-inner-spin-button,
@@ -228,6 +219,64 @@ input[type="radio"] {
 #post {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+.formContainer input:not([type="radio"]) {
+  font-size: 1rem;
+  outline: none;
+  border-radius: 0.3rem;
+  border: solid lightgray 1px;
+  display: flex;
+  padding: 0.2rem 0.5rem;
+}
+
+.formCpntainer input:not(.productInput):not([type="radio"]) {
+  width: 100%;
+}
+
+.formContainer input::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.formContainer input:focus-within:not([type="radio"]),
+.formContainer input:hover:not([type="radio"]) {
+  border-color: var(--main); /* change border when input focused */
+  box-shadow: 0 0 0 3px rgba(100, 53, 152, 0.15);
+}
+
+.formContainer button {
+  border-radius: 0.4rem;
+}
+
+.formContainer button {
+  background: var(--main);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 4px 10px rgba(100, 53, 152, 0.35);
+}
+
+.formContainer button:hover {
+  background: var(--tertiary);
+  box-shadow: 0 6px 14px rgba(54, 149, 34, 0.35);
+  transform: translateY(-1px);
+}
+.formContainer button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.formContainer button:focus-visible {
+  outline: 3px solid rgb(255, 239, 62);
+  outline-offset: 2px;
 }
 
 @media (min-width: 767px) {

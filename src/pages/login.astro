@@ -1,10 +1,10 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import LoginForm from "@/components/web/LoginForm";
+import LoginPage from "@/components/web/login/LoginPage.astro";
 
 const title = "Inloggen";
 ---
 
 <Layout title={title}>
-  <LoginForm client:load />
+  <LoginPage />
 </Layout>
