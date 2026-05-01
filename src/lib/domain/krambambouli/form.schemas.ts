@@ -24,10 +24,17 @@ const sharedFieldsSchema = z4.object({
 export const pickupFormSchema = z4.object({
   ...sharedFieldsSchema.shape,
   deliveryOption: z4.literal(deliveryOptionEnumSchema.enum.pickup),
+  pickupLocation: z4.int(),
 });
 export const deliveryFormSchema = z4.object({
   ...sharedFieldsSchema.shape,
   deliveryOption: z4.literal(deliveryOptionEnumSchema.enum.delivery),
+  deliveryZone: z4.string(),
+  streetName: z4.string(),
+  streetNumber: z4.string(),
+  bus: z4.string(),
+  postcode: z4.string(),
+  city: z4.string(),
 });
 
 export const krambambouliOrderFormSchema = z4.discriminatedUnion(
