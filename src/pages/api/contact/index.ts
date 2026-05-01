@@ -31,9 +31,8 @@ export async function POST({ request }: APIContext) {
 <p><em>Sent from website contact form</em></p>
 `;
     const url = new URL(request.url);
-    const domain = url.hostname;
     const { error } = await resend.emails.send({
-      from: `${form.name} <noreply@${domain}>`,
+      from: `${form.name} <noreply@${config.resend.domain}>`,
       to: `${config.email}`,
       subject: form.subject,
       html: html,

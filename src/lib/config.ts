@@ -5,6 +5,7 @@ dotenv.config();
 
 type ResendConfig = {
   apiKey: string;
+  domain: string;
 };
 type Config = {
   database: PoolConfig;
@@ -35,6 +36,7 @@ export const config: Config = {
   },
   resend: {
     apiKey: getEnv("RESEND_API_KEY"),
+    domain: getEnv("DOMAIN"),
   },
   email: getEnv("VATMAIL"),
 };

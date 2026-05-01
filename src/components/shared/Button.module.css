@@ -21,19 +21,16 @@
   text-decoration: none;
 }
 
-/* Optional active press feedback */
 .button:active {
   transform: translateY(1px);
 }
 
-/* Disabled state */
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
-/* PRIMARY */
 .primary {
   background-color: var(--btn-primary-bg);
   color: var(--btn-primary-text);
@@ -43,7 +40,6 @@
   background-color: var(--btn-primary-hover-bg);
 }
 
-/* SECONDARY */
 .secondary {
   background-color: var(--btn-secondary-bg);
   color: var(--btn-secondary-text);
@@ -53,7 +49,6 @@
   background-color: var(--btn-secondary-hover-bg);
 }
 
-/* TERTIARY */
 .tertiary {
   background-color: var(--btn-tertiary-bg);
   color: var(--btn-tertiary-text);
@@ -68,7 +63,6 @@
   background-color: var(--btn-tertiary-hover-bg);
 }
 
-/* DANGER */
 .danger {
   background-color: var(--color-danger);
   color: var(--color-danger-text);
