@@ -222,6 +222,7 @@ export default function KrambambouliForm({
                         <div className={styles.productButtonContainer}>
                           <button
                             type="button"
+                            className={styles.counterButton}
                             onClick={() =>
                               field.handleChange((old) => Math.max(0, old - 1))
                             }
@@ -229,6 +230,7 @@ export default function KrambambouliForm({
                             -
                           </button>
                           <input
+                            className={styles.productInput}
                             type="number"
                             value={field.state.value}
                             onChange={(e) =>
@@ -240,6 +242,7 @@ export default function KrambambouliForm({
                           />
                           <button
                             type="button"
+                            className={styles.counterButton}
                             onClick={() =>
                               field.handleChange((old) => Math.max(0, old + 1))
                             }
@@ -298,6 +301,7 @@ export default function KrambambouliForm({
                   id={field.name}
                   type="email"
                   required
+                  className={styles.input}
                   placeholder="john.doe@hotmail.com"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -314,6 +318,7 @@ export default function KrambambouliForm({
                 <label htmlFor={`${field.name}-${DeliveryOptionEnum.pickup}`}>
                   <input
                     type="radio"
+                    className={styles.radioButton}
                     name={field.name}
                     id={`${field.name}-${DeliveryOptionEnum.pickup}`}
                     required
@@ -331,6 +336,7 @@ export default function KrambambouliForm({
                   >
                     <input
                       type="radio"
+                      className={styles.radioButton}
                       id={`${field.name}-${DeliveryOptionEnum.delivery}`}
                       name={field.name}
                       required
@@ -364,6 +370,7 @@ export default function KrambambouliForm({
                             >
                               <input
                                 type="radio"
+                                className={styles.radioButton}
                                 name={field.name}
                                 id={`${field.name}-${index}`}
                                 value={index}
@@ -395,6 +402,7 @@ export default function KrambambouliForm({
                                     <input
                                       id={`${field.name}-${idx}`}
                                       type="radio"
+                                      className={styles.radioButton}
                                       name={field.name}
                                       value={loc.name}
                                       required
@@ -578,7 +586,9 @@ export default function KrambambouliForm({
             }}
           </form.Subscribe>
           <div className={styles.submitButtonContainer}>
-            <button type="submit">Bestellen</button>
+            <button className={styles.submitButton} type="submit">
+              Bestellen
+            </button>
           </div>
         </div>
       </form>
