@@ -6,10 +6,32 @@
 }
 
 :root {
-  --main: rgb(100, 53, 152); /* purple */
-  --secondary: rgb(255, 239, 62); /* yellow */
-  --tertiary: rgb(54, 149, 34); /* green */
-  --red: rgb(175, 36, 36); /* red*/
+  --color-primary: rgb(100, 53, 152);
+  --color-success: rgb(54, 149, 34);
+  --color-warning: rgb(255, 239, 62);
+  --color-danger: rgb(175, 36, 36);
+
+  --btn-primary-bg: var(--color-primary);
+  --btn-primary-hover-bg: rgb(80, 40, 125);
+  --btn-primary-text: white;
+
+  --btn-secondary-bg: rgb(235, 230, 245);
+  --btn-secondary-hover-bg: rgb(220, 215, 235);
+  --btn-secondary-text: var(--color-primary);
+
+  --btn-tertiary-bg: transparent;
+  --btn-tertiary-text: var(--color-primary);
+  --btn-tertiary-hover-bg: rgba(100, 53, 152, 0.1);
+
+  --color-success-bg: rgba(54, 149, 34, 0.1);
+  --color-success-text: rgb(54, 149, 34);
+
+  --color-warning-bg: rgba(255, 239, 62, 0.2);
+  --color-warning-text: white;
+
+  --color-danger-bg: rgba(175, 36, 36, 0.1);
+  --color-danger-text: white;
+
   --logo-width: 3rem;
 }
 

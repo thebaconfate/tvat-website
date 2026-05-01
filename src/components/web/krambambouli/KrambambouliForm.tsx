@@ -13,6 +13,7 @@ import { useForm } from "@tanstack/react-form";
 import z4 from "zod/v4";
 import { productSchema } from "@/lib/domain/products";
 import { fromCents } from "@/lib/domain/price/price.utils";
+import { Button } from "@/components/shared/Button";
 
 interface Props {
   products: KrambambouliProductData[];
@@ -235,15 +236,15 @@ export default function KrambambouliForm({
                     <form.Field name={`cart[${i}].amount`}>
                       {(field) => (
                         <div className={styles.productButtonContainer}>
-                          <button
+                          <Button
+                            variant="stepper"
                             type="button"
-                            className={styles.counterButton}
                             onClick={() =>
                               field.handleChange((old) => Math.max(0, old - 1))
                             }
                           >
                             -
-                          </button>
+                          </Button>
                           <input
                             className={styles.productInput}
                             type="number"
@@ -255,15 +256,15 @@ export default function KrambambouliForm({
                             }
                             name={`${product.id}-quantity`}
                           />
-                          <button
+                          <Button
+                            variant="stepper"
                             type="button"
-                            className={styles.counterButton}
                             onClick={() =>
                               field.handleChange((old) => Math.max(0, old + 1))
                             }
                           >
                             +
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </form.Field>
@@ -601,12 +602,7 @@ export default function KrambambouliForm({
             }}
           </form.Subscribe>
           <div className={styles.submitButtonContainer}>
-            <button
-              className={`${styles.submitButton} ${!form.state.isValid && styles.submitError}`}
-              type="submit"
-            >
-              Bestellen
-            </button>
+            <Button>Bestellen</Button>
           </div>
         </div>
       </form>
