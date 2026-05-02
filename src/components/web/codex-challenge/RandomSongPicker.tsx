@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Language, type Song } from "../../../../lib/codex-challenge";
 import styles from "./RandomSongPicker.module.css";
+import { Language, type Song } from "@/lib/codex-challenge";
 
 interface Props {
   dutchSongs: Song[];

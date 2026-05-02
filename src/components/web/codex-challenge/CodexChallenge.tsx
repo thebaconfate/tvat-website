@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Language, type Song } from "../../../../lib/codex-challenge";
-import RandomSongPicker from "../song-picker/RandomSongPicker";
 import styles from "./CodexChallenge.module.css";
 import { Button } from "@/components/shared/Button";
+import { Language, type Song } from "@/lib/codex-challenge";
+import RandomSongPicker from "./RandomSongPicker";
 
 interface Props {
   dutchSongs: Song[];
@@ -99,7 +99,7 @@ export default function CodexChallenge({
                           variant="secondary"
                           onClick={createScoreHandler(1)}
                         >
-                          1 punten
+                          1 punt
                         </Button>
                         <Button
                           variant="secondary"
