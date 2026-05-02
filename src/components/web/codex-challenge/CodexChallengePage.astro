@@ -1,0 +1,16 @@
+---
+import styles from "./CodexChallengePage.module.css";
+import CodexChallenge from "./CodexChallenge.tsx";
+import type { Song } from "@/lib/codex-challenge";
+interface Props {
+  dutchSongs: Song[];
+  frenchSongs: Song[];
+  germanSongs: Song[];
+  otherSongs: Song[];
+}
+---
+
+<main class={styles.contentContainer}>
+  <h1 class={styles.title}>Codex Challenge</h1>
+  <CodexChallenge {...Astro.props} client:load />
+</main>
