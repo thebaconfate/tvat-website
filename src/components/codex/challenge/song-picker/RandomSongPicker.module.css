@@ -1,3 +1,45 @@
 .song {
   text-align: center;
+  max-width: 50%;
+}
+
+.langContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.langContainer > :nth-child(2) {
+  text-align: center;
+}
+
+.langContainer > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 15%);
+  gap: 3%;
+  place-content: center;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (max-width: 426px) {
+  .buttons {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
