@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Language, type Song } from "../../../../lib/codex-challenge";
-import "./random-song-picker.css";
 import styles from "./RandomSongPicker.module.css";
 
 interface Props {
@@ -70,11 +69,11 @@ export default function RandomSongPicker({
   }
 
   return (
-    <div className="picker">
-      <div className="buttons">
-        <div className="lang-container">
+    <div className={styles.picker}>
+      <div className={styles.buttons}>
+        <div className={styles.langContainer}>
           <img
-            className="lang"
+            className={styles.lang}
             src="/vlaamse-leeuw.jpg"
             onClick={makeRandomFunction(dutchSongs)}
             alt="vlaamse leeuw"
@@ -91,9 +90,9 @@ export default function RandomSongPicker({
             </p>
           )}
         </div>
-        <div className="lang-container">
+        <div className={styles.langContainer}>
           <img
-            className="lang"
+            className={styles.lang}
             src="/waalse-haan.png"
             onClick={makeRandomFunction(frenchSongs)}
             alt="waalse haan"
@@ -110,7 +109,7 @@ export default function RandomSongPicker({
             </p>
           )}
         </div>
-        <div className="lang-container">
+        <div className={styles.langContainer}>
           <img
             className="lang"
             src="/duitse-dinges.png"
@@ -129,9 +128,8 @@ export default function RandomSongPicker({
             </p>
           )}
         </div>
-        <div className="lang-container">
+        <div className={styles.langContainer}>
           <img
-            className="lang"
             src="/internationaal.png"
             onClick={makeRandomFunction(otherSongs)}
             alt="anders"
@@ -151,7 +149,7 @@ export default function RandomSongPicker({
           )}
         </div>
       </div>
-      <div className="result">
+      <div className={styles.result}>
         <div className={styles.song}>
           {error ? (
             <>

@@ -19,6 +19,8 @@ main {
   margin-top: 2rem;
   display: flex;
   justify-content: center;
+  text-wrap-style: balance;
+  text-align: center;
 }
 .boardyearsNavigationContainer {
   display: flex;

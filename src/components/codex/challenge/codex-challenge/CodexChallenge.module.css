@@ -1,8 +1,9 @@
 .contentContainer {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
   flex: 1;
-  margin-bottom: 10%;
+  margin-top: 1rem;
 }
 
 .title {
@@ -38,14 +39,4 @@
   display: flex;
   justify-content: center;
   gap: 5%;
-}
-
-@media (min-width: 425px) {
-  .buttonContainer {
-  }
-}
-
-@media (min-width: 768px) {
-  .buttonContainer {
-  }
 }
