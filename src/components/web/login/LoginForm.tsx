@@ -3,6 +3,7 @@ import style from "./LoginForm.module.css";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { Eye, EyeClosed, Mail } from "lucide-react";
+import { Button } from "@/components/shared/Button";
 
 export default function LoginForm() {
   const [visible, setVisible] = useState(false);
@@ -87,9 +88,7 @@ export default function LoginForm() {
             )
           }
         </form.Subscribe>
-        <button className={style.submitButton} type="submit">
-          Inloggen
-        </button>
+        <Button>Inloggen</Button>
       </form>
     </div>
   );

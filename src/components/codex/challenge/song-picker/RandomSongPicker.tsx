@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Language, type Song } from "../../../../lib/codex-challenge";
 import "./random-song-picker.css";
+import styles from "./RandomSongPicker.module.css";
 
 interface Props {
   dutchSongs: Song[];
@@ -151,7 +152,7 @@ export default function RandomSongPicker({
         </div>
       </div>
       <div className="result">
-        <div className="song">
+        <div className={styles.song}>
           {error ? (
             <>
               <p>Je hebt het maximum aantal liedjes van deze taal al berijkt</p>
