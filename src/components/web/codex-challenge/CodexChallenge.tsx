@@ -62,123 +62,120 @@ export default function CodexChallenge({
   }
 
   return (
-    <main className={styles.contentContainer}>
-      <h1 className={styles.title}>Codex Challenge</h1>
-      <div className={styles.content}>
-        {(() => {
-          switch (mode) {
-            case Mode.CodexChallenge:
-              return (
-                <>
-                  <RandomSongPicker
-                    dutchSongs={dutchSongs}
-                    frenchSongs={frenchSongs}
-                    germanSongs={germanSongs}
-                    otherSongs={otherSongs}
-                    song={song}
-                    alreadySelectedSongs={songSet}
-                    setSong={(newSong: Song) => {
-                      if (addedScore || song === undefined) {
-                        setSong(newSong);
-                        setSongSet((prev) => new Set(prev).add(newSong));
-                        setAddedScore(false);
-                      }
-                    }}
-                  ></RandomSongPicker>
-                  <div className={styles.challengeContainer}>
-                    <p>{`Totaal: ${Object.values(totalScore).reduce((acc, e) => acc + e, 0)}/20`}</p>
-                    {song ? (
-                      <div className={styles.scoreButtonsContainer}>
-                        <Button
-                          variant="secondary"
-                          onClick={createScoreHandler(2)}
-                        >
-                          2 punten
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={createScoreHandler(1)}
-                        >
-                          1 punt
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={createScoreHandler(0)}
-                        >
-                          0 punten
-                        </Button>
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                    <div className={styles.buttonContainer}>
-                      <Button variant="danger" onClick={() => goBack()}>
-                        Terug
+    <div className={styles.content}>
+      {(() => {
+        switch (mode) {
+          case Mode.CodexChallenge:
+            return (
+              <>
+                <RandomSongPicker
+                  dutchSongs={dutchSongs}
+                  frenchSongs={frenchSongs}
+                  germanSongs={germanSongs}
+                  otherSongs={otherSongs}
+                  song={song}
+                  alreadySelectedSongs={songSet}
+                  setSong={(newSong: Song) => {
+                    if (addedScore || song === undefined) {
+                      setSong(newSong);
+                      setSongSet((prev) => new Set(prev).add(newSong));
+                      setAddedScore(false);
+                    }
+                  }}
+                ></RandomSongPicker>
+                <div className={styles.challengeContainer}>
+                  <p>{`Totaal: ${Object.values(totalScore).reduce((acc, e) => acc + e, 0)}/20`}</p>
+                  {song ? (
+                    <div className={styles.scoreButtonsContainer}>
+                      <Button
+                        variant="secondary"
+                        onClick={createScoreHandler(2)}
+                      >
+                        2 punten
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        onClick={createScoreHandler(1)}
+                      >
+                        1 punt
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        onClick={createScoreHandler(0)}
+                      >
+                        0 punten
                       </Button>
                     </div>
-                  </div>
-                </>
-              );
-            case Mode.Randomizer:
-              return (
-                <>
-                  <RandomSongPicker
-                    dutchSongs={dutchSongs}
-                    frenchSongs={frenchSongs}
-                    germanSongs={germanSongs}
-                    otherSongs={otherSongs}
-                    song={song}
-                    setSong={setSong}
-                  />
+                  ) : (
+                    ""
+                  )}
                   <div className={styles.buttonContainer}>
-                    <Button
-                      variant="danger"
-                      className={styles.returnButton}
-                      onClick={() => goBack()}
-                    >
+                    <Button variant="danger" onClick={() => goBack()}>
                       Terug
                     </Button>
                   </div>
-                </>
-              );
-            case Mode.Menu:
-              return (
-                <>
-                  <div className={styles.challengeInformation}>
-                    <p>Welkom tot de codex challenge. </p>
-                    <p>
-                      Voor de challenge wordt gevraagd om de eerste strofe en
-                      het refrein te zingen met codex, tenzij anders vermeld.
-                    </p>
-                    <p>
-                      Elk lied staat op 2 punten en er worden 10 liedjes
-                      gevraagd. Je kan dus 20 punten in totaal scoren.
-                    </p>
-                    <p>Je slaagt als je minstens 10 op 20 haalt.</p>
-                    <p>
-                      Er worden 4 nederland-, 3 frans-, 2 duits- en 1 anders- of
-                      engelstalige liedjes gevraagd.
-                    </p>
-                  </div>
-                  <div className={styles.buttonContainer}>
-                    <Button
-                      className={styles.button}
-                      onClick={() => setMode(Mode.CodexChallenge)}
-                    >
-                      Challenge starten
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      onClick={() => setMode(Mode.Randomizer)}
-                    >
-                      Oefenen
-                    </Button>
-                  </div>
-                </>
-              );
-          }
-        })()}
-      </div>
-    </main>
+                </div>
+              </>
+            );
+          case Mode.Randomizer:
+            return (
+              <>
+                <RandomSongPicker
+                  dutchSongs={dutchSongs}
+                  frenchSongs={frenchSongs}
+                  germanSongs={germanSongs}
+                  otherSongs={otherSongs}
+                  song={song}
+                  setSong={setSong}
+                />
+                <div className={styles.buttonContainer}>
+                  <Button
+                    variant="danger"
+                    className={styles.returnButton}
+                    onClick={() => goBack()}
+                  >
+                    Terug
+                  </Button>
+                </div>
+              </>
+            );
+          case Mode.Menu:
+            return (
+              <>
+                <div className={styles.challengeInformation}>
+                  <p>Welkom tot de codex challenge. </p>
+                  <p>
+                    Voor de challenge wordt gevraagd om de eerste strofe en het
+                    refrein te zingen met codex, tenzij anders vermeld.
+                  </p>
+                  <p>
+                    Elk lied staat op 2 punten en er worden 10 liedjes gevraagd.
+                    Je kan dus 20 punten in totaal scoren.
+                  </p>
+                  <p>Je slaagt als je minstens 10 op 20 haalt.</p>
+                  <p>
+                    Er worden 4 nederland-, 3 frans-, 2 duits- en 1 anders- of
+                    engelstalige liedjes gevraagd.
+                  </p>
+                </div>
+                <div className={styles.buttonContainer}>
+                  <Button
+                    className={styles.button}
+                    onClick={() => setMode(Mode.CodexChallenge)}
+                  >
+                    Challenge starten
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setMode(Mode.Randomizer)}
+                  >
+                    Oefenen
+                  </Button>
+                </div>
+              </>
+            );
+        }
+      })()}
+    </div>
   );
 }

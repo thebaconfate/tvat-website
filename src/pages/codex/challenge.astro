@@ -1,8 +1,8 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import CodexChallenge from "../../components/codex/challenge/codex-challenge/CodexChallenge";
 import { readFileSync } from "fs";
 import { Language, type Song } from "../../lib/codex-challenge";
+import CodexChallengePage from "@/components/web/codex-challenge/CodexChallengePage.astro";
 
 export const prerender = true;
 const title = "Codex Challenge";
@@ -20,11 +20,10 @@ const otherSongs = songs.filter(
 ---
 
 <Layout title={title}>
-  <CodexChallenge
+  <CodexChallengePage
     dutchSongs={dutchSongs}
     frenchSongs={frenchSongs}
     germanSongs={germanSongs}
     otherSongs={otherSongs}
-    client:load
   />
 </Layout>
