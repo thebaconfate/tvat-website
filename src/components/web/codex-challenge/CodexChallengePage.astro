@@ -2,6 +2,9 @@
 import styles from "./CodexChallengePage.module.css";
 import CodexChallenge from "./CodexChallenge.tsx";
 import type { Song } from "@/lib/codex-challenge";
+
+// TODO: Refactor the Song interface to be up to date
+// with modern Zod
 interface Props {
   dutchSongs: Song[];
   frenchSongs: Song[];
