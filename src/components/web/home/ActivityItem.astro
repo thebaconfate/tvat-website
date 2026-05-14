@@ -30,7 +30,7 @@ function createMapUrl(location: string) {
   <li>
     {
       capitalize(
-        formatDate(new Date(activity.date), locale, {
+        formatDate(new Date(activity.occursAt), locale, {
           weekday: "long",
           month: "long",
           day: "numeric",
@@ -39,7 +39,14 @@ function createMapUrl(location: string) {
       )
     }
   </li>
-  <li>{activity.time}</li>
+  <li>
+    {
+      formatDate(new Date(activity.occursAt), locale, {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    }
+  </li>
   <li>
     <a
       href={activity.location.url
