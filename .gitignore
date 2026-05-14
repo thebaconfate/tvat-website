@@ -29,6 +29,5 @@ pnpm-debug.log*
 
 populate-*.sql
 
-migrate/
-.migrations.sql
+migrate/*.sql
 .venv/
