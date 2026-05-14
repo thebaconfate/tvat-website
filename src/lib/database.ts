@@ -20,7 +20,6 @@ class Database {
       try {
         this.pool = new Pool(this.config);
         await this.pool.query("SELECT 1");
-        console.log("Database connected");
         return this.pool;
       } catch (err: any) {
         console.warn(

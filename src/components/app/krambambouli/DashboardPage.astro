@@ -1,0 +1,106 @@
+---
+
+---
+
+<div class="filters"></div>
+<table>
+  <thead>
+    <th>Datum</th>
+    <th>Naam</th>
+    <th>Email</th>
+    {
+      products.map((p) => (
+        <th>
+          {p.name
+            .toLowerCase()
+            .replace("krambambouli ", "")
+            .trimStart()
+            .replace(/^./, (c) => c.toUpperCase())}
+        </th>
+      ))
+    }
+    <th>Ophaallocatie</th>
+    <th>Prijs</th>
+    <th>Betaald?</th>
+    <th>Opgehaald?</th>
+  </thead>
+  <tbody>
+    {
+      page.content.map((order, index) => (
+        <tr class={index % 2 === 1 ? "coloured" : ""}>
+          <td>{dateToDDMM(order.createdAt)}</td>
+          <td class="name">{`${order.firstName} ${order.lastName}`}</td>
+          <td>{order.email}</td>
+          {products.map((p) => (
+            <td>
+              {order.orders.find((o) => o.productId === p.id)?.amount ?? 0}
+            </td>
+          ))}
+          <td>
+            {fmtLocation({
+              description: order.description,
+              streetName: order.streetName,
+              houseNumber: order.houseNumber,
+              bus: order.bus,
+              post: order.post,
+              city: order.city,
+            })}
+          </td>
+          <td>{fmtPrice(order.owed.euros, order.owed.cents)}</td>
+          <td>
+            <Checkbox
+              client:visible
+              customerId={order.customerId}
+              currentValue={order.paid}
+              endpoint="/api/krambambouli/toggle-payment"
+              bodyKey="paid"
+            />
+          </td>
+          <td>
+            <Checkbox
+              client:visible
+              customerId={order.customerId}
+              currentValue={order.fulfilled}
+              endpoint="/api/krambambouli/toggle-fulfilled"
+              bodyKey="fulfilled"
+            />
+          </td>
+        </tr>
+      ))
+    }
+    <tr class={(page.content.length + 1) % 2 === 1 ? "coloured" : ""}>
+      <td></td>
+      <td class="name">Totaal</td>
+      <td></td>
+      {
+        products.map((p) => (
+          <td>{totals.products.find((_p) => _p.id === p.id)?.amount ?? 0}</td>
+        ))
+      }
+      <td></td>
+      <td>{totals.yield.toString()}</td>
+    </tr>
+  </tbody>
+</table>
+<style>
+  table {
+    margin: 1rem;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid transparent;
+    color: black;
+  }
+
+  tr:nth-child(even) {
+    background-color: rgba(222, 208, 225, 1);
+  }
+
+  .name {
+    font-weight: bold;
+  }
+</style>

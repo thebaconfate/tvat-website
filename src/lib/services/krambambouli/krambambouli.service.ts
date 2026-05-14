@@ -9,7 +9,7 @@ class KrambambouliService {
   async formActive(): Promise<boolean> {
     const sql = `
         SELECT c.config_value AS "configValue"
-        FROM config c WHERE c.config_key ILIKE 'krambambouli_enabled'
+        FROM config c WHERE c.config_key ILIKE 'krambambouli_form_enabled'
         `;
     const result = await database.query<{ configValue: boolean }>(sql);
     const [row] = result.rows;
@@ -23,10 +23,7 @@ class KrambambouliService {
         p.name,
         p.description,
         p.image_url as "imageUrl",
-        json_build_object(
-            'euros', p.euros,
-            'cents', p.cents
-        ) as "price"
+        p.price as "price"
     FROM products p
     WHERE p.active = TRUE
         AND p.category ILIKE '%krambambouli%'
@@ -42,10 +39,7 @@ class KrambambouliService {
         dz.name,
         dz.postal_code_to AS "postalCodeTo",
         dz.postal_code_from AS "postalCodeFrom",
-        json_build_object(
-            'euros', dz.euros,
-            'cents', dz.cents
-        ) AS "price"
+        dz.price AS "price"
     FROM krambambouli_delivery_zones dz
     WHERE dz.active = TRUE
     `;

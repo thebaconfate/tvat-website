@@ -3,8 +3,7 @@ import { pageSchema } from "../page/page.schema";
 
 export const activitySchema = z.object({
   name: z.string().min(3),
-  date: z.iso.date(),
-  time: z.iso.time(),
+  occursAt: z.iso.datetime(),
   location: z.object({
     name: z.string(),
     address: z.string().nullish(),

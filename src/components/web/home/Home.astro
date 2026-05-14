@@ -9,7 +9,7 @@ import { websiteRoutes } from "@/lib/oldRoutes";
 
 const activities = await activityService.fetchActivityPage(
   new URLSearchParams([
-    ["dateAfter", new Date().toJSON()],
+    ["dateAfter", new Date().toISOString().split("T")[0]],
     ["size", String(2)],
   ]),
 );

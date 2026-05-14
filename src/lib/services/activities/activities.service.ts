@@ -25,12 +25,12 @@ class ActivityService {
 
     if (urlSearchParams.has("dateBefore")) {
       values.push(`${urlSearchParams.get("dateBefore")}`);
-      filters.push(`date <= $${values.length}`);
+      filters.push(`occurs_at <= $${values.length}`);
     }
 
     if (urlSearchParams.has("dateAfter")) {
       values.push(`${urlSearchParams.get("dateAfter")}`);
-      filters.push(`date >= $${values.length}`);
+      filters.push(`occurs_at >= $${values.length}`);
     }
     if (urlSearchParams.has("location")) {
       values.push(`%${urlSearchParams.get("location")}%`);
@@ -44,8 +44,7 @@ class ActivityService {
     SELECT
         id,
         name,
-        date,
-        time,
+        occurs_at AS occursAt,
         json_build_object(
             'name', location_name,
             'url', location_url,
@@ -53,7 +52,7 @@ class ActivityService {
         ) AS location
     FROM activities
     ${whereClause}
-    ORDER BY date, time ASC
+    ORDER BY occurs_at ASC
     LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
     const [countResult, contentResult] = await Promise.all([
       database.query<{ total: number }>(countQuery, values),
