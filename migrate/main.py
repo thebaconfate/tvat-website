@@ -155,7 +155,7 @@ def migrate_customers():
         ORDER BY c.id ASC;
     """
     insert_sql = """
-        INSERT INTO krambambouli_customers (email, first_name, last_name)
+        INSERT INTO customers (email, first_name, last_name)
         VALUES (%s, %s, %s)
         ON CONFLICT (email) DO NOTHING
     """
@@ -186,46 +186,6 @@ def migrate_pickup_locations():
     migrate(select_sql, None, insert_sql, create_params)
 
 
-def migrate_orders():
-    pass
-
-
-def migrate_pickup_orders():
-    select_sql = """
-        SELECT
-            c.email,
-            c.owed_euros * 100 + c.owed_cents AS total_owed,
-            c.paid,
-            c.created_at,
-            c.fulfilled,
-            pl.description,
-            JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        'amount', o.amount,
-                        'product_name', p.name,
-                        'product_description', p.description,
-                        'price', p.euros * 100 + p.cents,
-                        'image_url', p.image_url)) AS orders
-        FROM krambambouli_customers c
-        JOIN krambambouli_orders o
-        ON c.id = o.customer_id
-        JOIN products p
-        ON o.product_id = p.id
-        JOIN krambambouli_pickup_locations kpl
-        ON c.id = kpl.customer_id
-        JOIN pickup_locations pl
-        ON kpl.pickup_location_id = pl.id
-        GROUP BY c.id
-    """
-    with connection.MySQLConnection(**MYSQL_CONFIG) as conn:
-        cursor = conn.cursor()
-        cursor.execute(select_sql, [])
-        row = cursor.fetchone()
-        while row is not None:
-            print(row)
-            row = cursor.fetchone()
-
-
 def migrate_users():
     select_sql = """
         SELECT
@@ -244,6 +204,82 @@ def migrate_users():
     migrate(select_sql, [], insert_sql, create_params)
 
 
+def migrate_pickup_orders():
+    select_from_mysql = """
+        SELECT
+            c.email,
+            c.owed_euros * 100 + c.owed_cents AS total_owed,
+            c.paid,
+            c.created_at,
+            c.fulfilled,
+            pl.description,
+            pl.active,
+            JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'amount', o.amount,
+                        'product_name', p.name,
+                        'product_description', p.description,
+                        'price', p.euros * 100 + p.cents,
+                        'image_url', p.image_url)) AS orders
+        FROM krambambouli_customers c
+        JOIN krambambouli_orders o
+        ON c.id = o.customer_id
+        JOIN products p
+        ON o.product_id = p.id
+        JOIN krambambouli_pickup_locations kpl
+        ON c.id = kpl.customer_id
+        JOIN pickup_locations pl
+        ON kpl.pickup_location_id = pl.id
+        GROUP BY c.id, pl.description, pl.active
+    """
+    select_customer_id_sql = """
+        SELECT id
+        FROM customers c
+        WHERE c.email = %s
+    """
+    select_pickup_location_id_sql = """
+        SELECT id
+        FROM krambambouli_pickup_locations l
+        WHERE l.name = %s AND l.active = %s
+    """
+    with connection.MySQLConnection(**MYSQL_CONFIG) as conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(select_from_mysql, [])
+        row = cursor.fetchone()
+        with psycopg.connect(pgc) as conn:
+            with conn.cursor() as c:
+                while row is not None:
+                    row = cast(Row, row)
+                    c.execute(select_customer_id_sql, [row["email"]])
+                    email = c.fetchone()
+                    if email is None:
+                        raise Exception("customer_id not found")
+                    email = email[0]
+                    c.execute(
+                        select_pickup_location_id_sql,
+                        (row["description"], bool(row["active"])),
+                    )
+                    pickup_id = c.fetchone()
+                    if pickup_id is None:
+                        raise Exception("pickup id not found")
+                    pickup_id = pickup_id[0]
+                    order = (
+                        email,
+                        "pickup",
+                        pickup_id,
+                        row["total_owed"],
+                        row["paid"],
+                        row["fulfilled"],
+                        row["created_at"],
+                    )
+                    print(order)
+                    row = cursor.fetchone()
+
+
+def migrate_orders():
+    pass
+
+
 def migrate_all():
     migrate_users()
     migrate_pickup_locations()
@@ -252,4 +288,5 @@ def migrate_all():
 
 
 if __name__ == "__main__":
+    # migrate_all()
     migrate_pickup_orders()

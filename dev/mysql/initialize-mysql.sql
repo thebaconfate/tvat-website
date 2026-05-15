@@ -79,7 +79,7 @@ CREATE TABLE krambambouli_delivery_zones (
     active BOOLEAN DEFAULT TRUE
 );
 
-CREATE TABLE IF NOT EXISTS krambambouli_customers (
+CREATE TABLE IF NOT EXISTS customers (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
