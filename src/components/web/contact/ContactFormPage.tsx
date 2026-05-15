@@ -4,10 +4,12 @@ import { useForm } from "@tanstack/react-form";
 import { contactFormSchema } from "@/lib/domain/contact";
 import { Button } from "@/components/shared/Button";
 import { useState } from "react";
+import Input from "@/components/shared/Input";
+import Textarea from "@/components/shared/Textarea";
 
 type FormState = "edit" | "success" | "error";
 
-export default function ContactForm() {
+export default function ContactFormPage() {
   const [formState, setFormState] = useState<FormState>("edit");
   const form = useForm({
     defaultValues: {
@@ -82,7 +84,7 @@ export default function ContactForm() {
               {(field) => (
                 <label htmlFor={field.name} className={styles.inputContainer}>
                   Naam
-                  <input
+                  <Input
                     id={field.name}
                     type="text"
                     value={field.state.value}
@@ -97,7 +99,7 @@ export default function ContactForm() {
               {(field) => (
                 <label htmlFor={field.name} className={styles.inputContainer}>
                   E-mail
-                  <input
+                  <Input
                     id={field.name}
                     type="email"
                     value={field.state.value}
@@ -112,10 +114,11 @@ export default function ContactForm() {
               {(field) => (
                 <label htmlFor={field.name} className={styles.inputContainer}>
                   Onderwerp
-                  <input
+                  <Input
                     id={field.name}
                     type="text"
                     maxLength={20}
+                    className={styles.input}
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     required
@@ -128,14 +131,15 @@ export default function ContactForm() {
               {(field) => (
                 <div className={styles.messageContainer}>
                   <label htmlFor="message">Bericht</label>
-                  <textarea
+                  <Textarea
                     id="message"
                     name="message"
+                    className={styles.textarea}
                     rows={5}
                     required
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                  ></textarea>
+                  ></Textarea>
                 </div>
               )}
             </form.Field>

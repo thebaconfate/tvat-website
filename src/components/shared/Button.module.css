@@ -1,18 +1,14 @@
 .button {
   font: inherit;
   font-weight: 500;
-
   border: none;
   border-radius: 8px;
-
   padding: 0.5rem 1rem;
   cursor: pointer;
-
   transition:
     background-color 0.15s ease,
     color 0.15s ease,
     transform 0.05s ease;
-
   user-select: none;
   text-decoration: none;
 }

@@ -190,6 +190,42 @@ def migrate_orders():
     pass
 
 
+def migrate_pickup_orders():
+    select_sql = """
+        SELECT
+            c.email,
+            c.owed_euros * 100 + c.owed_cents AS total_owed,
+            c.paid,
+            c.created_at,
+            c.fulfilled,
+            pl.description,
+            JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'amount', o.amount,
+                        'product_name', p.name,
+                        'product_description', p.description,
+                        'price', p.euros * 100 + p.cents,
+                        'image_url', p.image_url)) AS orders
+        FROM krambambouli_customers c
+        JOIN krambambouli_orders o
+        ON c.id = o.customer_id
+        JOIN products p
+        ON o.product_id = p.id
+        JOIN krambambouli_pickup_locations kpl
+        ON c.id = kpl.customer_id
+        JOIN pickup_locations pl
+        ON kpl.pickup_location_id = pl.id
+        GROUP BY c.id
+    """
+    with connection.MySQLConnection(**MYSQL_CONFIG) as conn:
+        cursor = conn.cursor()
+        cursor.execute(select_sql, [])
+        row = cursor.fetchone()
+        while row is not None:
+            print(row)
+            row = cursor.fetchone()
+
+
 def migrate_users():
     select_sql = """
         SELECT
@@ -216,4 +252,4 @@ def migrate_all():
 
 
 if __name__ == "__main__":
-    pass
+    migrate_pickup_orders()
