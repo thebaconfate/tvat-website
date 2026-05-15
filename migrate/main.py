@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from typing import Dict, cast
 from mysql.connector.types import RowItemType
@@ -242,6 +243,12 @@ def migrate_pickup_orders():
         FROM krambambouli_pickup_locations l
         WHERE l.name = %s AND l.active = %s
     """
+    insert_order_sql = """
+        INSERT INTO krambambouli_orders
+        (customer_id, delivery_option, pickup_location_id, total_owed, paid,
+         received, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """
     with connection.MySQLConnection(**MYSQL_CONFIG) as conn:
         cursor = conn.cursor(dictionary=True)
         cursor.execute(select_from_mysql, [])
@@ -263,16 +270,19 @@ def migrate_pickup_orders():
                     if pickup_id is None:
                         raise Exception("pickup id not found")
                     pickup_id = pickup_id[0]
+                    created_at = cast(datetime, row["created_at"])
                     order = (
                         email,
                         "pickup",
                         pickup_id,
                         row["total_owed"],
-                        row["paid"],
-                        row["fulfilled"],
+                        bool(row["paid"]),
+                        bool(row["fulfilled"])
+                        if created_at > datetime(2025, 1, 1)
+                        else bool(row["paid"]),
                         row["created_at"],
                     )
-                    print(order)
+                    c.execute(insert_order_sql, order)
                     row = cursor.fetchone()
 
 
@@ -288,5 +298,5 @@ def migrate_all():
 
 
 if __name__ == "__main__":
-    # migrate_all()
+    migrate_all()
     migrate_pickup_orders()
