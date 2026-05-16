@@ -1,10 +1,12 @@
 from datetime import datetime
 import os
-from typing import Dict, cast
+from typing import Dict, List, cast
 from mysql.connector.types import RowItemType
 import psycopg
 import dotenv
+import json
 from mysql.connector import connection
+
 
 dotenv.load_dotenv()
 credentials = {"HOST", "PASSWORD", "USER", "DATABASE"}
@@ -205,6 +207,35 @@ def migrate_users():
     migrate(select_sql, [], insert_sql, create_params)
 
 
+def migrate_order_items(order_id, order_items, pg_cursor):
+    select_product_id = """
+        SELECT p.id
+        FROM products p
+        WHERE p.name = %s
+        AND p.description = %s
+        AND p.price = %s
+        AND p.image_url = %s
+    """
+    insert_order_item_sql = """
+        INSERT INTO krambambouli_order_items
+        (order_id, product_id, amount)
+        VALUES (%s, %s, %s)
+    """
+    for item in order_items:
+        params = (
+            item["product_name"],
+            item["product_description"],
+            item["price"],
+            item["image_url"],
+        )
+        pg_cursor.execute(select_product_id, params)
+        product_id = pg_cursor.fetchone()
+        if product_id is None:
+            raise Exception("Product id not found")
+        product_id = product_id[0]
+        pg_cursor.execute(insert_order_item_sql, (order_id, product_id, item["amount"]))
+
+
 def migrate_pickup_orders():
     select_from_mysql = """
         SELECT
@@ -248,6 +279,7 @@ def migrate_pickup_orders():
         (customer_id, delivery_option, pickup_location_id, total_owed, paid,
          received, created_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
+        RETURNING id;
     """
     with connection.MySQLConnection(**MYSQL_CONFIG) as conn:
         cursor = conn.cursor(dictionary=True)
@@ -271,6 +303,10 @@ def migrate_pickup_orders():
                         raise Exception("pickup id not found")
                     pickup_id = pickup_id[0]
                     created_at = cast(datetime, row["created_at"])
+                    order_items = row["orders"]
+                    order_items = cast(str, order_items)
+                    order_items = json.loads(order_items)
+                    order_items = cast(List[Dict[str, int | str]], order_items)
                     order = (
                         email,
                         "pickup",
@@ -283,6 +319,14 @@ def migrate_pickup_orders():
                         row["created_at"],
                     )
                     c.execute(insert_order_sql, order)
+                    order_insert_result = c.fetchone()
+                    if order_insert_result is None:
+                        raise Exception("""
+                                        Something went wrong when inserting the
+                                        order
+                                        """)
+                    order_id = order_insert_result[0]
+                    migrate_order_items(order_id, order_items, c)
                     row = cursor.fetchone()
 
 
