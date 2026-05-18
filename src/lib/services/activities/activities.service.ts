@@ -44,7 +44,7 @@ class ActivityService {
     SELECT
         id,
         name,
-        occurs_at AS occursAt,
+        occurs_at AS "occursAt",
         json_build_object(
             'name', location_name,
             'url', location_url,
