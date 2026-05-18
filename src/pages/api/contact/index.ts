@@ -21,24 +21,42 @@ export async function POST({ request }: APIContext) {
       message: sanitizeHtml(rawForm.message.replace(/\n/g, "<br>")),
     };
     const html = `
-<h2>Contact form submission</h2>
-<p><strong>Name:</strong> ${form.name || "N/A"}</p>
-<p><strong>Email:</strong> ${form.email}</p>
-<p><strong>Subject:</strong> ${form.subject || "N/A"}</p>
-<p><strong>Message:</strong></p>
-<p>${form.message}</p>
-<hr>
-<p><em>Sent from website contact form</em></p>
-`;
-    const url = new URL(request.url);
+        <p><strong>Name:</strong> ${form.name || "N/A"}</p>
+        <p><strong>Email:</strong> ${form.email}</p>
+        <p><strong>Subject:</strong> ${form.subject || "N/A"}</p>
+        <p><strong>Message:</strong></p>
+        <p>${form.message}</p>
+        <hr>`;
+    const tvatHtml = `
+        <h2>Contact form submission</h2>
+        ${html}
+        <p><em>Sent from website contact form</em></p>
+        `;
     const { error } = await resend.emails.send({
-      from: `${form.name} <noreply@${config.resend.domain}>`,
+      from: `${form.name} <contact-form@${config.resend.domain}>`,
       to: `${config.email}`,
       subject: form.subject,
-      html: html,
+      html: tvatHtml,
       replyTo: `${form.name} <${form.email}>`,
     });
-    if (!error) return new Response(null, { status: 200 });
+    if (!error) {
+      const submiteeHtml = `
+        <h2>Thank you for submitting the form</h2>
+        <h3>Your form details:</h3>
+        ${html}`;
+      try {
+        const { error } = await resend.emails.send({
+          from: `'t VAT <contact-form${config.resend.domain}>`,
+          to: `${form.email}`,
+          subject: `CONTACT FORM SUBMISSION`,
+          html: `${submiteeHtml}`,
+          replyTo: config.email,
+        });
+        console.log(error);
+      } finally {
+        return new Response(null, { status: 200 });
+      }
+    }
     if (error.statusCode == 429) {
       resendService.enqueue("contact", form, form.email);
       return new Response(null, { status: 200 });
