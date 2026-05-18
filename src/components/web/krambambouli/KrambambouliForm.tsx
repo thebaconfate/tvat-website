@@ -14,6 +14,7 @@ import z4 from "zod/v4";
 import { productSchema } from "@/lib/domain/products";
 import { fromCents } from "@/lib/domain/price/price.utils";
 import { Button } from "@/components/shared/Button";
+import type { PriceData } from "@/lib/domain/price";
 
 interface Props {
   products: KrambambouliProductData[];
@@ -42,7 +43,7 @@ function dateToDDMMYYYY(date: Date) {
 
 type ZoneUI = {
   name: string;
-  price: { euros: number; cents: number };
+  price: PriceData;
   ranges: { from: number; to: number }[];
 };
 export default function KrambambouliForm({
@@ -231,7 +232,7 @@ export default function KrambambouliForm({
                     <h3 className={styles.productTitle}>{product.name}</h3>
                     <div className={styles.productDetails}>
                       <p>{product.description}</p>
-                      <p>{`€${product.price.euros},${product.price.cents === 0 ? "-" : product.price.cents}`}</p>
+                      <p>{`€${Math.floor(product.price / 100)},${product.price % 100 === 0 ? "-" : product.price % 100}`}</p>
                     </div>
                     <form.Field name={`cart[${i}].amount`}>
                       {(field) => (
@@ -429,7 +430,7 @@ export default function KrambambouliForm({
                                     />
                                     {`Levering ${loc.name}`}
                                   </label>
-                                  <p>{`€${loc.price.euros},${loc.price.cents === 0 ? "-" : loc.price.cents}`}</p>
+                                  <p>{`€${Math.floor(loc.price / 100)},${loc.price % 100 === 0 ? "-" : loc.price % 100}`}</p>
                                 </span>
                               )}
                             </form.Field>
@@ -545,10 +546,7 @@ export default function KrambambouliForm({
               let totalCents = observable.cart.reduce((acc, current) => {
                 const amount = current.amount;
                 if (amount === 0) return acc;
-                return (
-                  acc +
-                  amount * (current.price.euros * 100 + current.price.cents)
-                );
+                return acc + amount * current.price;
               }, 0);
               if (observable.deliveryOption === DeliveryOptionEnum.delivery) {
                 const deliveryZone =
@@ -562,9 +560,7 @@ export default function KrambambouliForm({
                   uniqueDeliveryOptions?.find(
                     (l) => l.name === observable.deliveryZone,
                   );
-                if (deliveryZone)
-                  totalCents +=
-                    deliveryZone.price.euros * 100 + deliveryZone.price.cents;
+                if (deliveryZone) totalCents += deliveryZone.price;
               }
               const total = fromCents(totalCents);
               return (

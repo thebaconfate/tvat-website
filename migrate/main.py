@@ -57,70 +57,6 @@ def migrate(select_sql, params, insert_sql, create_params):
                     row = cursor.fetchone()
 
 
-select_pickups_sql = """
-        SELECT
-            c.first_name,
-            c.last_name,
-            c.email,
-            c.owed_euros * 100 + c.owed_cents AS total_owed,
-            c.paid,
-            c.created_at,
-            c.fulfilled,
-            p.description,
-            JSON_ARRAYAGG(JSON_OBJECT('amount', o.amount, 'product_name', products.name)) AS orders
-        FROM krambambouli_customers c
-        JOIN krambambouli_orders o
-            ON c.id = o.customer_id
-        JOIN krambambouli_pickup_locations pl
-            ON pl.customer_id = c.id
-        JOIN pickup_locations p
-            ON p.id = pl.pickup_location_id
-        JOIN products
-            ON products.id = o.product_id
-        GROUP BY
-            c.id,
-            p.description
-        ORDER BY c.id ASC;
-    """
-select_deliveries_sql = """
-        SELECT
-            kc.first_name,
-            kc.last_name,
-            kc.email,
-            kc.owed_euros * 100 + kc.owed_cents AS total_owed,
-            kc.paid,
-            kc.created_at,
-            kc.fulfilled,
-            kda.street_name,
-            kda.house_number,
-            kda.bus,
-            kda.post,
-            kda.city,
-            JSON_ARRAYAGG(JSON_OBJECT('product_name', p.name, 'amount', ko.amount)) AS orders
-        FROM krambambouli_customers kc
-        JOIN krambambouli_orders ko
-            ON kc.id = ko.customer_id
-        JOIN products p
-            ON p.id = ko.product_id
-        JOIN krambambouli_delivery_addresses kda
-            ON kc.id = kda.customer_id
-        GROUP BY
-            kc.first_name,
-            kc.last_name,
-            kc.email,
-            total_owed,
-            kc.paid,
-            kc.created_at,
-            kc.fulfilled,
-            kda.street_name,
-            kda.house_number,
-            kda.bus,
-            kda.post,
-            kda.city,
-            p.id;"
-    """
-
-
 def migrate_products():
     select_sql = """
         SELECT
@@ -443,6 +379,31 @@ def migrate_delivery_orders():
                     row = cursor.fetchone()
 
 
+def migrate_delivery_zones():
+    select_delivery_zones = """
+        SELECT
+            l.name,
+            l.euros * 100 + l.cents AS "price",
+            l.area_start,
+            l.area_end
+        FROM delivery_zones l;
+    """
+    insert_delivery_sql = """
+        INSERT INTO krambambouli_delivery_zones (
+                postal_code_from,
+                postal_code_to,
+                name,
+                price
+        )
+        VALUES (%s, %s, %s, %s)
+    """
+
+    def create_params(row):
+        return (row["area_start"], row["area_end"], row["name"], row["price"])
+
+    migrate(select_delivery_zones, [], insert_delivery_sql, create_params)
+
+
 def migrate_orders():
     migrate_pickup_orders()
     migrate_delivery_orders()
@@ -454,6 +415,7 @@ def migrate_all():
     migrate_products()
     migrate_customers()
     migrate_orders()
+    migrate_delivery_zones()
 
 
 if __name__ == "__main__":
