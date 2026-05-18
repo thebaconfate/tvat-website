@@ -290,10 +290,10 @@ def migrate_pickup_orders():
                 while row is not None:
                     row = cast(Row, row)
                     c.execute(select_customer_id_sql, [row["email"]])
-                    email = c.fetchone()
-                    if email is None:
+                    customer_id = c.fetchone()
+                    if customer_id is None:
                         raise Exception("customer_id not found")
-                    email = email[0]
+                    customer_id = customer_id[0]
                     c.execute(
                         select_pickup_location_id_sql,
                         (row["description"], bool(row["active"])),
@@ -308,7 +308,7 @@ def migrate_pickup_orders():
                     order_items = json.loads(order_items)
                     order_items = cast(List[Dict[str, int | str]], order_items)
                     order = (
-                        email,
+                        customer_id,
                         "pickup",
                         pickup_id,
                         row["total_owed"],
@@ -330,8 +330,56 @@ def migrate_pickup_orders():
                     row = cursor.fetchone()
 
 
+def migrate_delivery_orders():
+    select_from_mysql = """
+
+        SELECT
+            c.email,
+            c.owed_euros * 100 + c.owed_cents AS total_owed,
+            c.paid,
+            c.created_at,
+            c.fulfilled,
+            JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'amount', o.amount,
+                        'product_name', p.name,
+                        'product_description', p.description,
+                        'price', p.euros * 100 + p.cents,
+                        'image_url', p.image_url)) AS orders
+        FROM krambambouli_customers c
+        JOIN krambambouli_orders o
+        ON c.id = o.customer_id
+        JOIN products p
+        ON o.product_id = p.id
+        JOIN pickup_locations pl
+        ON kpl.pickup_location_id = pl.id
+        GROUP BY c.id
+    """
+    insert_order_sql = """
+
+        INSERT INTO krambambouli_orders (
+                customer_id,
+                delivery_option,
+                total_owed,
+                paid,
+                received,
+                created_at
+        )
+        VALUES
+        (%s, %s, %s, %s, %, %s)
+    """
+    with connection.MySQLConnection(**MYSQL_CONFIG) as conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(select_from_mysql, [])
+        row = cursor.fetchone()
+        with psycopg.connect(pgc) as conn:
+            with conn.cursor() as c:
+                pass
+
+
 def migrate_orders():
-    pass
+    migrate_pickup_orders()
+    migrate_delivery_orders()
 
 
 def migrate_all():
@@ -343,4 +391,4 @@ def migrate_all():
 
 if __name__ == "__main__":
     migrate_all()
-    migrate_pickup_orders()
+    migrate_orders()
