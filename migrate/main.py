@@ -332,13 +332,17 @@ def migrate_pickup_orders():
 
 def migrate_delivery_orders():
     select_from_mysql = """
-
         SELECT
             c.email,
             c.owed_euros * 100 + c.owed_cents AS total_owed,
             c.paid,
             c.created_at,
             c.fulfilled,
+            a.street_name,
+            a.house_number,
+            a.bus,
+            a.post,
+            a.city,
             JSON_ARRAYAGG(
                     JSON_OBJECT(
                         'amount', o.amount,
@@ -347,16 +351,26 @@ def migrate_delivery_orders():
                         'price', p.euros * 100 + p.cents,
                         'image_url', p.image_url)) AS orders
         FROM krambambouli_customers c
+        JOIN krambambouli_delivery_addresses a
+        ON c.id = a.customer_id
         JOIN krambambouli_orders o
         ON c.id = o.customer_id
         JOIN products p
         ON o.product_id = p.id
-        JOIN pickup_locations pl
-        ON kpl.pickup_location_id = pl.id
-        GROUP BY c.id
+        GROUP BY
+            c.id,
+            a.street_name,
+            a.house_number,
+            a.bus,
+            a.post,
+            a.city
+    """
+    select_customer_id_sql = """
+        SELECT id
+        FROM customers
+        WHERE email = %s
     """
     insert_order_sql = """
-
         INSERT INTO krambambouli_orders (
                 customer_id,
                 delivery_option,
@@ -366,7 +380,20 @@ def migrate_delivery_orders():
                 created_at
         )
         VALUES
-        (%s, %s, %s, %s, %, %s)
+        (%s, %s, %s, %s, %s, %s)
+        RETURNING id;
+    """
+    insert_delivery_sql = """
+        INSERT INTO krambambouli_delivery_locations (
+                order_id,
+                street_name,
+                house_number,
+                bus,
+                postal_code,
+                city
+        )
+        VALUES
+        (%s, %s, %s, %s, %s, %s)
     """
     with connection.MySQLConnection(**MYSQL_CONFIG) as conn:
         cursor = conn.cursor(dictionary=True)
@@ -374,7 +401,46 @@ def migrate_delivery_orders():
         row = cursor.fetchone()
         with psycopg.connect(pgc) as conn:
             with conn.cursor() as c:
-                pass
+                while row is not None:
+                    row = cast(Row, row)
+                    email = row["email"]
+                    c.execute(select_customer_id_sql, [email])
+                    customer_id = c.fetchone()
+                    if customer_id is None:
+                        raise Exception(f"customer_id not found for {email}")
+                    customer_id = customer_id[0]
+                    created_at = row["created_at"]
+                    created_at = cast(datetime, created_at)
+                    order = (
+                        customer_id,
+                        "delivery",
+                        row["total_owed"],
+                        bool(row["paid"]),
+                        bool(row["fulfilled"])
+                        if created_at > datetime(2025, 1, 1)
+                        else bool(row["paid"]),
+                        row["created_at"],
+                    )
+                    c.execute(insert_order_sql, order)
+                    order_id = c.fetchone()
+                    if order_id is None:
+                        raise Exception("order id not generated for some reason")
+                    order_id = order_id[0]
+                    order_items = row["orders"]
+                    order_items = cast(str, order_items)
+                    order_items = json.loads(order_items)
+                    order_items = cast(List[Dict[str, int | str]], order_items)
+                    delivery = (
+                        order_id,
+                        row["street_name"],
+                        row["house_number"],
+                        row["bus"],
+                        row["post"],
+                        row["city"],
+                    )
+                    c.execute(insert_delivery_sql, delivery)
+                    migrate_order_items(order_id, order_items, c)
+                    row = cursor.fetchone()
 
 
 def migrate_orders():
@@ -387,8 +453,8 @@ def migrate_all():
     migrate_pickup_locations()
     migrate_products()
     migrate_customers()
+    migrate_orders()
 
 
 if __name__ == "__main__":
     migrate_all()
-    migrate_orders()
