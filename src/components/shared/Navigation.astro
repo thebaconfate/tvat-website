@@ -1,60 +1,62 @@
 ---
-import style from "./Navigation.module.css";
+import styles from "./Navigation.module.css";
 import { websiteRoutes } from "@/lib/routes";
 ---
 
-<nav class={style.navContainer}>
-  <input type="checkbox" id="nav-toggle" class={style.navToggle} />
-  <label for="nav-toggle" class={style.navToggleLabel}>
+<nav class={styles.navContainer}>
+  <input type="checkbox" id="nav-toggle" class={styles.navToggle} />
+  <label for="nav-toggle" class={styles.navToggleLabel}>
     <svg width="30" height="30" viewBox="0 0 30 30">
       <path
-        class={style.line1}
+        class={styles.line1}
         d="M5 7h20"
         stroke="black"
         stroke-width="3"
         stroke-linecap="round"></path>
       <path
-        class={style.line2}
+        class={styles.line2}
         d="M5 15h20"
         stroke="black"
         stroke-width="3"
         stroke-linecap="round"></path>
       <path
-        class={style.line3}
+        class={styles.line3}
         d="M5 23h20"
         stroke="black"
         stroke-width="3"
         stroke-linecap="round"></path>
     </svg>
   </label>
-  <ul class={style.navList}>
+  <ul class={styles.navList}>
     <li>
-      <a class={style.navLink} href={websiteRoutes.home.url}>Home</a>
+      <a class={styles.navLink} href={websiteRoutes.home.url}>Home</a>
     </li>
     <li>
       <input
         type="checkbox"
         id="about-us-toggle"
-        class={style.dropdownToggle}
+        class={styles.dropdownToggle}
       />
-      <label for="about-us-toggle" class={style.dropdownToggleLabel}>
+      <label for="about-us-toggle" class={styles.dropdownToggleLabel}>
         <a>Over ons</a>
       </label>
       <ul>
         <li>
-          <a class={style.navLink} href={websiteRoutes.aboutUs.url}>Over ons</a>
+          <a class={styles.navLink} href={websiteRoutes.aboutUs.url}>Over ons</a
+          >
         </li>
         <li>
-          <a class={style.navLink} href={websiteRoutes.board.url}>Bestuur</a>
+          <a class={styles.navLink} href={websiteRoutes.board.url}>Bestuur</a>
         </li>
         <li>
-          <a class={style.navLink} href={websiteRoutes.clubsong.url}>Clublied</a
+          <a class={styles.navLink} href={websiteRoutes.clubsong.url}
+            >Clublied</a
           >
         </li>
       </ul>
     </li>
     <li>
-      <a class={style.navLink} href={websiteRoutes.contact.url}> Contact </a>
+      <a class={styles.navLink} href={websiteRoutes.contact.url}> Contact </a>
     </li>
     <!--
     <li>
@@ -62,7 +64,7 @@ import { websiteRoutes } from "@/lib/routes";
     </li>
     -->
     <li>
-      <a class={style.navLink} href={websiteRoutes.krambambouli.url}
+      <a class={styles.navLink} href={websiteRoutes.krambambouli.url}
         >Krambambouli</a
       >
     </li>
@@ -74,12 +76,13 @@ import { websiteRoutes } from "@/lib/routes";
         ].join("")}>Lustrumgalabal</a
       >
       -->
-    <li class={style.navlink}>
-      <a class={style.navLink} href={websiteRoutes.codex.url}>Codex challenge</a
+    <li class={styles.navlink}>
+      <a class={styles.navLink} href={websiteRoutes.codex.url}
+        >Codex challenge</a
       >
     </li>
     <li>
-      <a class={style.navLink} href={websiteRoutes.login.url}>login</a>
+      <a class={styles.navLink} href={websiteRoutes.login.url}>login</a>
     </li>
   </ul>
 </nav>
