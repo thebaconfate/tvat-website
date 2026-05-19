@@ -12,7 +12,6 @@ import {
 import { useForm } from "@tanstack/react-form";
 import z4 from "zod/v4";
 import { productSchema } from "@/lib/domain/products";
-import { fromCents } from "@/lib/domain/price/price.utils";
 import { Button } from "@/components/shared/Button";
 import type { PriceData } from "@/lib/domain/price";
 import { apiRoutes } from "@/lib/oldRoutes";
@@ -582,7 +581,7 @@ export default function KrambambouliForm({
             }}
           >
             {(observable) => {
-              let totalCents = observable.cart.reduce((acc, current) => {
+              let total = observable.cart.reduce((acc, current) => {
                 const amount = current.amount;
                 if (amount === 0) return acc;
                 return acc + amount * current.price;
@@ -599,14 +598,13 @@ export default function KrambambouliForm({
                   uniqueDeliveryOptions?.find(
                     (l) => l.name === observable.deliveryZone,
                   );
-                if (deliveryZone) totalCents += deliveryZone.price;
+                if (deliveryZone) total += deliveryZone.price;
               }
-              const total = fromCents(totalCents);
               return (
                 <div className={styles.informationContainer}>
                   <p>
                     Totaalbedrag{" "}
-                    <b>{`€${total.euros},${total.cents === 0 ? "-" : total.cents}`}</b>
+                    <b>{`€${Math.floor(total / 100)},${total % 100 === 0 ? "-" : total % 100}`}</b>
                   </p>
                   <p>
                     Over te schrijven naar de VATrekening:{" "}

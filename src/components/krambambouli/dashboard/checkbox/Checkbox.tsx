@@ -2,14 +2,14 @@ import { useState } from "react";
 import "./styles.css";
 
 interface Props {
-  customerId: number;
+  orderId: string;
   currentValue: boolean;
   endpoint: string;
   bodyKey: string;
 }
 
 export default function Checkbox({
-  customerId,
+  orderId: customerId,
   currentValue,
   endpoint,
   bodyKey,

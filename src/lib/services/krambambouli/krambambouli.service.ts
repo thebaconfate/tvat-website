@@ -5,6 +5,9 @@ import type {
   KrambambouliProductData,
   PickupLocationData,
 } from "@/lib/domain/krambambouli";
+import type { OrderData } from "@/lib/domain/krambambouli/order.types";
+import type { Page } from "@/lib/domain/page/page.types";
+import type { OrderInterface } from "@/lib/interfaces/database/order";
 
 class KrambambouliService {
   async formActive(): Promise<boolean> {
@@ -91,6 +94,13 @@ class KrambambouliService {
         totalOwed,
       ]);
     });
+  }
+
+  async getOrders(): Promise<Page<OrderData>> {
+    return {
+      page: { size: 0, number: 0, totalElements: 0, totalPages: 0 },
+      content: [],
+    };
   }
 }
 

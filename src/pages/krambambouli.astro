@@ -42,11 +42,7 @@ try {
       () => [],
     );
   }
-  deliveryLocations?.sort((loc1, loc2) =>
-    loc1.price.euros === loc2.price.euros
-      ? loc1.price.cents - loc2.price.cents
-      : loc1.price.euros - loc2.price.euros,
-  );
+  deliveryLocations?.sort((loc1, loc2) => loc1.price - loc2.price);
 } catch (e) {
   errors = e;
   [products, pickupLocations, deliveryLocations] = Array.from(
