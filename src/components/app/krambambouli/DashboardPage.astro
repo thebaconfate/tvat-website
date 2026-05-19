@@ -1,5 +1,17 @@
 ---
+import Checkbox from "@/components/krambambouli/dashboard/checkbox/Checkbox";
+import { formatDate } from "@/lib/domain/datetime";
+import { krambambouliService } from "@/lib/services/krambambouli";
+import { getLocale } from "@/lib/utils";
 
+const locale = getLocale(Astro.request);
+
+const [products, page] = await Promise.all([
+  krambambouliService.getKrambambouliProducts(),
+  krambambouliService.getOrders(),
+]);
+
+if (!products) return Astro.redirect("/500");
 ---
 
 <div class="filters"></div>
@@ -28,7 +40,7 @@
     {
       page.content.map((order, index) => (
         <tr class={index % 2 === 1 ? "coloured" : ""}>
-          <td>{dateToDDMM(order.createdAt)}</td>
+          <td>{formatDate(new Date(order.createdAt), locale, {})}</td>
           <td class="name">{`${order.firstName} ${order.lastName}`}</td>
           <td>{order.email}</td>
           {products.map((p) => (
@@ -36,21 +48,12 @@
               {order.orders.find((o) => o.productId === p.id)?.amount ?? 0}
             </td>
           ))}
-          <td>
-            {fmtLocation({
-              description: order.description,
-              streetName: order.streetName,
-              houseNumber: order.houseNumber,
-              bus: order.bus,
-              post: order.post,
-              city: order.city,
-            })}
-          </td>
-          <td>{fmtPrice(order.owed.euros, order.owed.cents)}</td>
+          <td>{"location palceholder"}</td>
+          <td>{`€${Math.floor(order.totalOwed / 100)},${order.totalOwed % 100 === 0 ? "-" : order.totalOwed % 100}`}</td>
           <td>
             <Checkbox
               client:visible
-              customerId={order.customerId}
+              orderId={order.id}
               currentValue={order.paid}
               endpoint="/api/krambambouli/toggle-payment"
               bodyKey="paid"
@@ -59,8 +62,8 @@
           <td>
             <Checkbox
               client:visible
-              customerId={order.customerId}
-              currentValue={order.fulfilled}
+              orderId={order.id}
+              currentValue={order.received}
               endpoint="/api/krambambouli/toggle-fulfilled"
               bodyKey="fulfilled"
             />
@@ -73,12 +76,10 @@
       <td class="name">Totaal</td>
       <td></td>
       {
-        products.map((p) => (
-          <td>{totals.products.find((_p) => _p.id === p.id)?.amount ?? 0}</td>
-        ))
+        "" // total per product
       }
       <td></td>
-      <td>{totals.yield.toString()}</td>
+      <td>{/* total  */}</td>
     </tr>
   </tbody>
 </table>
