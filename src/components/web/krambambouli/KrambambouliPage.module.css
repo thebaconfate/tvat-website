@@ -36,14 +36,22 @@
   grid-template-columns: 1.5rem auto;
   align-items: center;
   gap: calc(1rem / 2);
+  object-fit: contain;
 }
 
 .rowContainer svg {
+  height: 100%;
+  width: 100%;
   flex-shrink: 0;
 }
 
 .rowContainer > p {
   font-size: 1rem;
+}
+
+.altMessage {
+  text-align: center;
+  margin: 10%;
 }
 
 @media (min-width: 767px) {
@@ -52,6 +60,9 @@
   }
   .brouwers {
     width: 90%;
+  }
+  .altMessage {
+    margin: 2%;
   }
 }
 
