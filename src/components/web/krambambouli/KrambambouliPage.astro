@@ -49,7 +49,9 @@ const { errors, products, deliveryLocations, pickupLocations, formActive } =
     </ul>
     {
       errors ? (
-        <div>Something went wrong, contact the administrator...</div>
+        <div class={styles.altMessage}>
+          Something went wrong, contact the administrator...
+        </div>
       ) : products && deliveryLocations && pickupLocations && formActive ? (
         <KrambambouliForm
           products={products}
@@ -58,7 +60,10 @@ const { errors, products, deliveryLocations, pickupLocations, formActive } =
           client:load
         />
       ) : (
-        "Het formulier is niet langer beschikbaar. Indien u een bestelling heeft geplaatst zal er contact opgenomen worden"
+        <div class={styles.altMessage}>
+          Het formulier is niet langer beschikbaar. Indien u een bestelling
+          heeft geplaatst zal er contact opgenomen worden
+        </div>
       )
     }
   </div>
