@@ -38,6 +38,10 @@
   gap: calc(1rem / 2);
 }
 
+.rowContainer svg {
+  flex-shrink: 0;
+}
+
 .rowContainer > p {
   font-size: 1rem;
 }
