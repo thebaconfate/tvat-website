@@ -13,7 +13,7 @@
 li ul {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
   justify-content: space-around;
   align-items: center;
 }
@@ -21,7 +21,8 @@ li ul {
 .navList {
   list-style: none;
   position: absolute;
-  top: 100%;
+  top: 99%;
+  padding-top: 1rem;
   left: 0;
   right: 0;
   transition:
@@ -104,6 +105,10 @@ li ul {
 @media (min-width: 768px) {
   :root {
     --hamburger-height: 3rem;
+  }
+
+  .navList {
+    padding-top: unset;
   }
 }
 
