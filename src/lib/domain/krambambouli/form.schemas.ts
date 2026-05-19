@@ -5,12 +5,10 @@ export const deliveryOptionEnumSchema = z4.enum(["delivery", "pickup"]);
 const sharedFieldsSchema = z4.object({
   cart: z4
     .array(
-      z4
-        .object({
-          productId: z4.int(),
-          amount: z4.int().nonnegative(),
-        })
-        .loose(),
+      z4.object({
+        productId: z4.int(),
+        amount: z4.int().nonnegative(),
+      }),
     )
     .refine(
       (val) => val.reduce((prev, current) => prev + current.amount, 0) > 0,
@@ -24,7 +22,7 @@ const sharedFieldsSchema = z4.object({
 export const pickupFormSchema = z4.object({
   ...sharedFieldsSchema.shape,
   deliveryOption: z4.literal(deliveryOptionEnumSchema.enum.pickup),
-  pickupLocation: z4.int(),
+  pickupLocationId: z4.int(),
 });
 export const deliveryFormSchema = z4.object({
   ...sharedFieldsSchema.shape,

@@ -15,6 +15,7 @@ import { productSchema } from "@/lib/domain/products";
 import { fromCents } from "@/lib/domain/price/price.utils";
 import { Button } from "@/components/shared/Button";
 import type { PriceData } from "@/lib/domain/price";
+import { apiRoutes } from "@/lib/oldRoutes";
 
 interface Props {
   products: KrambambouliProductData[];
@@ -126,40 +127,78 @@ export default function KrambambouliForm({
                 message: "pickupLocation must be a valid location",
               });
           } else if (val.deliveryOption === DeliveryOptionEnum.delivery) {
+            if (
+              deliveryLocations &&
+              !deliveryLocations.find(
+                (e) =>
+                  e.postalCodeFrom <= Number(val.postcode) &&
+                  e.postalCodeTo >= Number(val.postcode),
+              )
+            ) {
+              ctx.addIssue({
+                code: "custom",
+                input: val.postcode,
+                path: [val.postcode],
+                message: "Invalid postcode",
+              });
+            }
           }
         }),
-      /*
-        .refine(
-          (val) =>
-            val.deliveryOption === DeliveryOptionEnum.delivery ||
-            pickupLocations.find((e) => e.id === val.pickupLocation),
-          { error: "Invalid pickup location" },
-        )
-        .refine(
-          (val) =>
-            val.deliveryOption === DeliveryOptionEnum.pickup ||
-            ([
-              val.deliveryZone,
-              val.streetName,
-              val.streetNumber,
-              val.postcode,
-              val.city,
-            ].every((v) => v !== "") &&
-              uniqueDeliveryOptions &&
-              uniqueDeliveryOptions.some((o) =>
-                o.ranges.some(
-                  (r) =>
-                    r.from <= parseInt(val.postcode) &&
-                    r.to >= parseInt(val.postcode),
-                ),
-              )),
-          { error: "Invalid delivery location" },
-        ),
-        */
     },
     onSubmit: async ({ value }) => {
-      alert(`Success! : ${JSON.stringify(value, null, 2)}`);
-      console.log(JSON.stringify(value, null, 2));
+      const url = [
+        apiRoutes.krambambouli.url,
+        apiRoutes.krambambouli.order.url,
+      ].join("");
+      const commonPayload = {
+        email: value.email,
+        firstName: value.firstName,
+        lastName: value.lastName,
+        deliveryOption: value.deliveryOption,
+        cart: value.cart.reduce(
+          (acc: { productId: number; amount: number }[], i) => {
+            if (i.amount > 0) acc.push({ productId: i.id, amount: i.amount });
+            return acc;
+          },
+          [],
+        ),
+      };
+      const disciminant =
+        value.deliveryOption === "pickup"
+          ? {
+              pickupLocationId: value.pickupLocation,
+            }
+          : {
+              streetName: value.streetName,
+              streetNumber: value.streetNumber,
+              bus: value.bus,
+              city: value.city,
+              postcode: value.postcode,
+            };
+      const payload = { ...commonPayload, ...disciminant };
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok)
+        try {
+          const responsePayload = await response.json();
+          setPopup({
+            title: PopupEnum.SUCCESS,
+            text:
+              responsePayload.message ??
+              "Jouw bestelling is succesvol opgenomen, check jouw inbox of spam ter bevestiging.",
+            show: true,
+          });
+        } catch (e) {
+          console.log(e);
+          setPopup({
+            title: PopupEnum.SUCCESS,
+            text: "Jouw bestelling is succesvol opgenomen, check jouw inbox of spam ter bevestiging.",
+            show: true,
+          });
+        }
     },
     onSubmitInvalid: ({ formApi }) => {
       const errors = Object.values(formApi.state.fieldMeta)

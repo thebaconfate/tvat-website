@@ -18,9 +18,9 @@ const websiteRoutes = {
   contact: { url: "/contact" },
   login: { url: "/login" },
   kalender: { url: "/kalender" },
-};
+} as const;
 
-const baseApiUrl = "/api";
+const baseApiUrl = "/api" as const;
 
 const apiRoutes = {
   krambambouli: {
@@ -37,5 +37,5 @@ const apiRoutes = {
   contact: {
     url: `${baseApiUrl}/contact`,
   },
-};
+} as const;
 export { websiteRoutes, apiRoutes };
