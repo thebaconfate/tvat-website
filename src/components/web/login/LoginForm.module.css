@@ -1,0 +1,133 @@
+:root {
+  --main: rgb(100, 53, 152);
+  --secondary: rgb(255, 239, 62);
+  --tertiary: rgb(54, 149, 34);
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.formContainer {
+  display: grid;
+  justify-content: center;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+  width: 20rem;
+}
+
+@media screen and (max-width: 767px) {
+  .form {
+    width: 15rem;
+  }
+}
+
+@media screen and (max-width: 319px) {
+  .form {
+    width: 12rem;
+  }
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: solid rgba(100, 53, 152, 0.35) 2px;
+  background: white;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.05s ease;
+}
+
+.inputContainer,
+.submitButton {
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+}
+
+.inputContainer > input {
+  border: transparent;
+  display: flex;
+  outline: none;
+}
+
+input {
+  width: 100%;
+  font-size: 1rem;
+}
+
+input::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.inputContainer:focus-within {
+  border-color: var(--main); /* change border when input focused */
+  box-shadow: 0 0 0 3px rgba(100, 53, 152, 0.15);
+}
+.inputContainer:hover {
+  border-color: var(--main);
+}
+
+.inputIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+}
+
+button.inputIcon {
+  cursor: pointer;
+}
+
+.submitButton {
+  background: rgb(100, 53, 152);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 4px 10px rgba(100, 53, 152, 0.35);
+}
+
+.submitButton:hover {
+  background: rgb(54, 149, 34);
+  box-shadow: 0 6px 14px rgba(54, 149, 34, 0.35);
+  transform: translateY(-1px);
+}
+.submitButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid rgb(255, 239, 62);
+  outline-offset: 2px;
+}
+.formTitle {
+  text-align: center;
+}
+
+.errorContainer {
+  display: grid;
+}
+
+.errorMessage {
+  color: #d33;
+  font-size: 0.8rem;
+  font-style: normal;
+}

@@ -1,0 +1,21 @@
+.textarea {
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  position: relative;
+  border: solid rgba(100, 53, 152, 0.35) 2px;
+  background: white;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  outline: none;
+  font-size: 1rem;
+}
+
+.textarea:hover,
+.textarea:focus-within {
+  border-color: var(--color-primary);
+}
+
+.textarea:focus-within {
+  box-shadow: 0 0 0 3px rgba(100, 53, 152, 0.15);
+}

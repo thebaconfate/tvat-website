@@ -1,0 +1,122 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: var(--text-colour);
+}
+
+:root {
+  --color-primary: rgb(100, 53, 152);
+  --color-success: rgb(54, 149, 34);
+  --color-warning: rgb(255, 239, 62);
+  --color-danger: rgb(175, 36, 36);
+
+  --btn-primary-bg: var(--color-primary);
+  --btn-primary-hover-bg: rgb(80, 40, 125);
+  --btn-primary-text: white;
+
+  --btn-secondary-bg: rgb(235, 230, 245);
+  --btn-secondary-hover-bg: rgb(220, 215, 235);
+  --btn-secondary-text: var(--color-primary);
+
+  --btn-tertiary-bg: transparent;
+  --btn-tertiary-text: var(--color-primary);
+  --btn-tertiary-hover-bg: rgba(100, 53, 152, 0.1);
+
+  --color-success-bg: rgba(54, 149, 34, 0.1);
+  --color-success-text: rgb(54, 149, 34);
+
+  --color-warning-bg: rgba(255, 239, 62, 0.2);
+  --color-warning-text: white;
+
+  --color-danger-bg: rgba(175, 36, 36, 0.1);
+  --color-danger-text: white;
+
+  --logo-width: 3rem;
+}
+
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0px;
+  background-color: white;
+  z-index: 1;
+}
+
+.logo {
+  width: var(--logo-width);
+  z-index: 1000;
+}
+
+.logo a {
+  display: flex;
+}
+
+.logo a svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  --standard-padding: 0.5rem;
+  --text-colour: #585858;
+  overflow-x: hidden;
+}
+
+footer {
+  display: flex;
+  justify-content: space-evenly;
+  height: 10rem;
+  background-color: lightyellow;
+  align-items: center;
+  flex-direction: column;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  header {
+    position: relative;
+    z-index: unset;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    --standard-padding: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  body {
+    --logo-width: 4rem;
+    --standard-padding: 1rem;
+  }
+
+  footer {
+    justify-content: space-around;
+    flex-direction: row;
+  }
+}
+
+.socialsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+}
+
+.socialsContainer a > * {
+  width: 1.5rem;
+}

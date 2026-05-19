@@ -1,8 +1,10 @@
 ---
-export const prerender = true
+export const prerender = true;
 import Layout from "../layouts/Layout.astro";
-
+import ContactFormPage from "@/components/web/contact/ContactFormPage";
 const title = "Contact";
 ---
 
-<Layout title={title}> Work in progress </Layout>
+<Layout title={title}>
+  <ContactFormPage client:load />
+</Layout>

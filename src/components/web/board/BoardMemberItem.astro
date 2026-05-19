@@ -1,0 +1,99 @@
+---
+import type { BoardMember } from "../../../lib/board/board-member";
+import { Boulon } from "../../../lib/board/boulon";
+import { Star } from "../../../lib/board/star";
+import styles from "./BoardMemberItem.module.css";
+import { access } from "fs/promises";
+
+interface Props {
+  boardMember: BoardMember;
+  term: string;
+  last?: boolean;
+  index: number;
+}
+export function removeAccents(str: string): string {
+  return str
+    .normalize("NFD") // Split letters and diacritics (e.g. "é" → "é")
+    .replace(/[\u0300-\u036f]/g, ""); // Remove all combining marks
+}
+const { boardMember, term, index } = Astro.props;
+const src = `/boards/${term}/${removeAccents(boardMember.name.toLowerCase()).replaceAll(" ", "-")}`;
+const pngPath = `./public${src}.png`;
+const jpgPath = `./public${src}.jpg`;
+async function fileExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+const [pngExists, jpgExists] = await Promise.all([
+  fileExists(pngPath),
+  fileExists(jpgPath),
+]);
+const rgbColors = [styles.purple, styles.red, styles.green];
+const rgbaColors = [styles.purpleA, styles.redA, styles.greenA];
+const borderColors = [
+  styles.borderPurple,
+  styles.borderRed,
+  styles.borderGreen,
+];
+const i = index % 3;
+---
+
+<div class={styles.boardMember}>
+  <h2 class={styles.boardRole}>{boardMember.boardRole}</h2>
+  {
+    (pngExists || jpgExists) && (
+      <div class={styles.boardMemberPictureContainer}>
+        <picture class={`${styles.boardMemberPicture} ${borderColors[i]}`}>
+          {pngExists && <source srcset={src + ".png"} type="image/png" />}
+          <img
+            class={styles.boardMemberPicture}
+            src={src + ".jpg"}
+            alt={
+              jpgExists
+                ? boardMember.name + "'s foto"
+                : "Gebrek aan " + boardMember.name + "'s foto"
+            }
+          />
+        </picture>
+        <div class={`${styles.boardMemberOverlay} ${rgbaColors[i]}`}>
+          <div class={styles.barsContainer}>
+            <div class={`${styles.leftTopBar} ${styles.bar} ${rgbColors[i]}`} />
+            <div
+              class={`${styles.rightTopBar} ${styles.bar} ${rgbColors[i]}`}
+            />
+            <div
+              class={`${styles.leftBottomBar} ${styles.bar} ${rgbColors[i]}`}
+            />
+            <div
+              class={`${styles.rightBottomBar} ${styles.bar} ${rgbColors[i]}`}
+            />
+          </div>
+          <div class={styles.boardMemberStars}>
+            {boardMember.stars
+              ? boardMember.stars.map((s) =>
+                  s === Star.Gold ? (
+                    <img src="/star-g.png" alt="Gouden ster" />
+                  ) : (
+                    <img src="/star-s.png" alt="Zilvere ster" />
+                  ),
+                )
+              : boardMember.boulons
+                ? boardMember.boulons.map((b) =>
+                    b === Boulon.Silver ? (
+                      <img src="/boulon-s.png" alt="Zilvere boulon" />
+                    ) : (
+                      <img src="/boulon-g" alt="Gouden boulon" />
+                    ),
+                  )
+                : ""}
+          </div>
+        </div>
+      </div>
+    )
+  }
+  <h3>{boardMember.name}</h3>
+</div>

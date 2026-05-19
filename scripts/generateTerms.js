@@ -2,7 +2,10 @@ import fs from "fs/promises";
 import path from "path";
 import prettier from "prettier";
 
+console.log("Generating board years..");
+const startTime = new Date();
 // Path to your public boards directory
+
 const boardsDir = path.resolve("./public/boards");
 
 // Path to the output directory
@@ -48,4 +51,9 @@ const formatted = await prettier.format(output, { parser: "typescript" });
 
 await fs.writeFile(path.join(outputDir, "terms.ts"), formatted);
 
+const endTime = new Date();
+const elapsedTime = endTime - startTime;
 console.log("Generated terms.ts with terms:\n", terms);
+console.log(
+  `Generating terms took: ${elapsedTime}ms for ${terms.length} boards`,
+);

@@ -1,0 +1,70 @@
+---
+import Cookbook from "@/svgs/Cookbook.astro";
+import Expertise from "@/svgs/Expertise.astro";
+import Wine from "@/svgs/Wine.astro";
+import styles from "./KrambambouliPage.module.css";
+import KrambambouliForm from "./KrambambouliForm";
+import type {
+  DeliveryZoneData,
+  KrambambouliProductData,
+  PickupLocationData,
+} from "@/lib/domain/krambambouli";
+
+interface Props {
+  errors?: any;
+  formActive: boolean;
+  products: KrambambouliProductData[] | null;
+  deliveryLocations: DeliveryZoneData[] | null;
+  pickupLocations: PickupLocationData[] | null;
+}
+const { errors, products, deliveryLocations, pickupLocations, formActive } =
+  Astro.props;
+---
+
+<main class={styles.contentContainer}>
+  <picture class={styles.brouwersImageContainer}>
+    <img
+      src="/banner.jpg"
+      alt="brouwers aan het werk"
+      class={styles.brouwers}
+    />
+  </picture>
+  <div class={styles.content}>
+    <ul class={styles.introText}>
+      <li class={styles.rowContainer}>
+        <Cookbook />
+        <p>
+          Krambambouli is een drank op basis van wijn, rum, en een heleboel
+          geheime ingrediënten.
+        </p>
+      </li>
+      <li class={styles.rowContainer}>
+        <Expertise />
+        <p>Wordt met liefde en expertise door 't VAT gebrouwen.</p>
+      </li>
+      <li class={styles.rowContainer}>
+        <Wine />
+        <p>Bevat meer dan 15% procent alcohol en wordt warm gedronken.</p>
+      </li>
+    </ul>
+    {
+      errors ? (
+        <div class={styles.altMessage}>
+          Something went wrong, contact the administrator...
+        </div>
+      ) : products && deliveryLocations && pickupLocations && formActive ? (
+        <KrambambouliForm
+          products={products}
+          pickupLocations={pickupLocations}
+          deliveryLocations={deliveryLocations}
+          client:load
+        />
+      ) : (
+        <div class={styles.altMessage}>
+          Het formulier is niet langer beschikbaar. Indien u een bestelling
+          heeft geplaatst zal er contact opgenomen worden
+        </div>
+      )
+    }
+  </div>
+</main>
