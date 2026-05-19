@@ -1,0 +1,19 @@
+---
+import Layout from "@/layouts/Layout.astro";
+// import DashboardPageAstroComponent from "@/components/app/krambambouli/DashboardPage.astro";
+import { authService } from "@/lib/services/auth";
+import { krambambouliService } from "@/lib/services/krambambouli";
+
+const req = Astro.request;
+const [authenticatedPromise] = [authService.authenticate(req.headers)];
+const idk = await krambambouliService.getKrambambouliProducts();
+console.log(idk);
+const authenticated = await authenticatedPromise;
+if (!authenticated) return Astro.redirect("/403");
+
+const title = "Dashbambouli";
+---
+
+<Layout title={title}>
+  <!--<DashboardPageAstroComponent />-->
+</Layout>

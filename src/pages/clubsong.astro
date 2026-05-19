@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ClubSongPage from "@/components/web/clubsong/ClubSongPage.astro";
+const title = "Clublied";
+export const prerender = true;
+---
+
+<Layout title={title}>
+  <ClubSongPage />
+</Layout>

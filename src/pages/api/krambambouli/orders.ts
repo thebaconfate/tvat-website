@@ -1,5 +1,3 @@
-import Database from "../../../lib/database";
-
 export const prerender = false;
 
 interface Order {
@@ -8,7 +6,8 @@ interface Order {
 }
 
 export async function GET({}) {
-  return false;
+  return new Response();
+  /*
   const result = (await Database.getInstance().then((database) => {
     return database.getKrambambouliOrders();
   })) as Order[];
@@ -21,4 +20,5 @@ export async function GET({}) {
     { classic: 0, minus: 0 },
   );
   return new Response(JSON.stringify(orders), { status: 200 });
+  */
 }
