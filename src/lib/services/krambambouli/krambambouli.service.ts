@@ -87,12 +87,22 @@ class KrambambouliService {
       `;
       const pickup = order.deliveryOption === "pickup";
       const totalOwed = 0;
-      return client.query(createOrder, [
+      const orderResult = await client.query<{ id: string }>(createOrder, [
         customerId,
         order.deliveryOption,
         pickup ? order.pickupLocationId : null,
         totalOwed,
       ]);
+      const orderId = orderResult.rows[0].id;
+      const createOrderItem = `
+        INSERT INTO krambambouli_order_items (order_id, product_id, amount)
+        VALUES (%s, %s, %s)
+      `;
+      order.cart.map(
+        async (i) =>
+          await client.query(createOrderItem, [orderId, i.productId, i.amount]),
+      );
+      return;
     });
   }
 

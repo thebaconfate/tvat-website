@@ -11,7 +11,7 @@ export async function POST({
   try {
     const payload = await request.json();
     const order = krambambouliOrderFormSchema.parse(payload);
-    krambambouliService.createOrder(order);
+    await krambambouliService.createOrder(order);
   } catch (e) {
     console.error(e);
   } finally {
