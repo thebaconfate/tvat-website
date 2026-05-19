@@ -68,8 +68,8 @@ class Database {
   }
 
   public async withTransaction<T extends QueryResultRow = QueryResultRow>(
-    transaction: (client: PoolClient) => Promise<QueryResult<T>>,
-  ): Promise<QueryResult<T>> {
+    transaction: (client: PoolClient) => Promise<QueryResult<T> | void>,
+  ): Promise<QueryResult<T> | void> {
     return withRetry(async () => {
       const client = await this.pool.connect();
       try {
