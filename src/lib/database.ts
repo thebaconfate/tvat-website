@@ -12,6 +12,7 @@ const RETRYABLE_ERRORS = new Set([
   "ETIMEDOUT",
   "EPIPE",
   "57P01", // PostgreSQL: admin shutdown
+  "57P03", // PostgreSQL: THE DATABASE SYSTEM IS STARTING UP
   "08006", // PostgreSQL: connection failure
   "08001", // PostgreSQL: unable to connect
   "08004", // PostgreSQL: rejected connection
@@ -20,7 +21,6 @@ const RETRYABLE_ERRORS = new Set([
 function isRetryable(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
   const pgError = error as Error & { code?: string };
-  console.log(`Error: ${pgError}`);
   return (
     RETRYABLE_ERRORS.has(pgError.code ?? "") ||
     RETRYABLE_ERRORS.has((pgError as NodeJS.ErrnoException).code ?? "")
@@ -36,10 +36,8 @@ async function withRetry<T>(
   try {
     return await operation();
   } catch (error) {
-    console.error(error);
     if (retries <= 0 || !isRetryable(error)) throw error;
-    console.log("Retrying operation");
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    await new Promise((r) => setTimeout(r, delayMs));
     return withRetry(operation, retries - 1, delayMs * backoffMultiplier);
   }
 }
@@ -50,7 +48,7 @@ class Database {
   constructor() {
     this.pool = new Pool({
       ...config.database,
-      max: 3,
+      max: 5,
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 10_000,
     });
