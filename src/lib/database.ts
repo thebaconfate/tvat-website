@@ -34,7 +34,7 @@ async function withRetry<T>(
   backoffMultiplier = 2,
 ) {
   try {
-    return operation();
+    return await operation();
   } catch (error) {
     console.error(error);
     if (retries <= 0 || !isRetryable(error)) throw error;
