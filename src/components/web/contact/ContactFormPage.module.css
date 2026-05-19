@@ -1,0 +1,64 @@
+.contentContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+  flex-direction: column;
+  flex: 1;
+}
+
+.formContainer {
+  display: grid;
+  gap: 1rem;
+  margin: 0 10%;
+}
+
+.inputContainer {
+  display: grid;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.messageContainer {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.textarea {
+  resize: vertical;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .inputContainer {
+    grid-template-columns: 2fr 3fr;
+    gap: 1rem;
+  }
+
+  .messageContainer {
+    gap: 1rem;
+  }
+  .title {
+    margin-bottom: 2rem;
+  }
+  .textarea {
+    min-height: 30%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .textarea {
+    resize: both;
+    width: clamp(10rem, calc(0.5 * 100dvw), 30rem);
+    height: clamp(10rem, calc(0.25 * 100dvh), 15rem);
+  }
+
+  .formContainer {
+    justify-content: center;
+  }
+}

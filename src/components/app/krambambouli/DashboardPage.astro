@@ -1,0 +1,107 @@
+---
+import Checkbox from "@/components/krambambouli/dashboard/checkbox/Checkbox";
+import { formatDate } from "@/lib/domain/datetime";
+import { krambambouliService } from "@/lib/services/krambambouli";
+import { getLocale } from "@/lib/utils";
+
+const locale = getLocale(Astro.request);
+
+const [products, page] = await Promise.all([
+  krambambouliService.getKrambambouliProducts(),
+  krambambouliService.getOrders(),
+]);
+
+if (!products) return Astro.redirect("/500");
+---
+
+<div class="filters"></div>
+<table>
+  <thead>
+    <th>Datum</th>
+    <th>Naam</th>
+    <th>Email</th>
+    {
+      products.map((p) => (
+        <th>
+          {p.name
+            .toLowerCase()
+            .replace("krambambouli ", "")
+            .trimStart()
+            .replace(/^./, (c) => c.toUpperCase())}
+        </th>
+      ))
+    }
+    <th>Ophaallocatie</th>
+    <th>Prijs</th>
+    <th>Betaald?</th>
+    <th>Opgehaald?</th>
+  </thead>
+  <tbody>
+    {
+      page.content.map((order, index) => (
+        <tr class={index % 2 === 1 ? "coloured" : ""}>
+          <td>{formatDate(new Date(order.createdAt), locale, {})}</td>
+          <td class="name">{`${order.firstName} ${order.lastName}`}</td>
+          <td>{order.email}</td>
+          {products.map((p) => (
+            <td>
+              {order.orders.find((o) => o.productId === p.id)?.amount ?? 0}
+            </td>
+          ))}
+          <td>{"location palceholder"}</td>
+          <td>{`€${Math.floor(order.totalOwed / 100)},${order.totalOwed % 100 === 0 ? "-" : order.totalOwed % 100}`}</td>
+          <td>
+            <Checkbox
+              client:visible
+              orderId={order.id}
+              currentValue={order.paid}
+              endpoint="/api/krambambouli/toggle-payment"
+              bodyKey="paid"
+            />
+          </td>
+          <td>
+            <Checkbox
+              client:visible
+              orderId={order.id}
+              currentValue={order.received}
+              endpoint="/api/krambambouli/toggle-fulfilled"
+              bodyKey="fulfilled"
+            />
+          </td>
+        </tr>
+      ))
+    }
+    <tr class={(page.content.length + 1) % 2 === 1 ? "coloured" : ""}>
+      <td></td>
+      <td class="name">Totaal</td>
+      <td></td>
+      {
+        "" // total per product
+      }
+      <td></td>
+      <td>{/* total  */}</td>
+    </tr>
+  </tbody>
+</table>
+<style>
+  table {
+    margin: 1rem;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid transparent;
+    color: black;
+  }
+
+  tr:nth-child(even) {
+    background-color: rgba(222, 208, 225, 1);
+  }
+
+  .name {
+    font-weight: bold;
+  }
+</style>
