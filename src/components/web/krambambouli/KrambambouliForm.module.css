@@ -1,0 +1,288 @@
+.productsContainer {
+  display: grid;
+  gap: 2rem;
+  justify-items: center;
+}
+
+.product {
+  display: flex;
+  flex-direction: column;
+  width: max(13rem, 40%);
+}
+
+.productInfo {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.productTitle {
+  display: flex;
+  justify-content: center;
+}
+
+.product > picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.formContainer picture > img {
+  width: 100%;
+}
+
+.productDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.formContainer {
+  margin-bottom: 2rem;
+}
+.productDetails > :first-child {
+  font-weight: 500;
+}
+
+.productButtonContainer {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.formContainer select,
+.formContainer input {
+  font-size: 1rem;
+}
+
+.productButtonContainer > * {
+  border-radius: 5px;
+  text-align: center;
+}
+
+/*
+.productButtonContainer > button {
+  width: 2.5rem;
+  height: 2.5rem;
+  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+*/
+
+.productButtonContainer > input {
+  width: clamp(3rem, 20%, 4rem);
+}
+
+.productButtonContainer > input[type="number"]::-webkit-inner-spin-button,
+.productButtonContainer > input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide the spinner in Firefox */
+.productButtonContainer > input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+  /* Remove default styling */
+}
+
+.formContainer form {
+  display: grid;
+  gap: 3rem;
+  margin: 0 10%;
+}
+
+.fieldsContainer {
+  display: grid;
+  --gap: 1rem;
+  gap: var(--gap);
+}
+
+.fieldsContainer > * {
+  display: grid;
+  gap: calc(var(--gap) / 2);
+}
+
+.fieldsContainer > :first-child {
+  gap: var(--gap);
+}
+
+.fieldsContainer > :first-child > * {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.radioButton {
+  margin-right: 5px;
+}
+
+.deliveryRow {
+  display: grid;
+  justify-content: space-between;
+  grid-auto-flow: column;
+  gap: 0.5rem;
+}
+
+.deliveryRow > * {
+  display: flex;
+  gap: 1%;
+}
+
+.addressRow {
+  gap: 1rem;
+}
+
+.addressRow > :first-child {
+  display: grid;
+  grid-template-areas:
+    "address-label address-label"
+    "address-input address-input"
+    "housenumber-label bus-label"
+    "housenumber-input bus-input";
+  grid-template-columns: 1fr 1fr;
+  gap: 2%;
+}
+
+.addressRow > :first-child > :first-child {
+  grid-area: address-label;
+}
+
+.addressRow > :first-child > :nth-child(2) {
+  grid-area: address-input;
+}
+
+.addressRow:first-child > :nth-child(3) {
+  grid-area: housenumber-label;
+}
+
+.addressRow > :first-child > :nth-child(4) {
+  grid-area: housenumber-input;
+}
+
+.addressRow > :first-child > :nth-child(5) {
+  grid-area: bus-label;
+}
+
+.addressRow > :first-child > :nth-child(6) {
+  grid-area: bus-input;
+}
+
+.addressRow > :first-child > *,
+.addressRow > :last-child > * {
+  display: flex;
+  width: 100%;
+}
+
+.addressRow > :last-child {
+  display: grid;
+  grid-template-areas:
+    "postcode-label city-label"
+    "postcode-input city-input";
+  grid-template-columns: 2fr 3fr; /* ← this is what you’re missing */
+  gap: 2%;
+}
+
+.addressRow > :last-child > :first-child {
+  grid-area: postcode-label;
+}
+
+.addressRow > :last-child > :nth-child(2) {
+  grid-area: postcode-input;
+}
+
+.submitButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/*
+.submitButtonContainer > * {
+  padding: 0.5rem 1rem;
+  background-color: rgb(104, 41, 154);
+  color: white;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+*/
+
+#post::-webkit-outer-spin-button,
+#post::-webkit-inner-spin-button,
+#post {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+#post {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.formContainer input:not([type="radio"]) {
+  font-size: 1rem;
+  outline: none;
+  border-radius: 0.3rem;
+  border: solid lightgray 1px;
+  display: flex;
+  padding: 0.2rem 0.5rem;
+}
+
+.formCpntainer input:not(.productInput):not([type="radio"]) {
+  width: 100%;
+}
+
+.formContainer input::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.formContainer input:focus-within:not([type="radio"]),
+.formContainer input:hover:not([type="radio"]) {
+  border-color: var(--main); /* change border when input focused */
+  box-shadow: 0 0 0 3px rgba(100, 53, 152, 0.15);
+}
+
+@media (min-width: 767px) {
+  .productsContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fieldsContainer > :first-child {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .deliveryRow {
+    justify-content: unset;
+    grid-template-columns: 3fr 1fr;
+    gap: unset;
+  }
+  .deliveryRow > * {
+    display: unset;
+    gap: unset;
+  }
+  .addressRow > :first-child {
+    display: grid;
+    grid-template-areas:
+      "address-label housenumber-label bus-label"
+      "address-input housenumber-input bus-input";
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 2%;
+  }
+  .submitButtonContainer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+@media (min-width: 1024px) {
+  .deliveryRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+/*
+ * TODO: fix styles for laptop and large latops
+ * */

@@ -1,0 +1,63 @@
+.contentContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.imgContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.imgContainer > img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.clubSongContainer,
+.shoutContainer,
+.blueSongContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+.clubSongContainer > *,
+.shoutContainer > *,
+.blueSongContainer > * {
+  text-align: center;
+}
+.verse,
+.chorus {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.chorus {
+  font-weight: 900;
+}
+
+@media (min-width: 768px) {
+  .contentContainer {
+    margin-top: 2rem;
+  }
+  .imgContainer {
+    width: 90%;
+    margin: auto;
+  }
+}
+@media (min-width: 1024px) {
+  .imgContainer {
+    width: 70%;
+    max-width: 40rem;
+  }
+}
+
+@media (min-width: 1440px) {
+}

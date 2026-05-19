@@ -1,0 +1,30 @@
+.content {
+  margin: 0 10%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.challengeInformation {
+  text-align: center;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.challengeContainer {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 10%;
+}
+
+.scoreButtonsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5%;
+}
