@@ -1,57 +1,89 @@
 import {
   Pool,
-  type PoolConfig,
+  type PoolClient,
   type QueryResult,
   type QueryResultRow,
 } from "pg";
 import { config } from "./config";
 
-class Database {
-  private pool: Pool | null;
-  private config: PoolConfig;
-  constructor() {
-    this.pool = null;
-    this.config = config.database;
-  }
+const RETRYABLE_ERRORS = new Set([
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "ETIMEDOUT",
+  "EPIPE",
+  "57P01", // PostgreSQL: admin shutdown
+  "08006", // PostgreSQL: connection failure
+  "08001", // PostgreSQL: unable to connect
+  "08004", // PostgreSQL: rejected connection
+]);
 
-  private async connect(retries = 5, delay = 2000): Promise<Pool> {
-    if (this.pool) return this.pool;
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        this.pool = new Pool(this.config);
-        await this.pool.query("SELECT 1");
-        return this.pool;
-      } catch (err: any) {
-        console.warn(
-          `Database connection failed (attempt ${attempt}): ${err.message}`,
-        );
-        if (attempt === retries) throw err;
-        await new Promise((r) => setTimeout(r, attempt * delay));
-      }
-    }
-    throw new Error(
-      `Failed to connect to the database after ${retries} retries`,
-    );
+function isRetryable(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const pgError = error as Error & { code?: string };
+  console.log(`Error: ${pgError}`);
+  return (
+    RETRYABLE_ERRORS.has(pgError.code ?? "") ||
+    RETRYABLE_ERRORS.has((pgError as NodeJS.ErrnoException).code ?? "")
+  );
+}
+
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  retries = 5,
+  delayMs = 500,
+  backoffMultiplier = 2,
+) {
+  try {
+    return operation();
+  } catch (error) {
+    console.error(error);
+    if (retries <= 0 || !isRetryable(error)) throw error;
+    console.log("Retrying operation");
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    return withRetry(operation, retries - 1, delayMs * backoffMultiplier);
+  }
+}
+
+class Database {
+  private pool: Pool;
+
+  constructor() {
+    this.pool = new Pool({
+      ...config.database,
+      max: 3,
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 10_000,
+    });
+
+    this.pool.on("error", (err) => {
+      console.error("Idle pool client error:", err.message);
+    });
   }
 
   public async query<T extends QueryResultRow = QueryResultRow>(
     sql: string,
     params?: any[],
-    retries = 3,
-    delay = 1000,
   ): Promise<QueryResult<T>> {
-    for (let attempt = 1; attempt <= retries; attempt++) {
+    return withRetry(async () => await this.pool.query<T>(sql, params));
+  }
+
+  public async withTransaction<T extends QueryResultRow = QueryResultRow>(
+    transaction: (client: PoolClient) => Promise<QueryResult<T>>,
+  ): Promise<QueryResult<T>> {
+    return withRetry(async () => {
+      const client = await this.pool.connect();
       try {
-        const pool = await this.connect();
-        return pool.query<T>(sql, params);
-      } catch (err: any) {
-        console.warn(`Query attempt ${attempt} failed: ${err.message}`);
-        this.pool = null; // force reconnect next try
-        if (attempt === retries) throw err;
-        await new Promise((r) => setTimeout(r, (attempt - 1) * delay));
+        await client.query("BEGIN");
+        const result = await transaction(client);
+        await client.query("COMMIT");
+        return result;
+      } catch (e) {
+        await client.query("ROLLBACK");
+        throw e;
+      } finally {
+        client.release();
       }
-    }
-    throw new Error(`Query failed after ${retries} retries`);
+    });
   }
 }
 
