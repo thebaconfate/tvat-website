@@ -131,3 +131,7 @@ button.inputIcon {
   font-size: 0.8rem;
   font-style: normal;
 }
+
+.forgotPasswordLink {
+  text-align: center;
+}

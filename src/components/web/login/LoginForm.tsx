@@ -1,5 +1,5 @@
 import { credentialsSchema } from "@/lib/domain/auth";
-import style from "./LoginForm.module.css";
+import styles from "./LoginForm.module.css";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { Eye, EyeClosed, Mail } from "lucide-react";
@@ -26,20 +26,20 @@ export default function LoginForm() {
   });
 
   return (
-    <div className={style.formContainer}>
+    <div className={styles.formContainer}>
       <form
         method="POST"
-        className={style.form}
+        className={styles.form}
         onSubmit={(e) => {
           e.preventDefault();
           e.stopPropagation();
           form.handleSubmit();
         }}
       >
-        <h2 className={style.formTitle}>Inloggen</h2>
+        <h2 className={styles.formTitle}>Inloggen</h2>
         <form.Field name="email">
           {(field) => (
-            <div className={`${style.inputContainer} ${style.container}`}>
+            <div className={`${styles.inputContainer} ${styles.container}`}>
               <input
                 type="email"
                 id={field.name}
@@ -51,7 +51,7 @@ export default function LoginForm() {
                 autoComplete="email"
                 required
               />
-              <div className={style.inputIcon}>
+              <div className={styles.inputIcon}>
                 <Mail></Mail>
               </div>
             </div>
@@ -59,7 +59,7 @@ export default function LoginForm() {
         </form.Field>
         <form.Field name="password">
           {(field) => (
-            <div className={style.inputContainer}>
+            <div className={styles.inputContainer}>
               <input
                 type={visible ? "text" : "password"}
                 id={field.name}
@@ -72,7 +72,7 @@ export default function LoginForm() {
                 autoComplete="current-password"
               />
               <button
-                className={style.inputIcon}
+                className={styles.inputIcon}
                 type="button"
                 onClick={() => setVisible((v) => !v)}
               >
@@ -84,14 +84,17 @@ export default function LoginForm() {
         <form.Subscribe selector={(state) => state.errors}>
           {(errors) =>
             errors.length > 0 && (
-              <div className={style.errorContainer}>
-                <em className={style.errorMessage} role="alert">
+              <div className={styles.errorContainer}>
+                <em className={styles.errorMessage} role="alert">
                   Invalid credentials
                 </em>
               </div>
             )
           }
         </form.Subscribe>
+        <a className={styles.forgotPasswordLink} href="/forgot-password">
+          forgot password?
+        </a>
         <Button>Inloggen</Button>
       </form>
     </div>
