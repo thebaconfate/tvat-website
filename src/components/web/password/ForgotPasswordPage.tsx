@@ -1,4 +1,4 @@
-import styles from "./ForgotPassword.module.css";
+import styles from "./ForgotPasswordPage.module.css";
 
 export default function ForgotPasswordPage({}) {
   return (
