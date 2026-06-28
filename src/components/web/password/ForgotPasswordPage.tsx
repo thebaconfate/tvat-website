@@ -1,6 +1,16 @@
+import { useForm } from "@tanstack/react-form";
 import styles from "./ForgotPasswordPage.module.css";
+import z4 from "zod/v4";
 
 export default function ForgotPasswordPage({}) {
+  const from = useForm({
+    defaultValues: { email: "" },
+    validators: {
+      onSubmit: z4.object({
+        email: z4.email(),
+      }),
+    },
+  });
   return (
     <main>
       <form>
