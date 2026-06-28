@@ -8,7 +8,8 @@ class UserService {
     const query = `
     SELECT 1
     FROM users u
-    JOIN roles r ON u.role_id = r.id
+    JOIN user_roles ur ON ur.user_id = u.id
+    JOIN roles r ON ur.role_id = r.id
     WHERE r.name = 'root'
     LIMIT 1
     `;
@@ -22,27 +23,26 @@ class UserService {
             email,
             password,
             first_name,
-            last_name,
-            role_id
+            last_name
         )
+        VALUES ($1, $2, $3, $4)
+        RETURNING id, email, first_name, last_name
+    ),
+    inserted_role AS (
+        INSERT INTO user_roles (user_id, role_id)
         SELECT
-            $1,
-            $2,
-            $3,
-            $4,
-            r.id
-        FROM roles r
-        WHERE r.name = $5
-        RETURNING *
+            u.id,
+            (SELECT r.id FROM roles r WHERE r.name = $5)
+        FROM new_user u
+        RETURNING user_id
     )
     SELECT
         u.id,
         u.email,
         u.first_name AS "firstName",
         u.last_name AS "lastName",
-        r.name AS role
-    FROM new_user u
-    JOIN roles r ON r.id = u.role_id
+        $5 AS role
+    FROM new_user u;
     `;
     const params = [
       newUser.email,
@@ -81,11 +81,11 @@ class UserService {
         u.password,
         u.first_name AS "firstName",
         u.last_name AS "lastName",
-        r.name as role
-    FROM users
-    JOIN roles r ON r.id = u.role_id
-    WHERE email = $1
-    LIMIT 1;`;
+        r.name AS "role"
+    FROM users u
+    LEFT JOIN user_roles ur ON ur.user_id = u.id
+    LEFT JOIN roles r ON r.id = ur.role_id
+    WHERE u.email = $1`;
     const result = await database.query<UserDataWithPassword>(query, [email]);
     const [user] = result.rows;
     return user ?? null;
