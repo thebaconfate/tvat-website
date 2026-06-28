@@ -9,6 +9,7 @@ export async function POST({ request }: { request: Request }) {
     const jwtToken = await authService.login(credentials);
     if (!jwtToken)
       return new Response(JSON.stringify("Invalid credentials"), {
+        headers: { "Content-Type": "application/json" },
         status: 401,
       });
     const headers = setJwtCookie(jwtToken);
