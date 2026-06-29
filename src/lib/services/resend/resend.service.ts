@@ -20,9 +20,7 @@ class ResendService {
 
   async handleContactForm() {}
 
-  async sendPasswordResetLink(token: string, receiver: string) {
-    const resetURL = new URL("/reset-password");
-    resetURL.searchParams.append("token", token);
+  async sendPasswordResetLink(resetURL: URL, receiver: string) {
     await this.resend.emails.send({
       from: `'t VAT <forgot-password-form${config.resend.domain}>`,
       to: `${receiver}`,

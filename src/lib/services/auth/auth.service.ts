@@ -9,6 +9,7 @@ import {
 import { getAuthToken, verifyPassword } from "./auth.utils";
 import { database } from "@/lib/database";
 import { resendService } from "../resend/resend.service";
+import { ROUTES } from "@/lib/routes";
 
 class AuthService {
   private secretKey = crypto.randomBytes(64).toString("hex");
@@ -47,7 +48,7 @@ class AuthService {
     return this.verifyToken(token);
   }
 
-  async forgotPassword(email: string) {
+  async forgotPassword(email: string, siteOrigin: string) {
     // NOTE: The removal of expired tokens must be a separate query, otherwise
     // this method becomes vulnerable to timing attacks. An attacker can figure
     // out which email exists by timing the response time of the combined query.
@@ -79,6 +80,7 @@ class AuthService {
     const hashedToken = createHash("sha256").update(token).digest("base64url");
     const createdAt = new Date();
     const expiresAt = new Date(createdAt.getTime() + 10 * 60 * 1000);
+    const resetURL = new URL(ROUTES.RESET_PASSWORD.url, siteOrigin);
     await Promise.all([
       deletePromises,
       database.query(
@@ -88,7 +90,7 @@ class AuthService {
         `,
         [user.id, hashedToken, createdAt, expiresAt],
       ),
-      resendService.sendPasswordResetLink(token, user.email),
+      resendService.sendPasswordResetLink(resetURL, user.email),
     ]);
   }
 }
