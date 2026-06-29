@@ -8,6 +8,7 @@ import {
 } from "@/lib/domain/auth";
 import { getAuthToken, verifyPassword } from "./auth.utils";
 import { database } from "@/lib/database";
+import { resendService } from "../resend/resend.service";
 
 class AuthService {
   private secretKey = crypto.randomBytes(64).toString("hex");
@@ -49,11 +50,11 @@ class AuthService {
   async forgotPassword(email: string) {
     // NOTE: The removal of expired tokens must be a separate query, otherwise
     // this method becomes vulnerable to timing attacks. An attacker can figure
-    // out which email exists by timing the response time of the combined
-    // query. By using two separate queries the response time is the baseline
-    // of the heaviest query.
+    // out which email exists by timing the response time of the combined query.
+    // By using two separate queries the response time is the baseline of the
+    // heaviest query.
     const userPromise = this.userService.getUserByEmail(email);
-    const promises = Promise.all([
+    const deletePromises = Promise.all([
       database.query(
         `
         DELETE FROM password_recovery_tokens prt
@@ -71,20 +72,24 @@ class AuthService {
     ]);
     const user = await userPromise;
     if (!user) {
-      await promises;
+      await deletePromises;
       return;
     }
     const token = randomBytes(32).toString("base64url");
     const hashedToken = createHash("sha256").update(token).digest("base64url");
     const createdAt = new Date();
     const expiresAt = new Date(createdAt.getTime() + 10 * 60 * 1000);
-    const saveTokenPromise = database.query(
-      `
+    await Promise.all([
+      deletePromises,
+      database.query(
+        `
         INSERT INTO password_recovery_tokens (user_id, token_hash, created_at, expires_at) VALUES
         ($1, $2, $3, $4)
         `,
-      [user.id, hashedToken, createdAt, expiresAt],
-    );
+        [user.id, hashedToken, createdAt, expiresAt],
+      ),
+      resendService.sendPasswordResetLink(token, user.email),
+    ]);
   }
 }
 
