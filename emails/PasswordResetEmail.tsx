@@ -9,6 +9,7 @@ import {
   Button,
   Link,
   Img,
+  Heading,
 } from "react-email";
 type EmailProps = {
   resetURL: string;
@@ -44,17 +45,17 @@ export default function PasswordResetEmail({ resetURL }: EmailProps) {
   };
 
   const button = {
-    backgroundColor: "#2563eb", // Modern Royal Blue
-    borderRadius: "6px",
-    color: "#fff",
-    fontSize: "15px",
-    fontWeight: "bold",
+    backgroundColor: "rgb(100, 53, 152)",
+    color: "#ffffff",
+    font: "inherit",
+    fontWeight: 500,
+    border: "none",
+    borderRadius: "8px",
+    padding: "8px 16px",
     textDecoration: "none",
-    textAlign: "center" as const,
     display: "block",
-    width: "100%",
-    padding: "12px 0",
-    margin: "25px 0",
+    textAlign: "center" as const,
+    margin: "25px",
   };
 
   const link = {
@@ -68,14 +69,26 @@ export default function PasswordResetEmail({ resetURL }: EmailProps) {
       <Preview>Wachtwoord resetten</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Img
-            src="https://www.tvat.be/vatschild.png"
-            width="40"
-            height="40"
-            alt="Vatlogo"
-          />
           <Section>
-            <Text style={text}>Beste gebruiker</Text>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-end",
+              }}
+            >
+              <Heading
+                style={{ ...text, marginBottom: 0, fontSize: "1.25rem" }}
+              >
+                Beste gebruiker
+              </Heading>
+              <Img
+                src="https://www.tvat.be/vatschild.png"
+                alt="Vatlogo"
+                width="70"
+                height="auto"
+              />
+            </div>
             <Text style={text}>
               We hebben een verzoek ontvangen om het wachtwoord van je account
               te herstellen. Klik op de onderstaande knop om een nieuw
@@ -87,9 +100,9 @@ export default function PasswordResetEmail({ resetURL }: EmailProps) {
             </Button>
 
             <Text style={text}>
-              Deze link is **10 minuten** geldig. Als je dit verzoek niet hebt
-              gedaan, kun je deze e-mail veilig negeren—er verandert niets aan
-              je account.
+              Deze link is <b>10 minuten</b> geldig. Als je deze verzoek niet
+              hebt gedaan, dan kun je deze e-mail veilig negeren—er verandert
+              niets aan je account.
             </Text>
 
             <Text style={mutedText}>
