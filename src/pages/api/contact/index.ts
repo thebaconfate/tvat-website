@@ -1,10 +1,9 @@
 import { contactFormSchema } from "@/lib/domain/contact";
-import { resend } from "@/lib/resend";
 import sanitizeHtml from "sanitize-html";
 import type { APIContext } from "astro";
 import z4 from "zod/v4";
 import { config } from "@/lib/config";
-import { resendService } from "@/lib/services/resend/resend.service";
+import { resend, resendService } from "@/lib/services/resend/resend.service";
 
 /*
  * NOTE: Perhaps add some rate limiting to protect your resend api

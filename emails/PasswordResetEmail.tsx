@@ -11,10 +11,10 @@ import {
   Img,
 } from "react-email";
 type EmailProps = {
-  resetLink: string;
+  resetURL: string;
 };
-export default function PasswordResetEmail({ resetLink }: EmailProps) {
-  if (!resetLink) resetLink = "test";
+export default function PasswordResetEmail({ resetURL }: EmailProps) {
+  if (!resetURL) resetURL = "test";
   const main = {
     backgroundColor: "#f6f9fc",
     padding: "40px 0",
@@ -82,7 +82,7 @@ export default function PasswordResetEmail({ resetLink }: EmailProps) {
               wachtwoord in te stellen.
             </Text>
 
-            <Button style={button} href={resetLink}>
+            <Button style={button} href={resetURL}>
               Wachtwoord Herstellen
             </Button>
 
@@ -95,8 +95,8 @@ export default function PasswordResetEmail({ resetLink }: EmailProps) {
             <Text style={mutedText}>
               Werkt de knop niet? Kopieer en plak dan deze URL in je browser:
               <br />
-              <Link href={resetLink} style={link}>
-                {resetLink}
+              <Link href={resetURL} style={link}>
+                {resetURL}
               </Link>
             </Text>
           </Section>

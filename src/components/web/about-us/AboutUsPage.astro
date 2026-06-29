@@ -1,5 +1,5 @@
 ---
-import { websiteRoutes } from "@/lib/routes";
+import { ROUTES } from "@/lib/routes";
 import styles from "./AboutUsPage.module.css";
 import Banner from "../shared/Banner.astro";
 ---
@@ -116,9 +116,7 @@ import Banner from "../shared/Banner.astro";
         wijn, rum, suiker en kruiden die het best warm geserveerd wordt en die
         bezongen wordt in het alom bekende cantuslied 'Krambambouli'.
       </p>
-      <a href={websiteRoutes.krambambouli.url}
-        >Kom meer te weten over Krambambouli</a
-      >
+      <a href={ROUTES.KRAMBAMBOULI.url}>Kom meer te weten over Krambambouli</a>
     </div>
   </div>
 </main>
