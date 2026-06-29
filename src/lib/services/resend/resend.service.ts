@@ -21,10 +21,10 @@ class ResendService {
   async handleContactForm() {}
 
   async sendPasswordResetLink(resetURL: URL, receiver: string) {
-    await this.resend.emails.send({
-      from: `'t VAT <forgot-password-form${config.resend.domain}>`,
+    return this.resend.emails.send({
+      from: `'t VAT <no-reply${config.resend.domain}>`,
       to: `${receiver}`,
-      subject: `CONTACT FORM SUBMISSION`,
+      subject: `PASSWORD RESET`,
       react: PasswordResetEmail({ resetURL: resetURL.toString() }),
     });
   }
