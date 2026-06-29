@@ -73,7 +73,7 @@ class UserService {
     return user ?? null;
   }
 
-  async getUserByEmail(email: string) {
+  async getUserByEmail(email: string): Promise<UserDataWithPassword | null> {
     const query = `
     SELECT
         u.id,
