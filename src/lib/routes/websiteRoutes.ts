@@ -19,6 +19,7 @@ export const ROUTES = {
   CONTACT: { url: "/contact" },
   HISTORY: { url: "/history" },
   LOGIN: { url: "/login" },
+  RESET_PASSWORD: { url: "/reset-password" },
   BOARD: { url: `${BOARD_PREFIX}/${latestTerm}` },
   CODEX: {
     url: `${CODEX_PREFIX}`,
