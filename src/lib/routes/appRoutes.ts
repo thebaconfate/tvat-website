@@ -1,5 +1,5 @@
 const prefix = "/atlas" as const;
 
-export const appRoutes = {
-  krambambouli: `${prefix}/krambambouli`,
+export const APP_ROUTES = {
+  KRAMBAMBOULI: `${prefix}/krambambouli`,
 } as const;

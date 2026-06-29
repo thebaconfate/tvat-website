@@ -1,8 +1,10 @@
-const apiPrefix = "/api";
-export const apiRoutes = {
-  auth: {
-    url: `${apiPrefix}/auth`,
-    login: { url: "/login" },
-    forgotPassword: { url: "/forgot-password" },
+const API_PREFIX = "/api" as const;
+const AUTH_PREFIX = `${API_PREFIX}/auth` as const;
+
+export const API_ROUTES = {
+  AUTH: {
+    url: `${AUTH_PREFIX}`,
+    LOGIN: { url: `${AUTH_PREFIX}/login` },
+    FORGOT_PASSWORD: { url: `${AUTH_PREFIX}/forgot-password` },
   },
 } as const;
