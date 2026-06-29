@@ -81,7 +81,7 @@ class AuthService {
     const createdAt = new Date();
     const expiresAt = new Date(createdAt.getTime() + 10 * 60 * 1000);
     const resetURL = new URL(ROUTES.RESET_PASSWORD.url, siteOrigin);
-    console.log(user.email);
+    resetURL.searchParams.append("token", token);
     try {
       await Promise.all([
         deletePromises,
@@ -92,7 +92,11 @@ class AuthService {
         `,
           [user.id, hashedToken, createdAt, expiresAt],
         ),
-        resendService.sendPasswordResetLink(resetURL, user.email),
+        resendService.sendPasswordResetLink(
+          resetURL,
+          user.email,
+          user.firstName,
+        ),
       ]);
     } catch (e) {
       console.error(e);
