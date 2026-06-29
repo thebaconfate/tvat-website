@@ -10,11 +10,17 @@ import {
   Link,
   Img,
   Heading,
+  Row,
+  Column,
 } from "react-email";
 type EmailProps = {
   resetURL: string;
+  firstName: string;
 };
-export default function PasswordResetEmail({ resetURL }: EmailProps) {
+export default function PasswordResetEmail({
+  resetURL,
+  firstName = "Gebruiker",
+}: EmailProps) {
   if (!resetURL) resetURL = "test";
   const main = {
     backgroundColor: "#f6f9fc",
@@ -70,25 +76,27 @@ export default function PasswordResetEmail({ resetURL }: EmailProps) {
       <Body style={main}>
         <Container style={container}>
           <Section>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-end",
-              }}
-            >
-              <Heading
-                style={{ ...text, marginBottom: 0, fontSize: "1.25rem" }}
-              >
-                Beste gebruiker
-              </Heading>
-              <Img
-                src="https://www.tvat.be/vatschild.png"
-                alt="Vatlogo"
-                width="70"
-                height="auto"
-              />
-            </div>
+            <Row>
+              <Column align="left" style={{ verticalAlign: "bottom" }}>
+                <Heading
+                  style={{
+                    ...text,
+                    fontSize: "1.25rem",
+                    marginBottom: 0,
+                  }}
+                >
+                  Beste {firstName}
+                </Heading>
+              </Column>
+              <Column>
+                <Img
+                  src="https://www.tvat.be/vatschild.png"
+                  alt="Vatlogo"
+                  width="70"
+                  height="auto"
+                />
+              </Column>
+            </Row>
             <Text style={text}>
               We hebben een verzoek ontvangen om het wachtwoord van je account
               te herstellen. Klik op de onderstaande knop om een nieuw

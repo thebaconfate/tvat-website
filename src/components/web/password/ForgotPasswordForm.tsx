@@ -68,7 +68,7 @@ export default function ForgotPasswordForm() {
         </>
       ) : (
         <>
-          <p>
+          <p className={styles.submittedText}>
             Als er een account bestaat met dit e-mailadres, hebben we
             instructies gestuurd om je wachtwoord te herstellen. Controleer ook
             je inbox en de map met ongewenste e-mail (spam).

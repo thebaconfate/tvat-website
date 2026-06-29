@@ -18,14 +18,19 @@ class ResendService {
     return row ?? null;
   }
 
+  //TODO: Implement this; move existing logic to here
   async handleContactForm() {}
 
-  async sendPasswordResetLink(resetURL: URL, receiver: string) {
+  async sendPasswordResetLink(
+    resetURL: URL,
+    receiver: string,
+    firstName: string,
+  ) {
     return this.resend.emails.send({
       from: `'t VAT <no-reply@${config.resend.domain}>`,
       to: `${receiver}`,
-      subject: `PASSWORD RESET`,
-      react: PasswordResetEmail({ resetURL: resetURL.toString() }),
+      subject: `Password reset`,
+      react: PasswordResetEmail({ resetURL: resetURL.toString(), firstName }),
     });
   }
 }
