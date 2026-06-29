@@ -32,6 +32,7 @@ class AuthService {
 
   async login(credentials: Credentials) {
     const user = await this.userService.getUserByEmail(credentials.email);
+    if (!user) return null;
     const verified = await verifyPassword(credentials.password, user.password);
     if (!verified) return null;
     const payload = { sub: user.id, role: user.role };

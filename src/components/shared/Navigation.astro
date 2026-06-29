@@ -1,6 +1,6 @@
 ---
 import styles from "./Navigation.module.css";
-import { websiteRoutes } from "@/lib/routes";
+import { ROUTES } from "@/lib/routes";
 ---
 
 <nav class={styles.navContainer}>
@@ -29,7 +29,7 @@ import { websiteRoutes } from "@/lib/routes";
   </label>
   <ul class={styles.navList}>
     <li>
-      <a class={styles.navLink} href={websiteRoutes.home.url}>Home</a>
+      <a class={styles.navLink} href={ROUTES.HOME.url}>Home</a>
     </li>
     <li>
       <input
@@ -42,21 +42,18 @@ import { websiteRoutes } from "@/lib/routes";
       </label>
       <ul>
         <li>
-          <a class={styles.navLink} href={websiteRoutes.aboutUs.url}>Over ons</a
-          >
+          <a class={styles.navLink} href={ROUTES.ABOUT_US.url}>Over ons</a>
         </li>
         <li>
-          <a class={styles.navLink} href={websiteRoutes.board.url}>Bestuur</a>
+          <a class={styles.navLink} href={ROUTES.BOARD.url}>Bestuur</a>
         </li>
         <li>
-          <a class={styles.navLink} href={websiteRoutes.clubsong.url}
-            >Clublied</a
-          >
+          <a class={styles.navLink} href={ROUTES.CLUBSONG.url}>Clublied</a>
         </li>
       </ul>
     </li>
     <li>
-      <a class={styles.navLink} href={websiteRoutes.contact.url}> Contact </a>
+      <a class={styles.navLink} href={ROUTES.CONTACT.url}> Contact </a>
     </li>
     <!--
     <li>
@@ -64,9 +61,7 @@ import { websiteRoutes } from "@/lib/routes";
     </li>
     -->
     <li>
-      <a class={styles.navLink} href={websiteRoutes.krambambouli.url}
-        >Krambambouli</a
-      >
+      <a class={styles.navLink} href={ROUTES.KRAMBAMBOULI.url}>Krambambouli</a>
     </li>
     <!-- <li>
       <a
@@ -77,12 +72,10 @@ import { websiteRoutes } from "@/lib/routes";
       >
       -->
     <li class={styles.navlink}>
-      <a class={styles.navLink} href={websiteRoutes.codex.url}
-        >Codex challenge</a
-      >
+      <a class={styles.navLink} href={ROUTES.CODEX.url}>Codex challenge</a>
     </li>
     <li>
-      <a class={styles.navLink} href={websiteRoutes.login.url}>login</a>
+      <a class={styles.navLink} href={ROUTES.LOGIN.url}>login</a>
     </li>
   </ul>
 </nav>
