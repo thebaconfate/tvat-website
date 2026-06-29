@@ -69,7 +69,7 @@ export default function PasswordResetEmail({ resetURL }: EmailProps) {
       <Body style={main}>
         <Container style={container}>
           <Img
-            src="https://tvat.be/logo.png"
+            src="https://www.tvat.be/vatschild.png"
             width="40"
             height="40"
             alt="Vatlogo"
