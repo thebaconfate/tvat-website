@@ -81,6 +81,7 @@ class AuthService {
     const createdAt = new Date();
     const expiresAt = new Date(createdAt.getTime() + 10 * 60 * 1000);
     const resetURL = new URL(ROUTES.RESET_PASSWORD.url, siteOrigin);
+    console.log(user.email);
     try {
       await Promise.all([
         deletePromises,
