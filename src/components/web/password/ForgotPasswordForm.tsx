@@ -4,8 +4,11 @@ import z4 from "zod/v4";
 import Input from "@/components/shared/Input";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/shared/Button";
+import { useState } from "react";
+import { apiRoutes } from "@/lib/routes";
 
 export default function ForgotPasswordForm() {
+  const [submitted, setSubmitted] = useState(false);
   const form = useForm({
     defaultValues: { email: "" },
     validators: {
@@ -13,8 +16,18 @@ export default function ForgotPasswordForm() {
         email: z4.email(),
       }),
     },
+    onSubmit: async ({ value }) => {
+      const endpoint = [
+        apiRoutes.auth.url,
+        apiRoutes.auth.forgotPassword.url,
+      ].join("");
+      const response = await fetch(endpoint, {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(value),
+      });
+    },
   });
-  return (
+  return !submitted ? (
     <form
       onSubmit={(e) => {
         e.preventDefault();
@@ -47,5 +60,7 @@ export default function ForgotPasswordForm() {
       <a href="/login">Back to login</a>
       <Button>Send Reset Link</Button>
     </form>
+  ) : (
+    <></>
   );
 }
