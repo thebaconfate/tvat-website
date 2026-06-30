@@ -6,7 +6,7 @@ import {
   type Credentials,
   type JwtPayload,
 } from "@/lib/domain/auth";
-import { getAuthToken, verifyPassword } from "./auth.utils";
+import { getAuthToken, hashPassword, verifyPassword } from "./auth.utils";
 import { database } from "@/lib/database";
 import { resendService } from "../resend/resend.service";
 import { ROUTES } from "@/lib/routes";
@@ -100,6 +100,29 @@ class AuthService {
       ]);
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  async resetPassword(password: string, token: string) {
+    const hashedToken = createHash("sha256").update(token).digest("base64url");
+    const hashedPassword = await hashPassword(password);
+    const result = await database.query(
+      `
+      UPDATE users u
+      SET password = $1
+      FROM password_recovery_tokens prt
+      WHERE u.id = prt.user_id
+        AND prt.token_hash = $2
+        AND prt.expires_at > NOW()
+      RETURNING u.id
+      `,
+      [hashedPassword, hashedToken],
+    );
+    if (result.rowCount && result.rowCount > 0) {
+      await database.query(
+        `DELETE FROM password_recovery_tokens WHERE token_hash = $1`,
+        [hashedToken],
+      );
     }
   }
 }

@@ -9,7 +9,7 @@ export const userSchema = z.object({
   role: roleSchema,
 });
 
-const passwordSchema = z
+export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters in length")
   .regex(/[a-z]/, "Password must contain a lowercase letter")
