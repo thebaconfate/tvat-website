@@ -10,6 +10,7 @@ import { getAuthToken, hashPassword, verifyPassword } from "./auth.utils";
 import { database } from "@/lib/database";
 import { resendService } from "../resend/resend.service";
 import { ROUTES } from "@/lib/routes";
+import { InvalidTokenError } from "./auth.errors";
 
 class AuthService {
   private secretKey = crypto.randomBytes(64).toString("hex");
@@ -118,12 +119,13 @@ class AuthService {
       `,
       [hashedPassword, hashedToken],
     );
-    if (result.rowCount && result.rowCount > 0) {
-      await database.query(
-        `DELETE FROM password_recovery_tokens WHERE token_hash = $1`,
-        [hashedToken],
-      );
+    if (result.rowCount === 0) {
+      throw new InvalidTokenError("This token is invalid or expired");
     }
+    await database.query(
+      `DELETE FROM password_recovery_tokens WHERE token_hash = $1`,
+      [hashedToken],
+    );
   }
 }
 
