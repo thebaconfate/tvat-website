@@ -4,7 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { Eye, EyeClosed, Mail } from "lucide-react";
 import { Button } from "@/components/shared/Button";
-import { API_ROUTES } from "@/lib/routes";
+import { API_ROUTES, ROUTES } from "@/lib/routes";
 
 export default function LoginForm() {
   const [visible, setVisible] = useState(false);
@@ -15,9 +15,7 @@ export default function LoginForm() {
     },
     validators: { onSubmit: credentialsSchema },
     onSubmit: async ({ value }) => {
-      const endpoint = [API_ROUTES.AUTH.url, API_ROUTES.AUTH.LOGIN.url].join(
-        "",
-      );
+      const endpoint = API_ROUTES.AUTH.LOGIN.url;
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
