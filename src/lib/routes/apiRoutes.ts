@@ -6,5 +6,6 @@ export const API_ROUTES = {
     url: `${AUTH_PREFIX}`,
     LOGIN: { url: `${AUTH_PREFIX}/login` },
     FORGOT_PASSWORD: { url: `${AUTH_PREFIX}/forgot-password` },
+    RESET_PASSWORD: { url: `${AUTH_PREFIX}/reset-password` },
   },
 } as const;
