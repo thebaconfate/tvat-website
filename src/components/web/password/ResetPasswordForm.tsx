@@ -6,9 +6,9 @@ import z4 from "zod/v4";
 import { Eye, EyeClosed } from "lucide-react";
 
 type Props = {
-  token: string;
+  token?: string;
 };
-export default function ResetPasswordForm({ token }: Props) {
+export default function ResetPasswordForm({ token = "" }: Props) {
   const [visible, setVisible] = useState(false);
   const form = useForm({
     defaultValues: {
