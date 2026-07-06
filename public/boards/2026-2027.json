@@ -1,0 +1,183 @@
+{
+    "term": "2026-2027",
+    "boardMembers": [
+        {
+            "boardRole": "Praeses",
+            "name": "Lucas Miserez",
+            "stars": [
+                "G",
+                "G",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Vice-Praeses",
+            "name": "Simon Careme",
+            "stars": []
+        },
+        {
+            "boardRole": "Cantor",
+            "name": "Sam Van de Velde",
+            "boulons": [
+                "Z",
+                "Z",
+                "Z",
+                "Z",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Quaestor",
+            "name": "Maika Felix",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Ab-Actis",
+            "name": "Brent Van Langendonck",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Magister Krambambouli",
+            "name": "Kyo Schelfhout",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "Z",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Zangfeest",
+            "name": "Kyo Schelfhout",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "Z",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Cultuurmeester",
+            "name": "Kiara",
+            "stars": []
+        },
+        {
+            "boardRole": "Biermeester",
+            "name": "Ilias",
+            "stars": []
+        },
+        {
+            "boardRole": "Frituurmeester",
+            "name": "Lionel Vanderhelstraete",
+            "stars": [
+                "G",
+                "G"
+            ]
+        },
+        {
+            "name": "Lucie Madou",
+            "boardRole": "Socialemediaverantwoordelijke",
+            "stars": [
+                "G",
+                "G",
+                "G"
+            ]
+        },
+        {
+            "name": "Vic Arteel",
+            "boardRole": "Temmer",
+            "stars": [
+                "G",
+                "G",
+                "Z",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Jishi Vandoorne",
+            "stars": []
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Zoë Debo",
+            "stars": [
+                "G",
+                "Z"
+            ]
+        },
+        {
+            "boardRole": "Temmer",
+            "name": "Kate",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Nele",
+            "stars": []
+        },
+        {
+            "name": "Rias Smismans",
+            "boardRole": "Medewerker",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G",
+                "G",
+                "G"
+            ]
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Zia",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Lars",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Thomas",
+            "stars": []
+        },
+        {
+            "name": "Lana",
+            "boardRole": "Medewerker"
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Lex Withofs",
+            "boulons": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Jarni Van Waesberge",
+            "stars": []
+        },
+        {
+            "boardRole": "Medewerker",
+            "name": "Joppe Van Belle",
+            "stars": [
+                "G",
+                "Z"
+            ]
+        }
+    ]
+}
