@@ -21,6 +21,7 @@ export enum BoardRole {
   CultureMaster = "Cultuurmeester",
   CultureMaster2 = "Cultuur meester",
   CultureMaster3 = "Cultuur",
+  FrituurMaster = "Frituurmeester",
   Sport = "Sport",
   SportMaster = "Sport meester",
   SocialMedia = "Socialemediaverantwoordelijke",
@@ -72,6 +73,7 @@ export const boardRoleIndex: Record<BoardRole, number> = {
   [BoardRole.CultureMaster]: 1_000_000 - 1,
   [BoardRole.CultureMaster2]: 1_000_000,
   [BoardRole.CultureMaster3]: 1_000_000 + 1,
+  [BoardRole.FrituurMaster]: 2_000_000,
   [BoardRole.BeerMaster]: 1_000_000_000,
   [BoardRole.Member]: Infinity,
 };
