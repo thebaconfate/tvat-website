@@ -1,0 +1,22 @@
+---
+import LayoutAstroComponent from "@/layouts/Layout.astro";
+import { authService } from "@/lib/services/auth";
+
+const authenticated = (await authService.authenticate(Astro.request.headers))
+  ? true
+  : false;
+---
+
+<LayoutAstroComponent title="Dashboard" loggedIn={authenticated}>
+  <main
+    style={{
+      display: "flex",
+      flex: 1,
+      "justify-content": "center",
+      "align-items": "center",
+    }}
+  >
+    We werken aan de migratie van de app, deze feature is momenteel
+    uitgeschakeld
+  </main>
+</LayoutAstroComponent>
