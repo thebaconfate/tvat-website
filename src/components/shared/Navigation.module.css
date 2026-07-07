@@ -33,6 +33,7 @@ li ul {
   opacity: 0;
   background: white;
   padding-bottom: 100dvh;
+  z-index: 1;
 }
 
 .navList li a {
@@ -127,6 +128,7 @@ li ul {
     flex-wrap: wrap;
     gap: 0.5rem;
     padding-bottom: unset;
+    z-index: unset;
   }
 
   .navList li a {

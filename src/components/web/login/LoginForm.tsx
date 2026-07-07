@@ -4,7 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { Eye, EyeClosed, Mail } from "lucide-react";
 import { Button } from "@/components/shared/Button";
-import { API_ROUTES, APP_ROUTES, ROUTES } from "@/lib/routes";
+import { API_ROUTES, APP_ROUTES } from "@/lib/routes";
 import { navigate } from "astro/virtual-modules/transitions-router.js";
 
 export default function LoginForm() {
@@ -23,7 +23,7 @@ export default function LoginForm() {
         body: JSON.stringify(value),
       });
       if (response.ok) {
-        navigate(APP_ROUTES.KRAMBAMBOULI.DASHBOARD.url);
+        navigate(APP_ROUTES.APP.url);
       }
     },
   });
