@@ -1,0 +1,11 @@
+---
+import { ROUTES } from "@/lib/routes";
+
+if (Astro.cookies.has("Authorization")) {
+  Astro.cookies.delete("Authorization", {
+    path: "/",
+  });
+}
+
+return Astro.redirect(ROUTES.LOGIN.url);
+---
