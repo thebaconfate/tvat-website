@@ -8,7 +8,7 @@ interface Props {
 }
 import styles from "./Layout.module.css";
 import Vatschild from "@/svgs/Vatschild.astro";
-import { websiteRoutes } from "@/lib/oldRoutes";
+import { ROUTES } from "@/lib/routes";
 const { title } = Astro.props;
 ---
 
@@ -27,11 +27,13 @@ const { title } = Astro.props;
   <body class={styles.page}>
     <header>
       <div class={styles.logo}>
-        <a href={websiteRoutes.home.url}>
+        <a href={ROUTES.HOME.url}>
           <Vatschild />
         </a>
       </div>
-      <Navigation />
+      <Navigation server:defer>
+        <div>Loading navigation</div>
+      </Navigation>
     </header>
     <slot />
     <footer>

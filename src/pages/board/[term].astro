@@ -6,6 +6,12 @@ import { sortByTerm } from "../../lib/board/board-year";
 import BoardPage from "@/components/web/board/BoardPage.astro";
 import path from "path";
 
+/*
+ * TODO: Refactor this to pull the data from local persistant storage instead of
+ * the public directory. Move the contents of the directory to the persistant
+ * storage.
+ * */
+
 export const prerender = true;
 export async function getStaticPaths() {
   const directoryPath = path.resolve("./public/boards");

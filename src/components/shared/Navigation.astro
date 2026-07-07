@@ -1,6 +1,11 @@
 ---
+import { authService } from "@/lib/services/auth";
 import styles from "./Navigation.module.css";
 import { ROUTES } from "@/lib/routes";
+
+const loggedIn = (await authService.authenticate(Astro.request.headers))
+  ? true
+  : false;
 ---
 
 <nav class={styles.navContainer}>
@@ -75,7 +80,17 @@ import { ROUTES } from "@/lib/routes";
       <a class={styles.navLink} href={ROUTES.CODEX.url}>Codex challenge</a>
     </li>
     <li>
-      <a class={styles.navLink} href={ROUTES.LOGIN.url}>login</a>
+      {
+        loggedIn ? (
+          <a class={`${styles.navLink} authLink`} href={ROUTES.LOGOUT.url}>
+            Logout
+          </a>
+        ) : (
+          <a class={`${styles.navLink} authLink`} href={ROUTES.LOGIN.url}>
+            Login
+          </a>
+        )
+      }
     </li>
   </ul>
 </nav>
