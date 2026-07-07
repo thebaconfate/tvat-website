@@ -1,13 +1,8 @@
 ---
 import LayoutAstroComponent from "@/layouts/Layout.astro";
-import { authService } from "@/lib/services/auth";
-
-const authenticated = (await authService.authenticate(Astro.request.headers))
-  ? true
-  : false;
 ---
 
-<LayoutAstroComponent title="Dashboard" loggedIn={authenticated}>
+<LayoutAstroComponent title="Dashboard">
   <main
     style={{
       display: "flex",
