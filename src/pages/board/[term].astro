@@ -1,52 +1,30 @@
 ---
+import { terms } from "@/generated/terms";
 import Layout from "../../layouts/Layout.astro";
-import { readdir, readFile } from "fs/promises";
-import { BoardYear, type BoardYearInterface } from "../../lib/board/board-year";
-import { sortByTerm } from "../../lib/board/board-year";
 import BoardPage from "@/components/web/board/BoardPage.astro";
-import path from "path";
+import { BoardYear } from "@/lib/board/board-year";
+import { getEntry } from "astro:content";
+import { getCollection } from "astro:content";
 
-/*
- * TODO: Refactor this to pull the data from local persistant storage instead of
- * the public directory. Move the contents of the directory to the persistant
- * storage.
- * */
-
-export const prerender = true;
-export async function getStaticPaths() {
-  const directoryPath = path.resolve("./public/boards");
-  const directoryPromise = readdir(directoryPath);
-  const termRegex = /^\d{4}-\d{4}\.json$/;
-  const directory = await directoryPromise;
-  const filenames = directory.filter((path) => termRegex.test(path));
-  const boardYears: BoardYearInterface[] = await Promise.all(
-    filenames.map(async (filename) => {
-      const filePath = path.join(directoryPath, filename);
-      const board = await readFile(filePath, "utf-8");
-      return JSON.parse(board);
-    }),
-  );
-  const terms = boardYears.map((d) => d.term);
-  terms.sort(sortByTerm);
-  return boardYears.map((d) => {
-    return {
-      params: { term: d.term },
-      props: { boardYear: new BoardYear(d), terms: terms },
-    };
-  });
-}
-
-const { boardYear, terms } = Astro.props;
-const termIndex = terms.findIndex((a) => a === boardYear.term);
+const { term } = Astro.params;
+if (!term) return Astro.redirect("/404");
+const termIndex = terms.findIndex((a) => a === term);
 const nextTerm: string | undefined = terms[termIndex - 1];
 const previousTerm: string | undefined = terms[termIndex + 1];
+const boardYearCollection = await getCollection("boardYears");
+console.log(boardYearCollection);
+const boardYearEntry = await getEntry("boardYears", term);
 const title = "Bestuur";
 ---
 
 <Layout title={title}>
-  <BoardPage
-    boardYear={boardYear}
-    nextTerm={nextTerm}
-    previousTerm={previousTerm}
-  />
+  {
+    boardYearEntry && (
+      <BoardPage
+        boardYear={new BoardYear(boardYearEntry.data)}
+        nextTerm={nextTerm}
+        previousTerm={previousTerm}
+      />
+    )
+  }
 </Layout>
