@@ -2,6 +2,7 @@
 const { authService } = await import("@/lib/services/auth");
 import styles from "./Navigation.module.css";
 import { ROUTES } from "@/lib/routes";
+import { latestTerm } from "@/lib/cache/boardYears";
 
 const loggedIn = (await authService.authenticate(Astro.request.headers))
   ? true
@@ -50,7 +51,9 @@ const loggedIn = (await authService.authenticate(Astro.request.headers))
           <a class={styles.navLink} href={ROUTES.ABOUT_US.url}>Over ons</a>
         </li>
         <li>
-          <a class={styles.navLink} href={ROUTES.BOARD.url}>Bestuur</a>
+          <a class={styles.navLink} href={`${ROUTES.BOARD.url}/${latestTerm}`}
+            >Bestuur</a
+          >
         </li>
         <li>
           <a class={styles.navLink} href={ROUTES.CLUBSONG.url}>Clublied</a>

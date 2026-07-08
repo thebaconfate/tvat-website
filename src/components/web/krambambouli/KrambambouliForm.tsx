@@ -14,7 +14,6 @@ import z4 from "zod/v4";
 import { productSchema } from "@/lib/domain/products";
 import { Button } from "@/components/shared/Button";
 import type { PriceData } from "@/lib/domain/price";
-import { apiRoutes } from "@/lib/oldRoutes";
 
 interface Props {
   products: KrambambouliProductData[];
@@ -145,10 +144,7 @@ export default function KrambambouliForm({
         }),
     },
     onSubmit: async ({ value }) => {
-      const url = [
-        apiRoutes.krambambouli.url,
-        apiRoutes.krambambouli.order.url,
-      ].join("");
+      const url = [""].join(""); // TODO: Fix endpoint route
       const commonPayload = {
         email: value.email,
         firstName: value.firstName,

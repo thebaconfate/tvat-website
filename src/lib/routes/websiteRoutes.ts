@@ -1,9 +1,3 @@
-import { terms } from "../../generated/terms.ts";
-import { sortByTerm } from "../board/board-year";
-
-terms.sort(sortByTerm);
-const latestTerm = terms[0];
-
 const ACTIVITIES_BASE = "/activities" as const;
 const CODEX_PREFIX = "/codex" as const;
 const BOARD_PREFIX = "/board" as const;
@@ -21,7 +15,7 @@ export const ROUTES = {
   LOGIN: { url: "/login" },
   LOGOUT: { url: "/logout" },
   RESET_PASSWORD: { url: "/reset-password" },
-  BOARD: { url: `${BOARD_PREFIX}/${latestTerm}` },
+  BOARD: { url: `${BOARD_PREFIX}` },
   CODEX: {
     url: `${CODEX_PREFIX}`,
     CODEXCHALLENGE: { url: `${CODEX_PREFIX}/challenge` },

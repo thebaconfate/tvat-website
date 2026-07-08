@@ -9,4 +9,5 @@ export const API_ROUTES = {
     FORGOT_PASSWORD: { url: `${AUTH_PREFIX}/forgot-password` },
     RESET_PASSWORD: { url: `${AUTH_PREFIX}/reset-password` },
   },
+  CONTACT: { url: `${API_PREFIX}/contact` },
 } as const;
