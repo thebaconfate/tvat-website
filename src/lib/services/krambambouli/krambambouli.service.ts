@@ -7,7 +7,6 @@ import type {
 } from "@/lib/domain/krambambouli";
 import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
-import type { OrderInterface } from "@/lib/interfaces/database/order";
 
 class KrambambouliService {
   async formActive(): Promise<boolean> {

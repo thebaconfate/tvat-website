@@ -1,5 +1,5 @@
 import type { APIContext } from "astro";
 
-export async function GET({ request }: APIContext) {
+export async function GET({}: APIContext) {
   return new Response();
 }

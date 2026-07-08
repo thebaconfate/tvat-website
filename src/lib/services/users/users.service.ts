@@ -92,6 +92,7 @@ class UserService {
   }
 
   async editUser(user: Partial<UserData>) {
+    console.log(user);
     // TODO: implement this
   }
   async deleteUser(userId: number) {

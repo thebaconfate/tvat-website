@@ -1,4 +1,3 @@
-import { apiRoutes } from "@/lib/oldRoutes";
 import styles from "./ContactFormPage.module.css";
 import { useForm } from "@tanstack/react-form";
 import { contactFormSchema } from "@/lib/domain/contact";
@@ -6,6 +5,7 @@ import { Button } from "@/components/shared/Button";
 import { useState } from "react";
 import Input from "@/components/shared/Input";
 import Textarea from "@/components/shared/Textarea";
+import { API_ROUTES } from "@/lib/routes";
 
 type FormState = "edit" | "success" | "error";
 
@@ -23,7 +23,7 @@ export default function ContactFormPage() {
     },
     onSubmit: async ({ value }) => {
       try {
-        const response = await fetch(apiRoutes.contact.url, {
+        const response = await fetch(API_ROUTES.CONTACT.url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(value),

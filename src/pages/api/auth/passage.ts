@@ -1,6 +1,5 @@
 import { Auth } from "../../../lib/auth/auth";
 
-export const prerender = false;
 const unAuthorizedResponse = new Response(null, {
   status: 401,
 });

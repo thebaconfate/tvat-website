@@ -1,8 +1,6 @@
 import { krambambouliOrderFormSchema } from "@/lib/domain/krambambouli";
 import { krambambouliService } from "@/lib/services/krambambouli";
 
-export const prerender = false;
-
 export async function POST({
   request,
 }: {

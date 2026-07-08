@@ -1,5 +1,4 @@
 ---
-import { terms } from "@/generated/terms";
 import Layout from "../../layouts/Layout.astro";
 import BoardPage from "@/components/web/board/BoardPage.astro";
 import { BoardYear } from "@/lib/board/board-year";
@@ -8,23 +7,22 @@ import { getCollection } from "astro:content";
 
 const { term } = Astro.params;
 if (!term) return Astro.redirect("/404");
-const termIndex = terms.findIndex((a) => a === term);
-const nextTerm: string | undefined = terms[termIndex - 1];
-const previousTerm: string | undefined = terms[termIndex + 1];
 const boardYearCollection = await getCollection("boardYears");
-console.log(boardYearCollection);
+boardYearCollection.sort((a, b) => a.data.term - b.data.term);
+const termIndex = boardYearCollection.findIndex((a) => a.data.term === term);
+const nextTerm: string | undefined =
+  boardYearCollection[termIndex - 1]?.data.term;
+const previousTerm: string | undefined =
+  boardYearCollection[termIndex + 1]?.data.term;
 const boardYearEntry = await getEntry("boardYears", term);
+if (!boardYearEntry) return Astro.redirect("/404");
 const title = "Bestuur";
 ---
 
 <Layout title={title}>
-  {
-    boardYearEntry && (
-      <BoardPage
-        boardYear={new BoardYear(boardYearEntry.data)}
-        nextTerm={nextTerm}
-        previousTerm={previousTerm}
-      />
-    )
-  }
+  <BoardPage
+    boardYear={new BoardYear(boardYearEntry.data)}
+    nextTerm={nextTerm}
+    previousTerm={previousTerm}
+  />
 </Layout>
