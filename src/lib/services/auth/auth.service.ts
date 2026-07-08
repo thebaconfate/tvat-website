@@ -22,7 +22,7 @@ class AuthService {
       expiresIn: "1h",
     });
   }
-  private verifyToken(token: string): JwtPayload | boolean {
+  verifyToken(token: string): JwtPayload | false {
     try {
       const decoded = jwt.verify(token, this.secretKey);
       if (typeof decoded === "string")
