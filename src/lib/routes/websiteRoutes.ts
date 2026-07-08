@@ -9,6 +9,7 @@ export const ROUTES = {
     url: `${ACTIVITIES_BASE}`,
     LUSTRUMGALA: { url: `${ACTIVITIES_BASE}/lustrumgalabal` },
   },
+  UNAUTHORIZED: { url: "/401" },
   ABOUT_US: { url: "/about-us" },
   CONTACT: { url: "/contact" },
   HISTORY: { url: "/history" },

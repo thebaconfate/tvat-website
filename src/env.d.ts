@@ -1,13 +1,13 @@
 /// <reference path="../.astro/types.d.ts" />
+
 //
 type User = {
   id: number;
-  name: string;
+  role: string;
 };
 
 declare namespace App {
   interface Locals {
-    message: string;
+    user?: User;
   }
 }
-
