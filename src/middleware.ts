@@ -6,8 +6,15 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
   const authCookie = context.cookies.get("Authorization")?.value;
   if (!authCookie && !context.url.pathname.startsWith(APP_ROUTES.APP.url))
     return next();
-  console.log(ROUTES.LOGIN.url);
-  if (!authCookie) return context.redirect(ROUTES.UNAUTHORIZED.url);
+  if (!authCookie) {
+    const response = await next(
+      new Request(new URL(ROUTES.UNAUTHENTICATED.url, context.url)),
+    );
+    return new Response(response.body, {
+      status: 401,
+      headers: response.headers,
+    });
+  }
   const verifiedToken = authService.verifyToken(authCookie);
   if (!verifiedToken) {
     context.cookies.delete("Authorization");
