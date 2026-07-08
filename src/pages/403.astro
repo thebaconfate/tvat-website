@@ -3,5 +3,10 @@ import LayoutAstroComponent from "@/layouts/Layout.astro";
 ---
 
 <LayoutAstroComponent title="Forbidden">
-  <main>Forbidden</main>
+  <main>
+    <div>
+      Forbidden
+      <button onclick="history.back()">Go back</button>
+    </div>
+  </main>
 </LayoutAstroComponent>

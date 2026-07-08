@@ -4,4 +4,9 @@ import LayoutAstroComponent from "@/layouts/Layout.astro";
 
 <LayoutAstroComponent title="Unauthorized">
   <main>Unauthenticated</main>
+  <script>
+    import { ROUTES } from "@/lib/routes";
+    import { navigate } from "astro/virtual-modules/transitions-router.js";
+    setTimeout(() => navigate(ROUTES.LOGIN.url), 1000 * 2);
+  </script>
 </LayoutAstroComponent>
