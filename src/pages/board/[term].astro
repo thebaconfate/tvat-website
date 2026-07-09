@@ -1,14 +1,14 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import BoardPage from "@/components/web/board/BoardPage.astro";
-import { BoardYear } from "@/lib/board/board-year";
+import { BoardYear, sortByTerm } from "@/lib/board/board-year";
 import { getEntry } from "astro:content";
 import { getCollection } from "astro:content";
 
 const { term } = Astro.params;
 if (!term) return Astro.redirect("/404");
 const boardYearCollection = await getCollection("boardYears");
-boardYearCollection.sort((a, b) => a.data.term - b.data.term);
+boardYearCollection.sort((a, b) => sortByTerm(a.data.term, b.data.term));
 const termIndex = boardYearCollection.findIndex((a) => a.data.term === term);
 const nextTerm: string | undefined =
   boardYearCollection[termIndex - 1]?.data.term;
