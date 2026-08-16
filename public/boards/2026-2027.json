@@ -12,8 +12,13 @@
         },
         {
             "boardRole": "Vice-Praeses",
-            "name": "Simon Careme",
-            "stars": []
+            "name": "Simon Carême",
+            "stars": [
+                "G",
+                "Z",
+                "G",
+                "Z"
+            ]
         },
         {
             "boardRole": "Cantor",
@@ -72,13 +77,19 @@
         },
         {
             "boardRole": "Cultuurmeester",
-            "name": "Kiara",
-            "stars": []
+            "name": "Kiara Geuten",
+            "stars": [
+                "G",
+                "G"
+            ]
         },
         {
             "boardRole": "Biermeester",
-            "name": "Ilias",
-            "stars": []
+            "name": "Ilias Thils",
+            "boulons": [
+                "Z",
+                "G"
+            ]
         },
         {
             "boardRole": "Frituurmeester",
@@ -94,7 +105,7 @@
             "stars": [
                 "G",
                 "G",
-                "G"
+                "Z"
             ]
         },
         {
@@ -104,13 +115,19 @@
                 "G",
                 "G",
                 "Z",
+                "Z",
                 "Z"
             ]
         },
         {
             "boardRole": "Temmer",
             "name": "Jishi Vandoorne",
-            "stars": []
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G"
+            ]
         },
         {
             "boardRole": "Temmer",
@@ -149,8 +166,12 @@
         },
         {
             "boardRole": "Medewerker",
-            "name": "Lars",
-            "stars": []
+            "name": "Lars Deryckere (btw Simon kan je de foto knippen da enkel ik erop sta?)",
+            "stars": [
+                "G",
+                "G",
+                "G"
+            ]
         },
         {
             "boardRole": "Medewerker",
@@ -158,8 +179,12 @@
             "stars": []
         },
         {
-            "name": "Lana",
-            "boardRole": "Medewerker"
+            "name": "Lana Gabriels",
+            "boardRole": "Medewerker",
+            "stars": [
+                "G",
+                "Z"
+            ]
         },
         {
             "boardRole": "Medewerker",
