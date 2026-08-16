@@ -14,7 +14,8 @@ interface Props {
 export function removeAccents(str: string): string {
   return str
     .normalize("NFD") // Split letters and diacritics (e.g. "é" → "é")
-    .replace(/[\u0300-\u036f]/g, ""); // Remove all combining marks
+    .replace(/[\u0300-\u036f]/g, "") // Remove all combining marks
+    .replace(/[()?]/g, "");
 }
 const { boardMember, term, index } = Astro.props;
 const src = `/boards/${term}/${removeAccents(boardMember.name.toLowerCase()).replaceAll(" ", "-")}`;
