@@ -3,7 +3,6 @@ import type { BoardMember } from "../../../lib/board/board-member";
 import { Boulon } from "../../../lib/board/boulon";
 import { Star } from "../../../lib/board/star";
 import styles from "./BoardMemberItem.module.css";
-import { access } from "fs/promises";
 
 interface Props {
   boardMember: BoardMember;
@@ -20,19 +19,6 @@ export function removeAccents(str: string): string {
 const { boardMember, term, index } = Astro.props;
 const src = `/boards/${term}/${removeAccents(boardMember.name.toLowerCase()).replaceAll(" ", "-")}`;
 const pngPath = `${src}.png`;
-const jpgPath = `${src}.jpg`;
-async function fileExists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
-  }
-}
-const [pngExists, jpgExists] = await Promise.all([
-  fileExists(pngPath),
-  fileExists(jpgPath),
-]);
 const rgbColors = [styles.purple, styles.red, styles.green];
 const rgbaColors = [styles.purpleA, styles.redA, styles.greenA];
 const borderColors = [
@@ -79,7 +65,7 @@ const i = index % 3;
                   b === Boulon.Silver ? (
                     <img src="/boulon-s.png" alt="Zilvere boulon" />
                   ) : (
-                    <img src="/boulon-g" alt="Gouden boulon" />
+                    <img src="/boulon-g.png" alt="Gouden boulon" />
                   ),
                 )
               : ""
