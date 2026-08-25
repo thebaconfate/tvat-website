@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./RandomSongPicker.module.css";
-import { Language, type Song } from "@/lib/codex-challenge";
+import { LanguageEnum, type Language, type Song } from "@/lib/codex-challenge";
 
 interface Props {
   dutchSongs: Song[];
@@ -12,21 +12,22 @@ interface Props {
   setSong: (s: Song) => void;
 }
 
-const limit: { [key in Language]: number } = {
-  [Language.DUTCH]: 4,
-  [Language.FRENCH]: 3,
-  [Language.GERMAN]: 2,
-  [Language.ENGLISH]: 1,
-  [Language.OTHER]: 1,
+const limit: Record<Language, number> = {
+  [LanguageEnum.DUTCH]: 4,
+  [LanguageEnum.FRENCH]: 3,
+  [LanguageEnum.GERMAN]: 2,
+  [LanguageEnum.ENGLISH]: 1,
+  [LanguageEnum.OTHER]: 1,
 };
 
 function filterLang(language: Language) {
   return function f(song: Song) {
     switch (language) {
-      case Language.ENGLISH:
-      case Language.OTHER:
+      case LanguageEnum.ENGLISH:
+      case LanguageEnum.OTHER:
         return (
-          song.language === Language.ENGLISH || song.language === Language.OTHER
+          song.language === LanguageEnum.ENGLISH ||
+          song.language === LanguageEnum.OTHER
         );
       default:
         return song.language === language;
@@ -84,7 +85,7 @@ export default function RandomSongPicker({
             <p>
               {`${
                 [...alreadySelectedSongs].filter(
-                  (s) => s.language === Language.DUTCH,
+                  (s) => s.language === LanguageEnum.DUTCH,
                 ).length
               }/4`}
             </p>
@@ -103,7 +104,7 @@ export default function RandomSongPicker({
             <p>
               {`${
                 [...alreadySelectedSongs].filter(
-                  (s) => s.language === Language.FRENCH,
+                  (s) => s.language === LanguageEnum.FRENCH,
                 ).length
               }/3`}
             </p>
@@ -122,7 +123,7 @@ export default function RandomSongPicker({
             <p>
               {`${
                 [...alreadySelectedSongs].filter(
-                  (s) => s.language === Language.GERMAN,
+                  (s) => s.language === LanguageEnum.GERMAN,
                 ).length
               }/2`}
             </p>
@@ -141,8 +142,8 @@ export default function RandomSongPicker({
               {`${
                 [...alreadySelectedSongs].filter(
                   (s) =>
-                    s.language === Language.ENGLISH ||
-                    s.language === Language.OTHER,
+                    s.language === LanguageEnum.ENGLISH ||
+                    s.language === LanguageEnum.OTHER,
                 ).length
               }/1`}
             </p>

@@ -1,14 +1,29 @@
-export enum Language {
-  DUTCH = "Nederlands",
-  FRENCH = "Frans",
-  GERMAN = "Duits",
-  ENGLISH = "Engels",
-  OTHER = "Anderstalig",
-}
+import type { CollectionConfig } from "astro/content/config";
+import type { Loader } from "astro/loaders";
+import { z } from "zod/v4";
 
-export interface Song {
-  title: string;
-  page: number;
-  language: Language;
-  description?: string;
-}
+const languages = {
+  ENGLISH: "Engels",
+  DUTCH: "Nederlands",
+  OTHER: "Anderstalig",
+  FRENCH: "Frans",
+  GERMAN: "Duits",
+} as const;
+
+export const languageSchema = z.enum(languages);
+
+export const LanguageEnum = languageSchema.enum;
+
+export type Language = z.infer<typeof languageSchema>;
+
+export const songSchema = z.object({
+  id: z.int().positive(),
+  title: z.string(),
+  page: z.int().positive(),
+  language: languageSchema,
+  description: z.string().optional(),
+});
+
+export type Song = z.infer<typeof songSchema>;
+
+export type SongCollection = CollectionConfig<typeof songSchema, Loader>;
