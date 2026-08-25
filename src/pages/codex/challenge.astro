@@ -4,15 +4,16 @@ import CodexChallengePage from "@/components/web/codex-challenge/CodexChallengeP
 import { getCollection } from "astro:content";
 
 const title = "Codex Challenge";
-const songs = await getCollection("songs");
-const groupedSongs = Object.groupBy(songs, (song) => song.data.language);
+const songCollection = await getCollection("songs");
+const songs = songCollection.map((song) => song.data);
+const songsGroupedByLang = Object.groupBy(songs, (song) => song.language);
 ---
 
 <Layout title={title}>
   <CodexChallengePage
-    dutchSongs={groupedSongs.Nederlands?.map((songs) => songs.data) ?? []}
-    frenchSongs={groupedSongs.Frans?.map((songs) => songs.data) ?? []}
-    germanSongs={groupedSongs.Duits?.map((songs) => songs.data) ?? []}
-    otherSongs={groupedSongs.Anderstalig?.map((songs) => songs.data) ?? []}
+    dutchSongs={songsGroupedByLang.Nederlands ?? []}
+    frenchSongs={songsGroupedByLang.Frans ?? []}
+    germanSongs={songsGroupedByLang.Duits ?? []}
+    otherSongs={songsGroupedByLang.Anderstalig ?? []}
   />
 </Layout>
