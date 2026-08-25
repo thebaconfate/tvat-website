@@ -1,7 +1,12 @@
 import { useState } from "react";
 import styles from "./CodexChallenge.module.css";
+import z4 from "zod/v4";
 import { Button } from "@/components/shared/Button";
-import { Language, type Song } from "@/lib/codex-challenge";
+import {
+  languageSchema,
+  type Language,
+  type Song,
+} from "@/lib/codex-challenge";
 import RandomSongPicker from "./RandomSongPicker";
 
 interface Props {
@@ -17,16 +22,15 @@ enum Mode {
   Randomizer,
 }
 
-type Score = { [key in Language]: number };
+type Score = Record<Language, number>;
 
-const initScores: Score = {
-  [Language.DUTCH]: 0,
-  [Language.FRENCH]: 0,
-  [Language.GERMAN]: 0,
-  [Language.ENGLISH]: 0,
-  [Language.OTHER]: 0,
-};
-
+const initScores: Score = languageSchema.options.reduce(
+  (acc, key) => {
+    acc[key] = 0;
+    return acc;
+  },
+  {} as Record<Language, number>,
+);
 export default function CodexChallenge({
   dutchSongs,
   frenchSongs,
