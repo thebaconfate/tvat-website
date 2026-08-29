@@ -7,6 +7,10 @@ const title = "Codex Challenge";
 const songCollection = await getCollection("songs");
 const songs = songCollection.map((song) => song.data);
 const songsGroupedByLang = Object.groupBy(songs, (song) => song.language);
+const otherSongs = [
+...(songsGroupedByLang.Engels ?? []),
+...(songsGroupedByLang.Anderstalig ?? [])
+]
 ---
 
 <Layout title={title}>
@@ -14,6 +18,6 @@ const songsGroupedByLang = Object.groupBy(songs, (song) => song.language);
     dutchSongs={songsGroupedByLang.Nederlands ?? []}
     frenchSongs={songsGroupedByLang.Frans ?? []}
     germanSongs={songsGroupedByLang.Duits ?? []}
-    otherSongs={songsGroupedByLang.Anderstalig ?? []}
+    otherSongs={otherSongs}
   />
 </Layout>
