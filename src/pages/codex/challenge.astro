@@ -8,9 +8,9 @@ const songCollection = await getCollection("songs");
 const songs = songCollection.map((song) => song.data);
 const songsGroupedByLang = Object.groupBy(songs, (song) => song.language);
 const otherSongs = [
-...(songsGroupedByLang.Engels ?? []),
-...(songsGroupedByLang.Anderstalig ?? [])
-]
+  ...(songsGroupedByLang.Engels ?? []),
+  ...(songsGroupedByLang.Anderstalig ?? []),
+];
 ---
 
 <Layout title={title}>
