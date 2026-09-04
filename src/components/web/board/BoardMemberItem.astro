@@ -36,7 +36,14 @@ const i = index % 3;
       class={`${styles.boardMemberPicture} ${borderColors[i]}`}
       src={pngPath}
       alt={boardMember.name + "'s foto"}
-      onerror="this.onerror=null; this.src=this.src.replace('.png', '.jpg');"
+      onerror="
+      if (!this.dataset.fallbackTried) {
+      this.dataset.fallbackTried = 'true';
+      this.src = this.src.replace(/\.png$/i, '.jpg');
+    } else {
+      this.style.display = 'none';
+    }
+      "
       loading="lazy"
       decoding="async"
     />
