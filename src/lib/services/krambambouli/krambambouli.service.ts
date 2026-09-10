@@ -49,6 +49,7 @@ class KrambambouliService {
     const result = await database.query<DeliveryZoneData>(sql);
     return result.rows;
   }
+
   async getPickupLocations(): Promise<PickupLocationData[] | null> {
     const sql = `
     SELECT
@@ -63,7 +64,7 @@ class KrambambouliService {
 
   async createOrder(order: KrambambouliOrderFormData) {
     return database.withTransaction(async (client) => {
-      const createClientSql = `
+      const createCustomerSql = `
         INSERT INTO customers (email, first_name, last_name)
         VALUES ($1, $2, $3)
         ON CONFLICT (email) DO UPDATE
@@ -71,7 +72,7 @@ class KrambambouliService {
         RETURNING id
         `;
       const customerResult = await client.query<{ id: number }>(
-        createClientSql,
+        createCustomerSql,
         [order.email, order.firstName, order.lastName],
       );
       const customerId = customerResult.rows[0].id;
