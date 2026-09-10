@@ -1,4 +1,4 @@
-import { database } from "@/lib/database";
+import { database, type DatabaseClient } from "@/lib/database";
 import type {
   DeliveryZoneData,
   KrambambouliOrderFormData,
@@ -7,19 +7,28 @@ import type {
 } from "@/lib/domain/krambambouli";
 import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
+import type { PoolClient, QueryResult } from "pg";
 
-class KrambambouliService {
-  async formActive(): Promise<boolean> {
+type CustomerDetails = {
+  email: string;
+  firstName: string;
+  lastName: string;
+};
+
+class KrambambouliRepository {
+  async isFormEnabled(db: DatabaseClient = database): Promise<boolean> {
     const sql = `
         SELECT c.config_value AS "configValue"
         FROM config c WHERE c.config_key ILIKE 'krambambouli_form_enabled'
         `;
-    const result = await database.query<{ configValue: boolean }>(sql);
+    const result: QueryResult<{ configValue: boolean }> = await db.query(sql);
     const [row] = result.rows;
     return row.configValue ?? false;
   }
 
-  async getKrambambouliProducts(): Promise<KrambambouliProductData[] | null> {
+  async findActiveProducts(
+    db: DatabaseClient = database,
+  ): Promise<KrambambouliProductData[] | null> {
     const sql = `
     SELECT
         p.id,
@@ -31,11 +40,13 @@ class KrambambouliService {
     WHERE p.active = TRUE
         AND p.category ILIKE '%krambambouli%'
     `;
-    const result = await database.query<KrambambouliProductData>(sql);
+    const result: QueryResult<KrambambouliProductData> = await db.query(sql);
     return result.rows;
   }
 
-  async getDeliveryLocations(): Promise<DeliveryZoneData[] | null> {
+  async findActiveDeliveryZones(
+    db: DatabaseClient = database,
+  ): Promise<DeliveryZoneData[] | null> {
     const sql = `
     SELECT
         dz.id,
@@ -46,11 +57,12 @@ class KrambambouliService {
     FROM krambambouli_delivery_zones dz
     WHERE dz.active = TRUE
     `;
-    const result = await database.query<DeliveryZoneData>(sql);
+    const result: QueryResult<DeliveryZoneData> = await db.query(sql);
     return result.rows;
   }
-
-  async getPickupLocations(): Promise<PickupLocationData[] | null> {
+  async findActivePickupLocations(
+    db: DatabaseClient = database,
+  ): Promise<PickupLocationData[] | null> {
     const sql = `
     SELECT
         p.id,
@@ -58,12 +70,33 @@ class KrambambouliService {
     FROM krambambouli_pickup_locations p
     WHERE p.active = TRUE
     `;
-    const result = await database.query<PickupLocationData>(sql);
+    const result: QueryResult<PickupLocationData> = await db.query(sql);
     return result.rows;
   }
 
+  async upsertCustomer(
+    customer: CustomerDetails,
+    db: DatabaseClient = database,
+  ): Promise<number> {
+    const sql = `
+        INSERT INTO customers (email, first_name, last_name)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (email) DO UPDATE
+            SET email = EXCLUDED.email
+        RETURNING id
+        `;
+    const result: QueryResult<{ id: number }> = await db.query(sql, [
+      customer.email,
+      customer.firstName,
+      customer.lastName,
+    ]);
+    return result.rows[0].id;
+  }
+
+  async createAddress(address: any, db: DatabaseClient = database) {}
+
   async createOrder(order: KrambambouliOrderFormData) {
-    return database.withTransaction(async (client) => {
+    return database.withTransaction(async (client: PoolClient) => {
       const createCustomerSql = `
         INSERT INTO customers (email, first_name, last_name)
         VALUES ($1, $2, $3)
@@ -114,4 +147,4 @@ class KrambambouliService {
   }
 }
 
-export const krambambouliService = new KrambambouliService();
+export const krambambouliRepository = new KrambambouliRepository();

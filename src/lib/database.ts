@@ -86,3 +86,10 @@ class Database {
 }
 
 export const database = new Database();
+
+export interface DatabaseClient {
+  query<T extends QueryResultRow = QueryResultRow>(
+    sql: string,
+    params?: any[],
+  ): Promise<QueryResult<T>>;
+}
