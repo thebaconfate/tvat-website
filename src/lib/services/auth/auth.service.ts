@@ -7,7 +7,7 @@ import {
   type JwtPayload,
 } from "@/lib/domain/auth";
 import { getAuthToken, hashPassword, verifyPassword } from "./auth.utils";
-import { database } from "@/lib/database";
+import { database } from "@/lib/infrastructure/database";
 import { resendService } from "../resend/resend.service";
 import { ROUTES } from "@/lib/routes";
 import { InvalidTokenError } from "./auth.errors";

@@ -1,5 +1,5 @@
 import { config } from "@/lib/config";
-import { database } from "@/lib/database";
+import { database } from "@/lib/infrastructure/database";
 import PasswordResetEmail from "emails/PasswordResetEmail";
 import { Resend } from "resend";
 
