@@ -1,4 +1,4 @@
-import { database } from "@/lib/database";
+import { database } from "@/lib/infrastructure/database";
 import type {
   DeliveryZoneData,
   KrambambouliOrderFormData,
@@ -7,61 +7,31 @@ import type {
 } from "@/lib/domain/krambambouli";
 import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
+import { KrambambouliRepository } from "@/lib/repositories";
+import { Transactional } from "@/lib/infrastructure/transaction";
 
 class KrambambouliService {
+  constructor(
+    private readonly repository: KrambambouliRepository = new KrambambouliRepository(),
+  ) {}
+
   async formActive(): Promise<boolean> {
-    const sql = `
-        SELECT c.config_value AS "configValue"
-        FROM config c WHERE c.config_key ILIKE 'krambambouli_form_enabled'
-        `;
-    const result = await database.query<{ configValue: boolean }>(sql);
-    const [row] = result.rows;
-    return row.configValue ?? false;
+    return this.repository.isFormEnabled();
   }
 
   async getKrambambouliProducts(): Promise<KrambambouliProductData[] | null> {
-    const sql = `
-    SELECT
-        p.id,
-        p.name,
-        p.description,
-        p.image_url as "imageUrl",
-        p.price as "price"
-    FROM products p
-    WHERE p.active = TRUE
-        AND p.category ILIKE '%krambambouli%'
-    `;
-    const result = await database.query<KrambambouliProductData>(sql);
-    return result.rows;
+    return this.repository.findActiveProducts();
   }
 
   async getDeliveryLocations(): Promise<DeliveryZoneData[] | null> {
-    const sql = `
-    SELECT
-        dz.id,
-        dz.name,
-        dz.postal_code_to AS "postalCodeTo",
-        dz.postal_code_from AS "postalCodeFrom",
-        dz.price AS "price"
-    FROM krambambouli_delivery_zones dz
-    WHERE dz.active = TRUE
-    `;
-    const result = await database.query<DeliveryZoneData>(sql);
-    return result.rows;
+    return this.repository.findActiveDeliveryZones();
   }
 
   async getPickupLocations(): Promise<PickupLocationData[] | null> {
-    const sql = `
-    SELECT
-        p.id,
-        p.name
-    FROM krambambouli_pickup_locations p
-    WHERE p.active = TRUE
-    `;
-    const result = await database.query<PickupLocationData>(sql);
-    return result.rows;
+    return this.repository.findActivePickupLocations();
   }
 
+  @Transactional
   async createOrder(order: KrambambouliOrderFormData) {
     return database.withTransaction(async (client) => {
       const createCustomerSql = `
