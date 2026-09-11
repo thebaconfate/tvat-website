@@ -99,95 +99,83 @@ export class KrambambouliRepository {
   }
 
   async createAddress(address: any) {}
-  async createOrder(
-    customerId: number,
-    deliveryOption: "pickup" | "delivery",
-    totalOwed: number,
-    pickupLocationId?: number,
-  ) {
-    const createOrder = `
-        INSERT INTO krambambouli_orders (
-            customer_id,
-            delivery_option,
-            pickup_location_id,
-            total_owed,
-        ) VALUES ($1, $2, $3, $4)
-        RETURNING id
-      `;
-    const pickup = deliveryOption === "pickup";
-    const orderResult = await this.db.query<{ id: string }>(createOrder, [
-      customerId,
-      deliveryOption,
-      pickup ? pickupLocationId : null,
-      totalOwed,
-    ]);
-    return orderResult.rows[0].id;
-  }
 
-  async createOrderItems(
-    orderId: number,
-    items: { productId: number; amount: number }[],
-  ) {
-    const [productIds, amounts] = items.reduce<[number[], number[]]>(
-      ([ids, amts], item) => {
-        ids.push(item.productId);
-        amts.push(item.amount);
-        return [ids, amts];
-      },
-      [[], []],
-    );
+  async createOrder(order: KrambambouliOrderFormData) {
     const sql = `
-        INSERT INTO krambambouli_order_items (order_id, product_id, amount)
-        SELECT $1, unnested.product_id, unnested.amount
-        FROM UNNEST($2::int[], $3::int[]) AS unnested(product_id, amount)
-        RETURNING *;
-      `;
-    const result = await this.db.query(sql, [orderId, productIds, amounts]);
-    return result.rows;
-  }
+      WITH
 
-  async createOrderOld(order: KrambambouliOrderFormData) {
-    return database.withTransaction(async (client: PoolClient) => {
-      const createCustomerSql = `
-        INSERT INTO customers (email, first_name, last_name)
-        VALUES ($1, $2, $3)
-        ON CONFLICT (email) DO UPDATE
-            SET email = EXCLUDED.email
-        RETURNING id
-        `;
-      const customerResult = await client.query<{ id: number }>(
-        createCustomerSql,
-        [order.email, order.firstName, order.lastName],
-      );
-      const customerId = customerResult.rows[0].id;
-      const createOrder = `
-        INSERT INTO krambambouli_orders (
-            customer_id,
-            delivery_option,
-            pickup_location_id,
-            total_owed,
-        ) VALUES ($1, $2, $3, $4)
-        RETURNING id
+      upsert_customer AS (
+          INSERT INTO customers (email, first_name, last_name)
+          VALUES ($1, $2, $3)
+          ON CONFLICT (email) DO NOTHING
+          RETURNING id as customer_id
+      ),
+
+      cart AS (
+          SELECT
+            input.product_id,
+            input.amount,
+            p.price,
+            (input.amount * p.price) as total_price
+          FROM UNNEST($4::int[], $5::int[]) AS input(product_id, amount)
+          JOIN products p ON p.id = input.product_id
+      ),
+
+      cart_total AS (
+          SELECT SUM(total_price) AS total_owed FROM cart
+      ),
+
+      new_order AS (
+          INSERT INTO krambambouli_orders (
+              customer_id,
+              delivery_option,
+              pickup_location_id,
+              total_owed
+          )
+          SELECT
+            c.customer_id,
+            $6::varchar,
+            CASE WHEN $6 = 'pickup' THEN $7::int ELSE NULL END,
+            ct.total_owed
+          FROM upsert_customer c, cart_total ct
+          RETURNING *
+      ),
+
+      new_order_items AS (
+          INSERT INTO krambambouli_order_items (order_id, product_id, amount, price)
+          SELECT
+            o.order_id,
+            c.product_id,
+            c.amount,
+            c.price
+          FROM cart c, new_order o
+      ),
+
+      new_delivery_aaddress AS (
+          INSERT INTO krambambouli_delivery_locations (
+              order_id,
+              street_name,
+              house_number,
+              bus,
+              postal_code,
+              city
+          )
+          SELECT
+            o.order_id, $8, $9, $10, $11, $12, $13
+          FROM new_order o
+          WHERE $6 = 'delivery'
+      )
+
+      SELECT
+        id,
+        order_number,
+        customer_id,
+        delivery_option,
+        pickup_location_id,
+        total_owed,
+        paid
+      FROM new_order;
       `;
-      const pickup = order.deliveryOption === "pickup";
-      const totalOwed = 0;
-      const orderResult = await client.query<{ id: string }>(createOrder, [
-        customerId,
-        order.deliveryOption,
-        pickup ? order.pickupLocationId : null,
-        totalOwed,
-      ]);
-      const orderId = orderResult.rows[0].id;
-      const createOrderItem = `
-        INSERT INTO krambambouli_order_items (order_id, product_id, amount)
-        VALUES (%s, %s, %s)
-      `;
-      order.cart.map(
-        async (i) =>
-          await client.query(createOrderItem, [orderId, i.productId, i.amount]),
-      );
-      return;
-    });
   }
 
   async getOrders(): Promise<Page<OrderData>> {
