@@ -5,14 +5,14 @@ import { database } from "./database";
 // Stores the active transactional PoolClient for the current async execution chain
 export const transactionStorage = new AsyncLocalStorage<PoolClient>();
 
-export function Transactional<T extends (...args: any[]) => Promise<any>>(
-  originalMethod: T,
-  context: ClassMethodDecoratorContext,
+export function Transactional<This, Args extends any[], Return>(
+  originalMethod: (this: This, ...args: Args) => Promise<Return>,
+  _context: ClassMethodDecoratorContext<
+    This,
+    (this: This, ...args: Args) => Promise<Return>
+  >,
 ) {
-  return async function (
-    this: any,
-    ...args: Parameters<T>
-  ): Promise<Awaited<ReturnType<T>>> {
+  return async function (this: This, ...args: Args): Promise<Return> {
     const activeClient = transactionStorage.getStore();
 
     // 1. Re-use existing transaction if already inside one
@@ -21,12 +21,10 @@ export function Transactional<T extends (...args: any[]) => Promise<any>>(
     }
 
     // 2. Otherwise start a new transaction
-    return database.withTransaction<Awaited<ReturnType<T>>>(
-      async (client: PoolClient) => {
-        return transactionStorage.run(client, async () => {
-          return originalMethod.apply(this, args);
-        });
-      },
-    );
+    return database.withTransaction<Return>(async (client: PoolClient) => {
+      return transactionStorage.run(client, async () => {
+        return originalMethod.apply(this, args);
+      });
+    });
   };
 }

@@ -7,7 +7,7 @@ import type {
 } from "@/lib/domain/krambambouli";
 import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
-import { KrambambouliRepository } from "@/lib/repositories";
+import { KrambambouliRepository } from "@/lib/repositories/krambambouli";
 import { Transactional } from "@/lib/infrastructure/transaction";
 
 class KrambambouliService {

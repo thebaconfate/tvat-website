@@ -7,8 +7,9 @@ import type {
 } from "@/lib/domain/krambambouli";
 import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
-import type { PoolClient, QueryResult } from "pg";
-import { transactionStorage } from "../infrastructure/transaction";
+import type { QueryResult } from "pg";
+import { transactionStorage } from "../../infrastructure/transaction";
+import { Repository } from "../repository";
 
 type CustomerDetails = {
   email: string;
@@ -16,11 +17,7 @@ type CustomerDetails = {
   lastName: string;
 };
 
-export class KrambambouliRepository {
-  private get db(): DatabaseClient {
-    return transactionStorage.getStore() ?? database;
-  }
-
+export class KrambambouliRepository extends Repository {
   async isFormEnabled(): Promise<boolean> {
     const sql = `
         SELECT c.config_value AS "configValue"
