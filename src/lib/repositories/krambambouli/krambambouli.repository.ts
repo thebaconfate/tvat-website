@@ -1,14 +1,14 @@
 import { database, type DatabaseClient } from "@/lib/infrastructure/database";
-import type {
-  DeliveryZoneData,
-  KrambambouliOrderFormData,
-  KrambambouliProductData,
-  PickupLocationData,
+import {
+  DeliveryOptionEnum,
+  type DeliveryZoneData,
+  type KrambambouliOrderFormData,
+  type KrambambouliProductData,
+  type PickupLocationData,
 } from "@/lib/domain/krambambouli";
 import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
 import type { QueryResult } from "pg";
-import { transactionStorage } from "../../infrastructure/transaction";
 import { Repository } from "../repository";
 
 type CustomerDetails = {
@@ -16,6 +16,65 @@ type CustomerDetails = {
   firstName: string;
   lastName: string;
 };
+
+type OrderQueryResult = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  orderNumber: number;
+  email: string;
+  cart: {
+    productId: number;
+    amount: number;
+    productName: string;
+    price: number;
+  }[];
+  totalOwed: number;
+  paid: boolean;
+  received: boolean;
+  createdAt: string;
+  totalElements: number;
+};
+const query = `
+      SELECT
+        po.id as id,
+        c.first_name as "firstName",
+        c.last_name as "lastName",
+        po.order_number as "orderNumber",
+        c.email as email,
+        COALESCE(
+            json_agg(
+                json_build_object(
+                    'productId', oi.product_id,
+                    'amount', oi.amount,
+                    'price', oi.price,
+                    'productName', p.name,
+                )
+            ) FILTER (WHERE oi.order_id is NOT NULL),
+            '[]'::json
+        ) AS cart,
+        po.total_owed AS "totalOwed",
+        po.paid AS paid,
+        po.received AS received,
+        po.created_at as "createdAt",
+        po.total_elements as "totalElements"
+      FROM paginated_orders po
+      JOIN customers c on c.id = po.customer_id
+      LEFT JOIN krambambouli_order_items oi ON oi.order_id = po.id
+      LEFT JOIN products p ON p.id = oi.product_id
+      GROUP BY
+        po.id,
+        c.first_name,
+        c.last_name,
+        po.order_number,
+        c.email,
+        po.total_owed,
+        po.paid,
+        po.received,
+        po.created_at,
+        po.total_elements
+      ORDER BY po.created_at DESC;
+      `;
 
 export class KrambambouliRepository extends Repository {
   async isFormEnabled(): Promise<boolean> {
@@ -95,8 +154,6 @@ export class KrambambouliRepository extends Repository {
     return result.rows[0].id;
   }
 
-  async createAddress(address: any) {}
-
   async createOrder(order: KrambambouliOrderFormData) {
     const sql = `
       WITH
@@ -148,7 +205,7 @@ export class KrambambouliRepository extends Repository {
           FROM cart c, new_order o
       ),
 
-      new_delivery_aaddress AS (
+      new_delivery_address AS (
           INSERT INTO krambambouli_delivery_locations (
               order_id,
               street_name,
@@ -173,12 +230,115 @@ export class KrambambouliRepository extends Repository {
         paid
       FROM new_order;
       `;
+    const [productIds, productAmounts] = order.cart.reduce(
+      ([pIds, pAmts]: [number[], number[]], item) => {
+        pAmts.push(item.amount);
+        pIds.push(item.productId);
+        return [pIds, pAmts];
+      },
+      [[], []],
+    );
+    const isPickup = order.deliveryOption == DeliveryOptionEnum.pickup;
+    const params = [
+      order.email,
+      order.firstName,
+      order.lastName,
+      productIds,
+      productAmounts,
+      order.deliveryOption,
+      isPickup ? order.pickupLocationId : null,
+      isPickup ? null : order.streetName,
+      isPickup ? null : order.streetNumber,
+      isPickup ? null : order.bus,
+      isPickup ? null : order.postcode,
+      isPickup ? null : order.city,
+    ];
+    return await this.db.query(sql, params);
   }
 
-  async getOrders(): Promise<Page<OrderData>> {
+  async getOrders(
+    pageNumber: number = 1,
+    pageSize: number = 100,
+  ): Promise<Page<OrderData>> {
+    pageNumber = Math.max(1, pageNumber);
+    pageSize = Math.max(1, pageSize);
+    const offset = (pageNumber - 1) * pageSize;
+    const sql = `
+      WITH paginated_orders AS (
+          SELECT
+            o.id,
+            o.order_number,
+            o.total_owed,
+            o.paid,
+            o.received,
+            o.created_at
+            COUNT(*) OVER() as total_elements
+          FROM krambambouli_orders o
+          ORDER BY o.created_at DESC
+          LIMIT $1 OFFSET $2
+      )
+
+      SELECT
+        po.id as id,
+        c.first_name as "firstName",
+        c.last_name as "lastName",
+        po.order_number as "orderNumber",
+        c.email as email,
+        COALESCE(
+            json_agg(
+                json_build_object(
+                    'orderId', oi.order_id,
+                    'productId', oi.product_id,
+                    'amount', oi.amount,
+                    'productName', p.name,
+                )
+            ) FILTER (WHERE oi.order_id is NOT NULL),
+            '[]'::json
+        ) AS cart,
+        po.total_owed AS "totalOwed",
+        po.paid AS paid,
+        po.received AS received,
+        po.created_at as "createdAt",
+        po.total_elements as "totalElements"
+      FROM paginated_orders po
+      JOIN customers c on c.id = po.customer_id
+      LEFT JOIN krambambouli_order_items oi ON oi.order_id = po.id
+      LEFT JOIN products p ON p.id = oi.product_id
+      GROUP BY
+        po.id,
+        c.first_name,
+        c.last_name,
+        po.order_number,
+        c.email,
+        po.total_owed,
+        po.paid,
+        po.received,
+        po.created_at,
+        po.total_elements
+      ORDER BY po.created_at DESC;
+      `;
+    const result = await this.db.query<OrderQueryResult>(sql, [
+      pageSize,
+      offset,
+    ]);
+    const rows = result.rows;
+    const totalElements = rows.length > 0 ? Number(rows[0].totalElements) : 0;
+    const totalPages = Math.ceil(totalElements / pageSize);
+    const content: OrderData[] = rows.map((row) => ({
+      id: row.id,
+      firstName: row.firstName,
+      lastName: row.lastName,
+      email: row.email,
+      orderNumber: row.orderNumber,
+      totalOwed: row.totalOwed,
+      paid: row.paid,
+      received: row.received,
+      orders: row.cart,
+      createdAt: row.createdAt,
+    }));
     return {
-      page: { size: 0, number: 0, totalElements: 0, totalPages: 0 },
-      content: [],
+      page: { size: 0, number: 0, totalElements: 0, totalPages: totalPages },
+      content: content,
     };
   }
 }
