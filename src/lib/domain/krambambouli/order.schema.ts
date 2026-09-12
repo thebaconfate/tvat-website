@@ -1,9 +1,9 @@
 import z4 from "zod/v4";
 
 const itemSchema = z4.object({
-  orderId: z4.uuid(),
   productId: z4.int(),
   amount: z4.int(),
+  price: z4.int(),
 });
 
 export const orderSchema = z4.object({
