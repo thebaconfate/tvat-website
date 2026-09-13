@@ -33,8 +33,11 @@ class KrambambouliService {
     return this.repository.createOrder(order);
   }
 
-  async getOrders(): Promise<Page<OrderData>> {
-    return this.repository.getOrders();
+  async getOrders(
+    pageNumber?: number,
+    pageSize?: number,
+  ): Promise<Page<OrderData>> {
+    return this.repository.getOrders(pageNumber, pageSize);
   }
 }
 
