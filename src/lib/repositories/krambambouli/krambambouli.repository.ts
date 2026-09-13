@@ -253,7 +253,8 @@ export class KrambambouliRepository extends Repository {
       isPickup ? null : order.postcode,
       isPickup ? null : order.city,
     ];
-    return await this.db.query(sql, params);
+    const result = await this.db.query(sql, params);
+    return result.rows;
   }
 
   async getOrders(

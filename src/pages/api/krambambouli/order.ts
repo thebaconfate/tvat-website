@@ -1,5 +1,6 @@
 import { krambambouliOrderFormSchema } from "@/lib/domain/krambambouli";
 import { krambambouliService } from "@/lib/services/krambambouli";
+import { resendService } from "@/lib/services/resend/resend.service";
 
 export async function POST({
   request,
@@ -9,8 +10,8 @@ export async function POST({
   try {
     const payload = await request.json();
     const order = krambambouliOrderFormSchema.parse(payload);
-    console.log(order);
-    //    await krambambouliService.createOrder(order);
+    const createdOrder = await krambambouliService.createOrder(order);
+    // resendService
   } catch (e) {
     console.error(e);
   } finally {
