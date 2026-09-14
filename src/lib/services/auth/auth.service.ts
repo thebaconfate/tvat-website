@@ -8,7 +8,7 @@ import {
 } from "@/lib/domain/auth";
 import { getAuthToken, hashPassword, verifyPassword } from "./auth.utils";
 import { database } from "@/lib/infrastructure/database";
-import { resendService } from "../resend/resend.service";
+import { mailService } from "../mail/mail.service";
 import { ROUTES } from "@/lib/routes";
 import { InvalidTokenError } from "./auth.errors";
 
@@ -93,11 +93,7 @@ class AuthService {
         `,
           [user.id, hashedToken, createdAt, expiresAt],
         ),
-        resendService.sendPasswordResetLink(
-          resetURL,
-          user.email,
-          user.firstName,
-        ),
+        mailService.sendPasswordResetLink(resetURL, user.email, user.firstName),
       ]);
     } catch (e) {
       console.error(e);

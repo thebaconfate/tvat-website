@@ -5,7 +5,7 @@ import { Resend } from "resend";
 
 export const resend = new Resend(config.resend.apiKey);
 
-class ResendService {
+class MailService {
   private resend = resend;
   async enqueue(jobType: string, payload: any, recipient: string) {
     const sql = `
@@ -33,6 +33,8 @@ class ResendService {
       react: PasswordResetEmail({ resetURL: resetURL.toString(), firstName }),
     });
   }
+
+  async sendOrderConfirmation(order: any) {}
 }
 
-export const resendService = new ResendService();
+export const mailService = new MailService();

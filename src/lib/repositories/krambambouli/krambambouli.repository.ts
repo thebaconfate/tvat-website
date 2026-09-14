@@ -10,6 +10,8 @@ import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
 import type { QueryResult } from "pg";
 import { Repository } from "../repository";
+import z4 from "zod/v4";
+import { orderSchema } from "@/lib/domain/krambambouli/order.schema";
 
 type CustomerDetails = {
   email: string;
@@ -23,6 +25,7 @@ type OrderQueryResult = {
   lastName: string;
   orderNumber: number;
   email: string;
+  deliveryOption: DeliveryOptionEnum;
   cart: {
     productId: number;
     amount: number;
@@ -32,8 +35,11 @@ type OrderQueryResult = {
   totalOwed: number;
   paid: boolean;
   received: boolean;
-  createdAt: string;
+  createdAt: Date;
   totalElements: number;
+  deliveryFee: number;
+  pickupLocationId: number;
+  pickupLocationName: string;
 };
 const query = `
       SELECT
@@ -135,33 +141,16 @@ export class KrambambouliRepository extends Repository {
     return result.rows;
   }
 
-  async upsertCustomer(
-    customer: CustomerDetails,
-    db: DatabaseClient = database,
-  ): Promise<number> {
-    const sql = `
-        INSERT INTO customers (email, first_name, last_name)
-        VALUES ($1, $2, $3)
-        ON CONFLICT (email) DO UPDATE
-            SET email = EXCLUDED.email
-        RETURNING id
-        `;
-    const result: QueryResult<{ id: number }> = await db.query(sql, [
-      customer.email,
-      customer.firstName,
-      customer.lastName,
-    ]);
-    return result.rows[0].id;
-  }
-
-  async createOrder(order: KrambambouliOrderFormData) {
+  async createOrder(order: KrambambouliOrderFormData): Promise<OrderData> {
     const sql = `
       WITH
 
       upsert_customer AS (
           INSERT INTO customers (email, first_name, last_name)
           VALUES ($1, $2, $3)
-          ON CONFLICT (email) DO NOTHING
+          ON CONFLICT (email) DO UPDATE
+            SET first_name = EXCLUDED.first_name,
+                last_name = EXCLUDED.last_name
           RETURNING id as customer_id
       ),
 
@@ -175,8 +164,28 @@ export class KrambambouliRepository extends Repository {
           JOIN products p ON p.id = input.product_id
       ),
 
+      delivery_fee_lookup AS (
+          SELECT COALESCE(
+              (
+                SELECT price
+                FROM krambambouli_delivery_zones
+                WHERE active = true
+                  AND $6 = 'delivery'
+                  AND $11::int BETWEEN postal_code_from AND postal_code_to
+                ORDER BY price ASC
+                LIMIT 1
+              ),
+              0
+          ) AS fee
+      ),
+
       cart_total AS (
-          SELECT SUM(total_price) AS total_owed FROM cart
+          SELECT
+            SUM(c.total_price) AS items_total,
+            d.fee AS delivery_fee,
+            (SUM(c.total_price) + d.fee) AS total_owed
+          FROM cart c, delivery_fee_lookup d
+          GROUP BY d.fee
       ),
 
       new_order AS (
@@ -184,12 +193,14 @@ export class KrambambouliRepository extends Repository {
               customer_id,
               delivery_option,
               pickup_location_id,
+              delivery_fee,
               total_owed
           )
           SELECT
             c.customer_id,
             $6::varchar,
             CASE WHEN $6 = 'pickup' THEN $7::int ELSE NULL END,
+            ct.delivery_fee,
             ct.total_owed
           FROM upsert_customer c, cart_total ct
           RETURNING *
@@ -198,11 +209,12 @@ export class KrambambouliRepository extends Repository {
       new_order_items AS (
           INSERT INTO krambambouli_order_items (order_id, product_id, amount, price)
           SELECT
-            o.order_id,
+            o.id,
             c.product_id,
             c.amount,
             c.price
           FROM cart c, new_order o
+          RETURNING *
       ),
 
       new_delivery_address AS (
@@ -215,20 +227,67 @@ export class KrambambouliRepository extends Repository {
               city
           )
           SELECT
-            o.order_id, $8, $9, $10, $11, $12, $13
+            o.id, $8, $9, $10, $11, $12
           FROM new_order o
           WHERE $6 = 'delivery'
+          RETURNING *
       )
 
       SELECT
-        id,
-        order_number,
-        customer_id,
-        delivery_option,
-        pickup_location_id,
-        total_owed,
-        paid
-      FROM new_order;
+        o.id,
+        o.order_number AS "orderNumber",
+        c.first_name AS "firstName",
+        c.last_name AS "lastName",
+        c.email,
+        o.delivery_option AS "deliveryOption",
+        o.pickup_location_id AS "pickupLocationId",
+        o.delivery_fee AS "deliveryFee",
+        o.total_owed AS "totalOwed",
+        o.paid,
+        o.received,
+        o.created_at AS "createdAt",
+        da.street_name AS "streetName",
+        da.house_number AS "houseNumber",
+        da.bus AS "bus",
+        da.postal_code AS "postalCode",
+        da.city AS "city",
+        pl.name as "pickupLocationName",
+        COALESCE(
+            json_agg(
+                json_build_object(
+                    'productId', p.id,
+                    'productName', p.name,
+                    'amount', oi.amount,
+                    'price', oi.price
+                )
+            ) FILTER (WHERE oi.product_id IS NOT NULL),
+            '[]'::json
+        ) AS orders
+        FROM new_order o
+        JOIN customers c ON c.id = o.customer_id
+        LEFT JOIN new_order_items oi ON oi.order_id = o.id
+        LEFT JOIN products p ON p.id = oi.product_id
+        LEFT JOIN new_delivery_address da ON da.order_id = o.id
+        LEFT JOIN krambambouli_pickup_locations pl ON pl.id = o.pickup_location_id
+        GROUP BY
+            o.id,
+            o.order_number,
+            c.first_name,
+            c.last_name,
+            c.email,
+            o.delivery_option,
+            o.pickup_location_id,
+            pl.name,
+            o.delivery_fee,
+            o.total_owed,
+            o.paid,
+            o.received,
+            o.created_at,
+            da.street_name,
+            da.house_number,
+            da.bus,
+            da.postal_code,
+            da.city;
       `;
     const [productIds, productAmounts] = order.cart.reduce(
       ([pIds, pAmts]: [number[], number[]], item) => {
@@ -248,19 +307,20 @@ export class KrambambouliRepository extends Repository {
       order.deliveryOption,
       isPickup ? order.pickupLocationId : null,
       isPickup ? null : order.streetName,
-      isPickup ? null : order.streetNumber,
+      isPickup ? null : order.houseNumber,
       isPickup ? null : order.bus,
-      isPickup ? null : order.postcode,
+      isPickup ? null : order.postalCode,
       isPickup ? null : order.city,
     ];
-    const result = await this.db.query(sql, params);
-    return result.rows;
+    const result = await this.db.query<OrderData>(sql, params);
+    return orderSchema.parse(result.rows[0]);
   }
 
   async getOrders(
     pageNumber: number = 1,
     pageSize: number = 100,
   ): Promise<Page<OrderData>> {
+    // FIX: check the sql, might be outdated with the orderSchema refactor
     pageNumber = Math.max(1, pageNumber);
     pageSize = Math.max(1, pageSize);
     const offset = (pageNumber - 1) * pageSize;
@@ -325,18 +385,7 @@ export class KrambambouliRepository extends Repository {
     const rows = result.rows;
     const totalElements = rows.length > 0 ? Number(rows[0].totalElements) : 0;
     const totalPages = Math.ceil(totalElements / pageSize);
-    const content: OrderData[] = rows.map((row) => ({
-      id: row.id,
-      firstName: row.firstName,
-      lastName: row.lastName,
-      email: row.email,
-      orderNumber: row.orderNumber,
-      totalOwed: row.totalOwed,
-      paid: row.paid,
-      received: row.received,
-      orders: row.cart,
-      createdAt: row.createdAt,
-    }));
+    const content: OrderData[] = z4.array(orderSchema).parse(rows);
     return {
       page: { size: 0, number: 0, totalElements: 0, totalPages: totalPages },
       content: content,

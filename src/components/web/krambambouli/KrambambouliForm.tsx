@@ -85,9 +85,9 @@ export default function KrambambouliForm({
       pickupLocation: 0,
       deliveryZone: "",
       streetName: "",
-      streetNumber: "",
+      houseNumber: "",
       bus: "",
-      postcode: "",
+      postalCode: "",
       city: "",
     },
     validators: {
@@ -103,9 +103,9 @@ export default function KrambambouliForm({
           pickupLocation: z4.int(),
           deliveryZone: z4.string(),
           streetName: z4.string(),
-          streetNumber: z4.string(),
+          houseNumber: z4.string(),
           bus: z4.string(),
-          postcode: z4.string(),
+          postalCode: z4.string(),
           city: z4.string(),
         })
         .superRefine((val, ctx) => {
@@ -130,14 +130,14 @@ export default function KrambambouliForm({
               deliveryLocations &&
               !deliveryLocations.find(
                 (e) =>
-                  e.postalCodeFrom <= Number(val.postcode) &&
-                  e.postalCodeTo >= Number(val.postcode),
+                  e.postalCodeFrom <= Number(val.postalCode) &&
+                  e.postalCodeTo >= Number(val.postalCode),
               )
             ) {
               ctx.addIssue({
                 code: "custom",
-                input: val.postcode,
-                path: [val.postcode],
+                input: val.postalCode,
+                path: [val.postalCode],
                 message: "Invalid postcode",
               });
             }
@@ -159,19 +159,17 @@ export default function KrambambouliForm({
           [],
         ),
       };
-      const disciminant =
+      const payload =
         value.deliveryOption === "pickup"
-          ? {
-              pickupLocationId: value.pickupLocation,
-            }
+          ? { ...commonPayload, pickupLocationId: value.pickupLocation }
           : {
+              ...commonPayload,
               streetName: value.streetName,
-              streetNumber: value.streetNumber,
+              houseNumber: value.houseNumber,
               bus: value.bus,
               city: value.city,
-              postcode: value.postcode,
+              postalCode: value.postalCode,
             };
-      const payload = { ...commonPayload, ...disciminant };
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -491,7 +489,7 @@ export default function KrambambouliForm({
                               </>
                             )}
                           </form.Field>
-                          <form.Field name="streetNumber">
+                          <form.Field name="houseNumber">
                             {(field) => (
                               <>
                                 <label htmlFor={field.name}>Nummer</label>
@@ -526,7 +524,7 @@ export default function KrambambouliForm({
                           </form.Field>
                         </div>
                         <div className={styles.fieldRow}>
-                          <form.Field name="postcode">
+                          <form.Field name="postalCode">
                             {(field) => (
                               <>
                                 <label htmlFor={field.name}>Postcode</label>
@@ -573,7 +571,7 @@ export default function KrambambouliForm({
                 cart: state.values.cart,
                 deliveryOption: state.values.deliveryOption,
                 deliveryZone: state.values.deliveryZone,
-                postcode: state.values.postcode,
+                postcode: state.values.postalCode,
               };
             }}
           >
