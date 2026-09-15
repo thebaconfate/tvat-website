@@ -7,10 +7,18 @@ type ResendConfig = {
   apiKey: string;
   domain: string;
 };
+
+type PaymentConfig = {
+  iban: string;
+  bic: string;
+  accountHolder: string;
+};
+
 type Config = {
   database: PoolConfig;
   resend: ResendConfig;
   email: string;
+  payment: PaymentConfig;
 };
 
 export function getEnv(
@@ -39,4 +47,9 @@ export const config: Config = {
     domain: getEnv("DOMAIN"),
   },
   email: getEnv("VATMAIL"),
+  payment: {
+    iban: getEnv("IBAN"),
+    bic: getEnv("BIC"),
+    accountHolder: getEnv("ACCOUNTHOLDER"),
+  },
 };
