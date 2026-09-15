@@ -144,8 +144,12 @@
         },
         {
             "boardRole": "Medewerker",
-            "name": "Nele",
-            "stars": []
+            "name": "Nele De Winter",
+            "stars": [
+                "G",
+                "Z",
+                "G"
+            ]
         },
         {
             "name": "Rias Smismans",
@@ -166,7 +170,7 @@
         },
         {
             "boardRole": "Medewerker",
-            "name": "Lars Deryckere (btw Simon kan je de foto knippen da enkel ik erop sta?)",
+            "name": "Lars Deryckere",
             "stars": [
                 "G",
                 "G",
@@ -175,8 +179,14 @@
         },
         {
             "boardRole": "Medewerker",
-            "name": "Thomas",
-            "stars": []
+            "name": "Thomas Herman",
+            "stars": [
+                "G",
+                "G",
+                "G",
+                "G",
+                "G"
+            ]
         },
         {
             "name": "Lana Gabriels",
@@ -189,12 +199,29 @@
         {
             "boardRole": "Medewerker",
             "name": "Lex Withofs",
-            "boulons": []
+            "boulons": [
+                "Z",
+                "G",
+                "G",
+                "Z",
+                "G",
+                "Z",
+                "Z"
+            ]
         },
         {
             "boardRole": "Medewerker",
             "name": "Jarni Van Waesberge",
-            "stars": []
+            "stars": [
+                "G",
+                "G",
+                "Z",
+                "Z",
+                "G",
+                "G",
+                "Z",
+                "Z"
+            ]
         },
         {
             "boardRole": "Medewerker",
