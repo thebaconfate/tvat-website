@@ -4,7 +4,7 @@ import {
   type QueryResult,
   type QueryResultRow,
 } from "pg";
-import { config } from "../config";
+import { config } from "./config";
 
 const RETRYABLE_ERRORS = new Set([
   "ECONNREFUSED",
