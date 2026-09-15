@@ -65,6 +65,7 @@ export class KrambambouliRepository extends Repository {
     FROM products p
     WHERE p.active = TRUE
         AND p.category ILIKE '%krambambouli%'
+    ORDER BY p.id DESC
     `;
     const result: QueryResult<KrambambouliProductData> =
       await this.db.query(sql);
