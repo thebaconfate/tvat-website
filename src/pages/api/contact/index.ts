@@ -3,7 +3,7 @@ import sanitizeHtml from "sanitize-html";
 import type { APIContext } from "astro";
 import z4 from "zod/v4";
 import { config } from "@/lib/config";
-import { resend, resendService } from "@/lib/services/resend/resend.service";
+import { resend, mailService } from "@/lib/services/mail/mail.service";
 
 /*
  * NOTE: Perhaps add some rate limiting to protect your resend api
@@ -57,7 +57,7 @@ export async function POST({ request }: APIContext) {
       }
     }
     if (error.statusCode == 429) {
-      resendService.enqueue("contact", form, form.email);
+      mailService.enqueue("contact", form, form.email);
       return new Response(null, { status: 200 });
     }
     console.error(error);

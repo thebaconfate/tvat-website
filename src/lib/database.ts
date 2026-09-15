@@ -4,7 +4,7 @@ import {
   type QueryResult,
   type QueryResultRow,
 } from "pg";
-import { config } from "./config";
+import { config } from "../config";
 
 const RETRYABLE_ERRORS = new Set([
   "ECONNREFUSED",
@@ -86,3 +86,10 @@ class Database {
 }
 
 export const database = new Database();
+
+export interface DatabaseClient {
+  query<T extends QueryResultRow = QueryResultRow>(
+    sql: string,
+    params?: any[],
+  ): Promise<QueryResult<T>>;
+}

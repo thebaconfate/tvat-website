@@ -14,6 +14,8 @@ import z4 from "zod/v4";
 import { productSchema } from "@/lib/domain/products";
 import { Button } from "@/components/shared/Button";
 import type { PriceData } from "@/lib/domain/price";
+import { API_ROUTES } from "@/lib/routes";
+import { orderSchema } from "@/lib/domain/krambambouli/order.schema";
 
 interface Props {
   products: KrambambouliProductData[];
@@ -45,6 +47,14 @@ type ZoneUI = {
   price: PriceData;
   ranges: { from: number; to: number }[];
 };
+
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat("nl-BE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(amount / 100);
+}
+
 export default function KrambambouliForm({
   products,
   pickupLocations,
@@ -72,25 +82,10 @@ export default function KrambambouliForm({
     text: "",
     show: false,
   });
-  const form = useForm({
-    defaultValues: {
-      cart: products.map((p) => {
-        return { ...p, amount: 0 };
-      }),
-      firstName: "",
-      lastName: "",
-      email: "",
-      deliveryOption: "",
-      pickupLocation: 0,
-      deliveryZone: "",
-      streetName: "",
-      streetNumber: "",
-      bus: "",
-      postcode: "",
-      city: "",
-    },
-    validators: {
-      onSubmit: z4
+
+  const formSchema = useMemo(
+    () =>
+      z4
         .object({
           cart: z4.array(
             productSchema.extend({ amount: z4.int().nonnegative() }),
@@ -102,9 +97,9 @@ export default function KrambambouliForm({
           pickupLocation: z4.int(),
           deliveryZone: z4.string(),
           streetName: z4.string(),
-          streetNumber: z4.string(),
+          houseNumber: z4.string(),
           bus: z4.string(),
-          postcode: z4.string(),
+          postalCode: z4.string(),
           city: z4.string(),
         })
         .superRefine((val, ctx) => {
@@ -129,22 +124,45 @@ export default function KrambambouliForm({
               deliveryLocations &&
               !deliveryLocations.find(
                 (e) =>
-                  e.postalCodeFrom <= Number(val.postcode) &&
-                  e.postalCodeTo >= Number(val.postcode),
+                  e.postalCodeFrom <= Number(val.postalCode) &&
+                  e.postalCodeTo >= Number(val.postalCode),
               )
             ) {
               ctx.addIssue({
                 code: "custom",
-                input: val.postcode,
-                path: [val.postcode],
+                input: val.postalCode,
+                path: [val.postalCode],
                 message: "Invalid postcode",
               });
             }
           }
         }),
+    [pickupLocations, deliveryLocations],
+  );
+
+  const form = useForm({
+    defaultValues: {
+      cart: products.map((p) => {
+        return { ...p, amount: 0 };
+      }),
+      firstName: "",
+      lastName: "",
+      email: "",
+      deliveryOption: "",
+      pickupLocation: 0,
+      deliveryZone: "",
+      streetName: "",
+      houseNumber: "",
+      bus: "",
+      postalCode: "",
+      city: "",
+    },
+    validators: {
+      onSubmit: formSchema,
+      onChange: formSchema,
     },
     onSubmit: async ({ value }) => {
-      const url = [""].join(""); // TODO: Fix endpoint route
+      const url = API_ROUTES.KRAMBALBOULI.ORDER.url;
       const commonPayload = {
         email: value.email,
         firstName: value.firstName,
@@ -158,19 +176,17 @@ export default function KrambambouliForm({
           [],
         ),
       };
-      const disciminant =
+      const payload =
         value.deliveryOption === "pickup"
-          ? {
-              pickupLocationId: value.pickupLocation,
-            }
+          ? { ...commonPayload, pickupLocationId: value.pickupLocation }
           : {
+              ...commonPayload,
               streetName: value.streetName,
-              streetNumber: value.streetNumber,
+              houseNumber: value.houseNumber,
               bus: value.bus,
               city: value.city,
-              postcode: value.postcode,
+              postalCode: value.postalCode,
             };
-      const payload = { ...commonPayload, ...disciminant };
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -179,29 +195,35 @@ export default function KrambambouliForm({
       if (response.ok)
         try {
           const responsePayload = await response.json();
+          const order = orderSchema.parse(responsePayload);
           setPopup({
             title: PopupEnum.SUCCESS,
-            text:
-              responsePayload.message ??
-              "Jouw bestelling is succesvol opgenomen, check jouw inbox of spam ter bevestiging.",
+            text: `Bedankt! Jouw bestelling (#${order.orderNumber}) is succesvol ontvangen.\n\nWe hebben een e-mail gestuurd met de betalingsinstructies. Check ook je ongewenste mailbox (spam) als je deze niet meteen ziet.`,
             show: true,
           });
+          form.reset();
         } catch (e) {
-          console.log(e);
           setPopup({
-            title: PopupEnum.SUCCESS,
-            text: "Jouw bestelling is succesvol opgenomen, check jouw inbox of spam ter bevestiging.",
+            title: PopupEnum.ERROR,
+            text: "Er is iets misgegaan tijdens het plaatsen van de bestelling. Contacteer de paginabeheerder.",
             show: true,
           });
         }
     },
     onSubmitInvalid: ({ formApi }) => {
-      const errors = Object.values(formApi.state.fieldMeta)
+      const fieldErrors = Object.values(formApi.state.fieldMeta)
         .flatMap((f) => f?.errors ?? [])
-        .map((e) => e.message);
+        .map((e) => e.message)
+        .filter(Boolean);
+      const formErrors = (Object.values(formApi.state.errors) ?? [])
+        .map((e) => (typeof e === "string" ? e : e?.message))
+        .filter(Boolean);
+
+      const allErrors = [...fieldErrors, formErrors];
+
       setPopup({
         title: PopupEnum.ERROR,
-        text: errors[0] ?? "Er is iets misgegaan, probeer het later opnieuw",
+        text: allErrors[0] ?? "Er is iets misgegaan, probeer het later opnieuw",
         show: true,
       });
     },
@@ -266,7 +288,7 @@ export default function KrambambouliForm({
                     <h3 className={styles.productTitle}>{product.name}</h3>
                     <div className={styles.productDetails}>
                       <p>{product.description}</p>
-                      <p>{`€${Math.floor(product.price / 100)},${product.price % 100 === 0 ? "-" : product.price % 100}`}</p>
+                      <p>{formatCurrency(product.price)}</p>
                     </div>
                     <form.Field name={`cart[${i}].amount`}>
                       {(field) => (
@@ -424,7 +446,7 @@ export default function KrambambouliForm({
                                 className={styles.radioButton}
                                 name={field.name}
                                 id={`${field.name}-${index}`}
-                                value={index}
+                                value={loc.id}
                                 required
                                 checked={field.state.value === loc.id}
                                 onChange={() => field.handleChange(loc.id)}
@@ -464,7 +486,7 @@ export default function KrambambouliForm({
                                     />
                                     {`Levering ${loc.name}`}
                                   </label>
-                                  <p>{`€${Math.floor(loc.price / 100)},${loc.price % 100 === 0 ? "-" : loc.price % 100}`}</p>
+                                  <p>{formatCurrency(loc.price)}</p>
                                 </span>
                               )}
                             </form.Field>
@@ -490,7 +512,7 @@ export default function KrambambouliForm({
                               </>
                             )}
                           </form.Field>
-                          <form.Field name="streetNumber">
+                          <form.Field name="houseNumber">
                             {(field) => (
                               <>
                                 <label htmlFor={field.name}>Nummer</label>
@@ -525,7 +547,7 @@ export default function KrambambouliForm({
                           </form.Field>
                         </div>
                         <div className={styles.fieldRow}>
-                          <form.Field name="postcode">
+                          <form.Field name="postalCode">
                             {(field) => (
                               <>
                                 <label htmlFor={field.name}>Postcode</label>
@@ -567,14 +589,12 @@ export default function KrambambouliForm({
             }}
           </form.Subscribe>
           <form.Subscribe
-            selector={(state) => {
-              return {
-                cart: state.values.cart,
-                deliveryOption: state.values.deliveryOption,
-                deliveryZone: state.values.deliveryZone,
-                postcode: state.values.postcode,
-              };
-            }}
+            selector={(state) => ({
+              cart: state.values.cart,
+              deliveryOption: state.values.deliveryOption,
+              deliveryZone: state.values.deliveryZone,
+              postcode: state.values.postalCode,
+            })}
           >
             {(observable) => {
               let total = observable.cart.reduce((acc, current) => {
@@ -582,49 +602,33 @@ export default function KrambambouliForm({
                 if (amount === 0) return acc;
                 return acc + amount * current.price;
               }, 0);
+
               if (observable.deliveryOption === DeliveryOptionEnum.delivery) {
                 const deliveryZone =
                   uniqueDeliveryOptions?.find((l) =>
                     l.ranges.find(
                       (r) =>
-                        r.from <= parseInt(observable.postcode) &&
-                        r.to >= parseInt(observable.postcode),
+                        r.from <= parseInt(observable.postcode, 10) &&
+                        r.to >= parseInt(observable.postcode, 10),
                     ),
                   ) ||
                   uniqueDeliveryOptions?.find(
                     (l) => l.name === observable.deliveryZone,
                   );
+
                 if (deliveryZone) total += deliveryZone.price;
               }
+
               return (
                 <div className={styles.informationContainer}>
-                  <p>
-                    Totaalbedrag{" "}
-                    <b>{`€${Math.floor(total / 100)},${total % 100 === 0 ? "-" : total % 100}`}</b>
+                  <p className={styles.totalRow}>
+                    Totaalbedrag <b>{formatCurrency(total)}</b>
                   </p>
-                  <p>
-                    Over te schrijven naar de VATrekening:{" "}
-                    <b>BE60 7310 1732 4070</b>
-                  </p>
-                  <p>
-                    Met mededeling:{" "}
-                    <b>
-                      krambambouli +{" "}
-                      <form.Subscribe
-                        selector={(state) => {
-                          return {
-                            firstName: state.values.firstName,
-                            lastName: state.values.lastName,
-                          };
-                        }}
-                      >
-                        {(names) =>
-                          !names.firstName && !names.lastName
-                            ? "[Voornaam Achternaam]"
-                            : `${names.firstName} ${names.lastName}`
-                        }
-                      </form.Subscribe>
-                    </b>
+                  <p className={styles.emailNotice}>
+                    <i>
+                      Na het plaatsen van je bestelling ontvang je een e-mail
+                      met de betalingsinstructies.
+                    </i>
                   </p>
                 </div>
               );

@@ -37,10 +37,7 @@ try {
   } else {
     // Empty arrays have to be created otherwise you use the reference to the same
     // array => unexpected behavior
-    [products, pickupLocations, deliveryLocations] = Array.from(
-      { length: 3 },
-      () => [],
-    );
+    [products, pickupLocations, deliveryLocations] = [[], [], []];
   }
   deliveryLocations?.sort((loc1, loc2) => loc1.price - loc2.price);
 } catch (e) {
