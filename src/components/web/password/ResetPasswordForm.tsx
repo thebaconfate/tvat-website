@@ -6,7 +6,7 @@ import z4 from "zod/v4";
 import { Eye, EyeClosed } from "lucide-react";
 import { API_ROUTES, ROUTES } from "@/lib/routes";
 import { passwordSchema } from "@/lib/domain/users";
-import { navigate } from "astro/virtual-modules/transitions-router.js";
+import { navigate } from "astro:transitions/client";
 
 type Props = {
   token?: string;

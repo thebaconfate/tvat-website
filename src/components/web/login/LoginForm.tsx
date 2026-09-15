@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Eye, EyeClosed, Mail } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 import { API_ROUTES, APP_ROUTES } from "@/lib/routes";
-import { navigate } from "astro/virtual-modules/transitions-router.js";
+import { navigate } from "astro:transitions/client";
 
 export default function LoginForm() {
   const [visible, setVisible] = useState(false);
@@ -22,6 +22,7 @@ export default function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(value),
       });
+      console.log(response);
       if (response.ok) {
         navigate(APP_ROUTES.APP.url);
       }
