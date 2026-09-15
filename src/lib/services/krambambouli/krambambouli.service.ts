@@ -37,10 +37,7 @@ class KrambambouliService {
 
   async createOrder(order: KrambambouliOrderFormData) {
     const savedOrder = await this.repository.createOrder(order);
-    console.log(savedOrder);
-    console.log(typeof savedOrder.createdAt);
-    const o = orderSchema.parse(savedOrder);
-    this.mailService.sendOrderConfirmation(savedOrder);
+    await this.mailService.sendOrderConfirmation(savedOrder);
     return savedOrder;
   }
 

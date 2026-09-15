@@ -41,46 +41,6 @@ type OrderQueryResult = {
   pickupLocationId: number;
   pickupLocationName: string;
 };
-const query = `
-      SELECT
-        po.id as id,
-        c.first_name as "firstName",
-        c.last_name as "lastName",
-        po.order_number as "orderNumber",
-        c.email as email,
-        COALESCE(
-            json_agg(
-                json_build_object(
-                    'productId', oi.product_id,
-                    'amount', oi.amount,
-                    'price', oi.price,
-                    'productName', p.name,
-                )
-            ) FILTER (WHERE oi.order_id is NOT NULL),
-            '[]'::json
-        ) AS cart,
-        po.total_owed AS "totalOwed",
-        po.paid AS paid,
-        po.received AS received,
-        po.created_at as "createdAt",
-        po.total_elements as "totalElements"
-      FROM paginated_orders po
-      JOIN customers c on c.id = po.customer_id
-      LEFT JOIN krambambouli_order_items oi ON oi.order_id = po.id
-      LEFT JOIN products p ON p.id = oi.product_id
-      GROUP BY
-        po.id,
-        c.first_name,
-        c.last_name,
-        po.order_number,
-        c.email,
-        po.total_owed,
-        po.paid,
-        po.received,
-        po.created_at,
-        po.total_elements
-      ORDER BY po.created_at DESC;
-      `;
 
 export class KrambambouliRepository extends Repository {
   async isFormEnabled(): Promise<boolean> {
@@ -313,6 +273,7 @@ export class KrambambouliRepository extends Repository {
       isPickup ? null : order.city,
     ];
     const result = await this.db.query<OrderData>(sql, params);
+    console.log(result.rows);
     return orderSchema.parse(result.rows[0]);
   }
 

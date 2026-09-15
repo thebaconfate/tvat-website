@@ -27,7 +27,6 @@ export default function OrderConfirmationEmail({
   iban,
   bic,
 }: Props) {
-  const communication = "communicatie";
   const main = {
     backgroundColor: "#f6f9fc",
     padding: "40px 0",
