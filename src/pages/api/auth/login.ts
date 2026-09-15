@@ -1,8 +1,8 @@
 import { credentialsSchema } from "@/lib/domain/auth";
 import { authService } from "@/lib/services/auth";
-import { setJwtCookie } from "@/lib/services/auth";
+import type { APIContext } from "astro";
 
-export async function POST({ request }: { request: Request }) {
+export async function POST({ request, cookies }: APIContext) {
   try {
     const payload = await request.json();
     const credentials = credentialsSchema.parse(payload);
@@ -12,8 +12,14 @@ export async function POST({ request }: { request: Request }) {
         headers: { "Content-Type": "application/json" },
         status: 401,
       });
-    const headers = setJwtCookie(jwtToken);
-    return new Response(null, { headers });
+    cookies.set("Authorization", jwtToken, {
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 3600,
+    });
+    return new Response(null, { status: 200 });
   } catch (e: any) {
     console.error(e);
     return new Response(JSON.stringify(e), { status: 400 });
