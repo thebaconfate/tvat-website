@@ -2,7 +2,7 @@
 import Checkbox from "@/components/krambambouli/dashboard/checkbox/Checkbox";
 import { formatDate } from "@/lib/domain/datetime";
 import { krambambouliService } from "@/lib/services/krambambouli";
-import { getLocale } from "@/lib/utils";
+import { formatCurrency, getLocale } from "@/lib/utils";
 
 const { locals, request } = Astro;
 const locale = getLocale(request);
@@ -13,53 +13,43 @@ const page = await krambambouliService.getOrders();
 <div class="filters"></div>
 <table>
   <thead>
-    <th>Datum</th>
-    <th>Naam</th>
-    <th>Email</th>
-    <th>Ophaallocatie</th>
-    <th>Prijs</th>
-    <th>Betaald?</th>
-    <th>Opgehaald?</th>
+    <tr>
+      <th></th>
+      <th>Order #</th>
+      <th>Datum</th>
+      <th>Naam</th>
+      <th>Prijs</th>
+      <th>Ontvangen</th>
+      <th>Betaald</th>
+    </tr>
   </thead>
   <tbody>
     {
       page.content.map((order) => (
         <tr>
-          <td>{formatDate(new Date(order.createdAt), locale, {})}</td>
-          <td class="name">{`${order.firstName} ${order.lastName}`}</td>
-          <td>{order.email}</td>
-          <td>{"location palceholder"}</td>
-          <td>{`€${Math.floor(order.totalOwed / 100)},${order.totalOwed % 100 === 0 ? "-" : order.totalOwed % 100}`}</td>
-          <td>
-            <Checkbox
-              client:visible
-              orderId={order.id}
-              currentValue={order.paid}
-              endpoint="/api/krambambouli/toggle-payment"
-              bodyKey="paid"
-            />
-          </td>
-          <td>
-            <Checkbox
-              client:visible
-              orderId={order.id}
-              currentValue={order.received}
-              endpoint="/api/krambambouli/toggle-fulfilled"
-              bodyKey="fulfilled"
-            />
-          </td>
+          <td />
+          <td>{order.orderNumber}</td>
+          <td>{formatDate(order.createdAt, locale, {})}</td>
+          <td>{`${order.firstName} ${order.lastName}`}</td>
+          <td>{formatCurrency(order.totalOwed / 100)}</td>
+          <td>{order.received ? "Ja" : "Nee"}</td>
+          <td>{order.paid ? "Ja" : "Nee"}</td>
         </tr>
       ))
     }
-    <tr class={(page.content.length + 1) % 2 === 1 ? "coloured" : ""}>
+    <tr>
       <td></td>
       <td class="name">Totaal</td>
       <td></td>
-      {
-        "" // total per product
-      }
       <td></td>
-      <td>{/* total  */}</td>
+      <td
+        >{
+          formatCurrency(
+            page.content.reduce((acc, order) => acc + order.totalOwed, 0) / 100,
+          )
+        }</td
+      >
+      <td></td>
     </tr>
   </tbody>
 </table>
