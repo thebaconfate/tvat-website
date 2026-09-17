@@ -292,10 +292,14 @@ export class KrambambouliRepository extends Repository {
           SELECT
             o.id,
             o.order_number,
+            o.customer_id,
+            o.delivery_option,
             o.total_owed,
             o.paid,
             o.received,
-            o.created_at
+            o.created_at,
+            o.pickup_location_id,
+            o.delivery_fee,
             COUNT(*) OVER() as total_elements
           FROM krambambouli_orders o
           ORDER BY o.created_at DESC
@@ -307,27 +311,38 @@ export class KrambambouliRepository extends Repository {
         c.first_name as "firstName",
         c.last_name as "lastName",
         po.order_number as "orderNumber",
+        po.pickup_location_id as "pickupLocationId",
         c.email as email,
+        po.delivery_option as "deliveryOption",
+        po.delivery_fee as "deliveryFee",
+        pl.name as "pickupLocationName",
         COALESCE(
             json_agg(
                 json_build_object(
-                    'orderId', oi.order_id,
                     'productId', oi.product_id,
                     'amount', oi.amount,
                     'productName', p.name,
+                    'price', p.price
                 )
             ) FILTER (WHERE oi.order_id is NOT NULL),
             '[]'::json
-        ) AS cart,
+        ) AS orders,
         po.total_owed AS "totalOwed",
         po.paid AS paid,
         po.received AS received,
         po.created_at as "createdAt",
-        po.total_elements as "totalElements"
+        po.total_elements as "totalElements",
+        dl.street_name as "streetName",
+        dl.house_number as "houseNumber",
+        dl.bus,
+        dl.postal_code as "postalCode",
+        dl.city
       FROM paginated_orders po
       JOIN customers c on c.id = po.customer_id
       LEFT JOIN krambambouli_order_items oi ON oi.order_id = po.id
       LEFT JOIN products p ON p.id = oi.product_id
+      LEFT JOIN krambambouli_pickup_locations pl ON pl.id = po.pickup_location_id
+      LEFT JOIN krambambouli_delivery_locations dl ON dl.order_id = po.id
       GROUP BY
         po.id,
         c.first_name,
@@ -338,7 +353,16 @@ export class KrambambouliRepository extends Repository {
         po.paid,
         po.received,
         po.created_at,
-        po.total_elements
+        po.total_elements,
+        po.delivery_option,
+        po.pickup_location_id,
+        po.delivery_fee,
+        pl.name,
+        dl.street_name,
+        dl.house_number,
+        dl.bus,
+        dl.postal_code,
+        dl.city
       ORDER BY po.created_at DESC;
       `;
     const result = await this.db.query<OrderQueryResult>(sql, [
@@ -350,7 +374,12 @@ export class KrambambouliRepository extends Repository {
     const totalPages = Math.ceil(totalElements / pageSize);
     const content: OrderData[] = z4.array(orderSchema).parse(rows);
     return {
-      page: { size: 0, number: 0, totalElements: 0, totalPages: totalPages },
+      page: {
+        size: 0,
+        number: 0,
+        totalElements: totalElements,
+        totalPages: totalPages,
+      },
       content: content,
     };
   }

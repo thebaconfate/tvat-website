@@ -1,8 +1,8 @@
 ---
 import LayoutAstroComponent from "@/layouts/Layout.astro";
+import { APP_ROUTES } from "@/lib/routes";
 
-const { locals } = Astro;
-console.log(locals);
+return Astro.redirect(APP_ROUTES.KRAMBAMBOULI.DASHBOARD.url);
 ---
 
 <LayoutAstroComponent title="Dashboard">

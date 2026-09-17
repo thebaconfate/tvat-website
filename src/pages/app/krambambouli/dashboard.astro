@@ -1,31 +1,12 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-// import DashboardPageAstroComponent from "@/components/app/krambambouli/DashboardPage.astro";
-import { authService } from "@/lib/services/auth";
-import { krambambouliService } from "@/lib/services/krambambouli";
+import DashboardPageAstroComponent from "@/components/app/krambambouli/DashboardPage.astro";
 
-const [authenticatedPromise] = [
-  authService.authenticate(Astro.request.headers),
-];
-const idk = await krambambouliService.getKrambambouliProducts();
-console.log(idk);
-const authenticated = await authenticatedPromise;
-if (!authenticated) return Astro.redirect("/403");
-
+const { locals } = Astro;
+console.log(locals);
 const title = "Dashbambouli";
 ---
 
 <Layout title={title}>
-  <main
-    style={{
-      display: "flex",
-      flex: 1,
-      "justify-content": "center",
-      "align-items": "center",
-    }}
-  >
-    We werken aan de migratie van de app, deze feature is momenteel
-    uitgeschakeld
-  </main>
-  <!--<DashboardPageAstroComponent />-->
+  <DashboardPageAstroComponent />
 </Layout>
