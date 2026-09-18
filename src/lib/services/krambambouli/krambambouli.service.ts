@@ -8,7 +8,6 @@ import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
 import { KrambambouliRepository } from "@/lib/repositories/krambambouli";
 import { mailService } from "../mail";
-import { orderSchema } from "@/lib/domain/krambambouli/order.schema";
 
 class KrambambouliService {
   private readonly mailService: typeof mailService;

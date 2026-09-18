@@ -14,5 +14,6 @@ export const API_ROUTES = {
   KRAMBALBOULI: {
     url: `${API_PREFIX}`,
     ORDER: { url: `${KRAMBALBOULI_PREFIX}/order` },
+    ORDERS: { url: `${KRAMBALBOULI_PREFIX}/orders` },
   },
 } as const;
