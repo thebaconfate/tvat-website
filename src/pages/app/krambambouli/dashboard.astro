@@ -1,12 +1,16 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import DashboardPageAstroComponent from "@/components/app/krambambouli/DashboardPage.astro";
+import { krambambouliService } from "@/lib/services/krambambouli";
+import { getLocale } from "@/lib/utils";
+import DashboardPage from "@/components/app/krambambouli/DashboardPage";
+import type { Page } from "@/lib/domain/page";
+import type { OrderData } from "@/lib/domain/krambambouli";
 
-const { locals } = Astro;
-console.log(locals);
 const title = "Dashbambouli";
+const page: Page<OrderData> = await krambambouliService.getOrders();
+const locale = getLocale(Astro.request);
 ---
 
 <Layout title={title}>
-  <DashboardPageAstroComponent />
+  <DashboardPage page={page} locale={locale} client:load />
 </Layout>

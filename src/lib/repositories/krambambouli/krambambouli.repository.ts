@@ -283,7 +283,6 @@ export class KrambambouliRepository extends Repository {
     pageNumber: number = 1,
     pageSize: number = 100,
   ): Promise<Page<OrderData>> {
-    // FIX: check the sql, might be outdated with the orderSchema refactor
     pageNumber = Math.max(1, pageNumber);
     pageSize = Math.max(1, pageSize);
     const offset = (pageNumber - 1) * pageSize;
@@ -363,7 +362,7 @@ export class KrambambouliRepository extends Repository {
         dl.bus,
         dl.postal_code,
         dl.city
-      ORDER BY po.created_at DESC;
+      ORDER BY po.created_at DESC, po.order_number DESC;
       `;
     const result = await this.db.query<OrderQueryResult>(sql, [
       pageSize,
