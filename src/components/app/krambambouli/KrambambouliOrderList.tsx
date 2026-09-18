@@ -12,7 +12,7 @@ type Props = {
   locale: string;
 };
 
-export default function DashboardPage(props: Props) {
+export default function KrambambouliOrderList(props: Props) {
   const { krambambouliOrderPage } = useKrambambouliOrders({
     page: props.page,
   });
