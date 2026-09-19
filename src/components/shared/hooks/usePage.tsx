@@ -22,11 +22,11 @@ export function usePage<
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
-  const firstRenderSkiped = useRef(false);
+  const firstRenderSkipped = useRef(false);
   const debouncedFilters = useDebounced(filters);
   useEffect(() => {
-    if (initialPage && !firstRenderSkiped.current) {
-      firstRenderSkiped.current = true;
+    if (initialPage && !firstRenderSkipped.current) {
+      firstRenderSkipped.current = true;
       return;
     }
     const searchParams = new URLSearchParams();
@@ -36,6 +36,7 @@ export function usePage<
         searchParams.append(key, String(value));
     });
     setLoading(true);
+    setItemPage(undefined);
     fetch(`${url}?${searchParams.toString()}`)
       .then((response) => response.json())
       .then((data) => schema.parse(data))
