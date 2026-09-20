@@ -2,7 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import { krambambouliService } from "@/lib/services/krambambouli";
 import { getLocale } from "@/lib/utils";
-import DashboardPage from "@/components/app/krambambouli/DashboardPage";
+import KrambambouliOrderList from "@/components/app/krambambouli/KrambambouliOrderList";
 import type { Page } from "@/lib/domain/page";
 import type { OrderData } from "@/lib/domain/krambambouli";
 
@@ -12,5 +12,5 @@ const locale = getLocale(Astro.request);
 ---
 
 <Layout title={title}>
-  <DashboardPage page={page} locale={locale} client:load />
+  <KrambambouliOrderList page={page} locale={locale} client:load />
 </Layout>

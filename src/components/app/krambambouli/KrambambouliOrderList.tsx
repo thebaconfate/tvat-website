@@ -1,5 +1,5 @@
 import type { OrderData } from "@/lib/domain/krambambouli/order.types";
-import styles from "./DashboardPage.module.css";
+import styles from "./KrambambouliOrderList.module.css";
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { formatDate } from "@/lib/domain/datetime";
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export default function KrambambouliOrderList(props: Props) {
-  const { krambambouliOrderPage } = useKrambambouliOrders({
+  const { krambambouliOrderPage, filters } = useKrambambouliOrders({
     page: props.page,
   });
   return (
@@ -23,16 +23,16 @@ export default function KrambambouliOrderList(props: Props) {
           <tr className={styles.tr}>
             <th className={styles.th}></th>
             <th className={styles.th}>
-              <input placeholder="Order #" />
+              <input placeholder="Order #" value={filters.orderNumber ?? ""} />
             </th>
             <th className={styles.th}>
-              <input placeholder="Datum" />
+              <input placeholder="Datum" value={filters.date ?? ""} />
             </th>
             <th className={styles.th}>
-              <input placeholder="Naam" />
+              <input placeholder="Naam" value={filters.name ?? ""} />
             </th>
             <th className={styles.th}>
-              <input placeholder="Prijs" />
+              <input placeholder="Prijs" value={filters.price ?? ""} />
             </th>
             <th className={styles.th}>
               <input placeholder="Ontvangen" />
