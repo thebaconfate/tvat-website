@@ -8,6 +8,7 @@ import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
 import { KrambambouliRepository } from "@/lib/repositories/krambambouli";
 import { mailService } from "../mail";
+import type { URLSearchParams } from "node:url";
 
 class KrambambouliService {
   private readonly mailService: typeof mailService;
@@ -40,10 +41,13 @@ class KrambambouliService {
     return savedOrder;
   }
 
-  async getOrders(
-    pageNumber?: number,
-    pageSize?: number,
-  ): Promise<Page<OrderData>> {
+  async getOrders(urlSearchParams?: URLSearchParams): Promise<Page<OrderData>> {
+    const pageNumber = urlSearchParams
+      ? parseInt(urlSearchParams.get("page") ?? "1")
+      : 1;
+    const pageSize = urlSearchParams
+      ? parseInt(urlSearchParams.get("pageSize") ?? "100")
+      : 100;
     return this.repository.getOrders(pageNumber, pageSize);
   }
 }
