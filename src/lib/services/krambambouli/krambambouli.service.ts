@@ -35,10 +35,14 @@ class KrambambouliService {
     return this.repository.findActivePickupLocations();
   }
 
-  async createOrder(order: KrambambouliOrderFormData) {
+  async createOrder(order: KrambambouliOrderFormData): Promise<OrderData> {
     const savedOrder = await this.repository.createOrder(order);
     await this.mailService.sendOrderConfirmation(savedOrder);
     return savedOrder;
+  }
+
+  async patchOrder(order: Partial<KrambambouliOrderFormData>) {
+    // TODO: implement this
   }
 
   async getOrders(urlSearchParams?: URLSearchParams): Promise<Page<OrderData>> {
