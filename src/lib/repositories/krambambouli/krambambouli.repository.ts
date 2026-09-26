@@ -13,12 +13,6 @@ import { Repository } from "../repository";
 import z4 from "zod/v4";
 import { orderSchema } from "@/lib/domain/krambambouli/order.schema";
 
-type CustomerDetails = {
-  email: string;
-  firstName: string;
-  lastName: string;
-};
-
 type OrderQueryResult = {
   id: string;
   firstName: string;
@@ -374,8 +368,8 @@ export class KrambambouliRepository extends Repository {
     const content: OrderData[] = z4.array(orderSchema).parse(rows);
     return {
       page: {
-        size: 0,
-        number: 0,
+        size: content.length,
+        number: pageNumber,
         totalElements: totalElements,
         totalPages: totalPages,
       },

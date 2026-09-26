@@ -6,6 +6,8 @@ import { formatDate } from "@/lib/domain/datetime";
 import { formatCurrency } from "@/lib/utils";
 import type { Page } from "@/lib/domain/page";
 import useKrambambouliOrders from "./useKrambambouliOrders";
+import Input from "@/components/shared/Input";
+import Select from "@/components/shared/Select";
 
 type Props = {
   page: Page<OrderData>;
@@ -23,22 +25,46 @@ export default function KrambambouliOrderList(props: Props) {
           <tr className={styles.tr}>
             <th className={styles.th}></th>
             <th className={styles.th}>
-              <input placeholder="Order #" value={filters.orderNumber ?? ""} />
+              <Input
+                placeholder="Order #"
+                type="number"
+                value={filters.orderNumber ?? ""}
+              />
             </th>
             <th className={styles.th}>
-              <input placeholder="Datum" value={filters.date ?? ""} />
+              <Input type="date" value={filters.date ?? ""} />
             </th>
             <th className={styles.th}>
-              <input placeholder="Naam" value={filters.name ?? ""} />
+              <Input
+                placeholder="Naam"
+                type="text"
+                value={filters.name ?? ""}
+              />
             </th>
             <th className={styles.th}>
-              <input placeholder="Prijs" value={filters.price ?? ""} />
+              <Input
+                placeholder="Prijs"
+                type="number"
+                value={filters.price ?? ""}
+              />
             </th>
             <th className={styles.th}>
-              <input placeholder="Ontvangen" />
+              <Select
+                placeholder={"Ontvangen?"}
+                options={[
+                  { label: "Ja", value: "Ja" },
+                  { label: "Nee", value: "Nee" },
+                ]}
+              />
             </th>
             <th className={styles.th}>
-              <input placeholder="Betaald" />
+              <Select
+                placeholder={"Betaald?"}
+                options={[
+                  { label: "Ja", value: "Ja" },
+                  { label: "Nee", value: "Nee" },
+                ]}
+              />
             </th>
           </tr>
         </thead>
