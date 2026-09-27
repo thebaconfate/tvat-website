@@ -30,6 +30,7 @@ class AuthService {
       const parsed = tokenPayloadSchema.parse(decoded);
       return parsed;
     } catch (err) {
+      console.error(err);
       return false;
     }
   }

@@ -8,6 +8,7 @@ import type { Page } from "@/lib/domain/page";
 import useKrambambouliOrders from "./useKrambambouliOrders";
 import Input from "@/components/shared/Input";
 import Select from "@/components/shared/Select";
+import KrambambouliOrderItem from "./KrambambouliOrderItem";
 
 type Props = {
   page: Page<OrderData>;
@@ -147,29 +148,13 @@ export default function KrambambouliOrderList(props: Props) {
           </thead>
           <tbody>
             {krambambouliOrderPage &&
-              krambambouliOrderPage.content.map((order, index) => {
-                return (
-                  <tr key={index} className={styles.tr}>
-                    <td className={styles.td}>
-                      <ChevronDown />
-                    </td>
-                    <td className={styles.td}>{order.orderNumber}</td>
-                    <td className={styles.td}>
-                      {formatDate(new Date(order.createdAt), props.locale, {})}
-                    </td>
-                    <td
-                      className={styles.td}
-                    >{`${order.firstName} ${order.lastName}`}</td>
-                    <td className={styles.td}>
-                      {formatCurrency(order.totalOwed / 100)}
-                    </td>
-                    <td className={styles.td}>
-                      {order.received ? "Ja" : "Nee"}
-                    </td>
-                    <td className={styles.td}>{order.paid ? "Ja" : "Nee"}</td>
-                  </tr>
-                );
-              })}
+              krambambouliOrderPage.content.map((order, index) => (
+                <KrambambouliOrderItem
+                  order={order}
+                  key={index}
+                  locale={props.locale}
+                />
+              ))}
             <tr className={styles.tr}>
               <td></td>
               <td className={`${styles.td} ${styles.name}`}>Totaal</td>
@@ -184,6 +169,8 @@ export default function KrambambouliOrderList(props: Props) {
                     ) / 100,
                   )}
               </td>
+              <td></td>
+              <td></td>
             </tr>
           </tbody>
         </table>
