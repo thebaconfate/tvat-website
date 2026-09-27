@@ -1,39 +1,41 @@
-import "./styles.css"
+import styles from "./Popup.module.css";
 import { PopupEnum } from "../../lib/popup";
 
 function getPopupTypeClassName(type: any) {
-    switch (type) {
-        case PopupEnum.ERROR:
-            return "error-popup";
-        case PopupEnum.SUCCESS:
-            return "success-popup";
-        case PopupEnum.WARNING:
-            return "warning-popup";
-        case PopupEnum.INFO:
-            return "info-popup";
-        default:
-            throw new Error(`Unknown popup type: ${(typeof type).toString()}`);
-    }
+  switch (type) {
+    case PopupEnum.ERROR:
+      return styles.errorPopup;
+    case PopupEnum.SUCCESS:
+      return styles.successPopup;
+    case PopupEnum.WARNING:
+      return styles.warningPopup;
+    case PopupEnum.INFO:
+      return styles.infoPopup;
+    default:
+      throw new Error(`Unknown popup type: ${(typeof type).toString()}`);
+  }
 }
 
 export function Popup({
-    title,
-    message,
-    onClose,
+  title,
+  message,
+  onClose,
 }: Readonly<{
-    title: PopupEnum;
-    message: string;
-    onClose: () => void;
+  title: PopupEnum;
+  message: string;
+  onClose: () => void;
 }>) {
-    return (
-        <div className='overlay'>
-            <div className={`popup-container ${getPopupTypeClassName(title)}`}>
-                <div className='popup'>
-                    <h2>{title}</h2>
-                    <p>{message}</p>
-                    <button onClick={onClose}> Sluiten </button>
-                </div>
-            </div>
+  return (
+    <div className={styles.overlay}>
+      <div
+        className={`${styles.popupContainer} ${getPopupTypeClassName(title)}`}
+      >
+        <div className={styles.popup}>
+          <h2>{title}</h2>
+          <p>{message}</p>
+          <button onClick={onClose}> Sluiten </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

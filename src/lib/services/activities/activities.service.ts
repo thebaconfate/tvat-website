@@ -1,4 +1,4 @@
-import { database } from "@/lib/database";
+import { database } from "@/lib/infrastructure/database";
 import type { ActivityData, ActivityPageData } from "@/lib/domain/activities";
 import type { URLSearchParams } from "url";
 

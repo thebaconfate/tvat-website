@@ -27,11 +27,10 @@ export const pickupFormSchema = z4.object({
 export const deliveryFormSchema = z4.object({
   ...sharedFieldsSchema.shape,
   deliveryOption: z4.literal(deliveryOptionEnumSchema.enum.delivery),
-  deliveryZone: z4.string(),
   streetName: z4.string(),
-  streetNumber: z4.string(),
+  houseNumber: z4.string(),
   bus: z4.string(),
-  postcode: z4.string(),
+  postalCode: z4.string(),
   city: z4.string(),
 });
 

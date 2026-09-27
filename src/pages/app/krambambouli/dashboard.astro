@@ -1,31 +1,16 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-// import DashboardPageAstroComponent from "@/components/app/krambambouli/DashboardPage.astro";
-import { authService } from "@/lib/services/auth";
 import { krambambouliService } from "@/lib/services/krambambouli";
-
-const [authenticatedPromise] = [
-  authService.authenticate(Astro.request.headers),
-];
-const idk = await krambambouliService.getKrambambouliProducts();
-console.log(idk);
-const authenticated = await authenticatedPromise;
-if (!authenticated) return Astro.redirect("/403");
+import { getLocale } from "@/lib/utils";
+import KrambambouliOrderList from "@/components/app/krambambouli/KrambambouliOrderList";
+import type { Page } from "@/lib/domain/page";
+import type { OrderData } from "@/lib/domain/krambambouli";
 
 const title = "Dashbambouli";
+const page: Page<OrderData> = await krambambouliService.getOrders();
+const locale = getLocale(Astro.request);
 ---
 
 <Layout title={title}>
-  <main
-    style={{
-      display: "flex",
-      flex: 1,
-      "justify-content": "center",
-      "align-items": "center",
-    }}
-  >
-    We werken aan de migratie van de app, deze feature is momenteel
-    uitgeschakeld
-  </main>
-  <!--<DashboardPageAstroComponent />-->
+  <KrambambouliOrderList page={page} locale={locale} client:load />
 </Layout>
