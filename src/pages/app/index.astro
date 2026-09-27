@@ -2,6 +2,10 @@
 import LayoutAstroComponent from "@/layouts/Layout.astro";
 import { APP_ROUTES } from "@/lib/routes";
 
+console.log("received request to /app");
+const { locals } = Astro;
+console.log("locals");
+console.log(locals);
 return Astro.redirect(APP_ROUTES.KRAMBAMBOULI.DASHBOARD.url);
 ---
 

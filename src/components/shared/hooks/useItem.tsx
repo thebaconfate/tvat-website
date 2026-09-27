@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import type { ZodType } from "zod/v4";
 
 type Props<T> = {
-  id: number;
+  id: number | string;
   baseUrl: string;
   schema: ZodType<T>;
   init?: T;
