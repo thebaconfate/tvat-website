@@ -6,3 +6,5 @@ export * from "./pickup.types";
 export * from "./pickup.schemas";
 export * from "./form.types";
 export * from "./form.schemas";
+export * from "./order.types";
+export * from "./order.schema";

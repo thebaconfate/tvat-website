@@ -3,26 +3,32 @@ import { APP_ROUTES, ROUTES } from "./lib/routes";
 import { authService } from "./lib/services/auth";
 
 export async function onRequest(context: APIContext, next: MiddlewareNext) {
+  const { pathname } = context.url;
   const authCookie = context.cookies.get("Authorization")?.value;
-  if (!authCookie && !context.url.pathname.startsWith(APP_ROUTES.APP.url))
+
+  // 1. Allow public routes (anything outside of protected /app routes)
+  const isProtectedRoute = pathname.startsWith(APP_ROUTES.APP.url);
+  if (!isProtectedRoute) {
     return next();
-  if (!authCookie) {
-    const response = await next(
-      new Request(new URL(ROUTES.UNAUTHENTICATED.url, context.url)),
-    );
-    return new Response(response.body, {
-      status: 401,
-      headers: response.headers,
-    });
   }
+
+  // 2. Reject unauthenticated access to protected routes
+  if (!authCookie) {
+    return context.redirect(ROUTES.UNAUTHENTICATED.url);
+  }
+
+  // 3. Verify cookie token
   const verifiedToken = authService.verifyToken(authCookie);
   if (!verifiedToken) {
     context.cookies.delete("Authorization");
     return context.redirect(ROUTES.LOGIN.url);
   }
+
+  // 4. Attach user context and proceed
   context.locals.user = {
     id: verifiedToken.sub,
     role: verifiedToken.role,
   };
+
   return next();
 }

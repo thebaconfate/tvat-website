@@ -1,0 +1,32 @@
+.table {
+  margin: 1rem;
+  border-collapse: collapse;
+}
+
+.th,
+.td {
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid transparent;
+  color: black;
+}
+
+.tr:nth-child(even) {
+  background-color: rgba(222, 208, 225, 1);
+}
+
+.name {
+  font-weight: bold;
+}
+
+.filter {
+  min-width: unset;
+  width: 1rem;
+}
+
+.dateFilters {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: space-between;
+}
