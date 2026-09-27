@@ -24,6 +24,7 @@ export function usePage<
   const [error, setError] = useState();
   const firstRenderSkipped = useRef(false);
   const debouncedFilters = useDebounced(filters);
+
   useEffect(() => {
     if (initialPage && !firstRenderSkipped.current) {
       firstRenderSkipped.current = true;
@@ -44,7 +45,9 @@ export function usePage<
         setItemPage(newContent);
         setLoading(false);
       })
-      .catch((e) => setError(e));
+      .catch((e) => {
+        setError(e);
+      });
   }, [debouncedFilters, page]);
 
   return { itemPage, filters, setFilters, setPage, page, error, loading };
