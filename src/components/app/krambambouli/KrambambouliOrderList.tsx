@@ -1,8 +1,6 @@
 import type { OrderData } from "@/lib/domain/krambambouli/order.types";
 import styles from "./KrambambouliOrderList.module.css";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { formatDate } from "@/lib/domain/datetime";
+import { useMemo } from "react";
 import { formatCurrency } from "@/lib/utils";
 import type { Page } from "@/lib/domain/page";
 import useKrambambouliOrders from "./useKrambambouliOrders";
@@ -152,6 +150,7 @@ export default function KrambambouliOrderList(props: Props) {
                 <KrambambouliOrderItem
                   order={order}
                   key={index}
+                  index={index}
                   locale={props.locale}
                 />
               ))}
