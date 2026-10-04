@@ -6,7 +6,10 @@ import {
   type KrambambouliProductData,
   type PickupLocationData,
 } from "@/lib/domain/krambambouli";
-import type { OrderData } from "@/lib/domain/krambambouli/order.types";
+import type {
+  OrderData,
+  OrderFilters,
+} from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
 import type { QueryResult } from "pg";
 import { Repository } from "../repository";
@@ -276,10 +279,64 @@ export class KrambambouliRepository extends Repository {
   async getOrders(
     pageNumber: number = 1,
     pageSize: number = 100,
+    filters: OrderFilters = {},
   ): Promise<Page<OrderData>> {
     pageNumber = Math.max(1, pageNumber);
     pageSize = Math.max(1, pageSize);
     const offset = (pageNumber - 1) * pageSize;
+
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+
+    if (filters.orderNumber != null) {
+      params.push(filters.orderNumber);
+      conditions.push(`o.order_number = $${params.length}`);
+    }
+
+    if (filters.fromDate && !isNaN(filters.fromDate.getTime())) {
+      const startOfDay = new Date(filters.fromDate);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      params.push(startOfDay.toISOString());
+      conditions.push(`o.created_at >= $${params.length}::timestamptz`);
+    }
+
+    if (filters.toDate && !isNaN(filters.toDate.getTime())) {
+      const endOfDay = new Date(filters.toDate);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+      params.push(endOfDay.toISOString);
+      conditions.push(`o.created_at <= $${params.length}::timestamptz`);
+    }
+
+    if (filters.name && filters.name.trim() !== "") {
+      params.push(`%${filters.name.trim()}%`);
+      conditions.push(
+        `(c.first_name || ' ' || c.last_name) ILIKE $${params.length}`,
+      );
+    }
+
+    if (filters.price != null) {
+      params.push(filters.price);
+      conditions.push(`o.total_owed = $${params.length}`);
+    }
+
+    if (filters.received != null) {
+      params.push(filters.received);
+      conditions.push(`o.received = $${params.length}`);
+    }
+
+    if (filters.paid != null) {
+      params.push(filters.paid);
+      conditions.push(`o.paid = $${params.length}`);
+    }
+
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    params.push(pageSize);
+    const limitParamIndex = params.length;
+    params.push(offset);
+    const offsetParamIndex = params.length;
+
     const sql = `
       WITH paginated_orders AS (
           SELECT
@@ -295,8 +352,10 @@ export class KrambambouliRepository extends Repository {
             o.delivery_fee,
             COUNT(*) OVER() as total_elements
           FROM krambambouli_orders o
+          JOIN customers c ON c.id = o.customer_id
+          ${whereClause}
           ORDER BY o.created_at DESC
-          LIMIT $1 OFFSET $2
+          LIMIT $${limitParamIndex} OFFSET $${offsetParamIndex}
       )
 
       SELECT
@@ -358,10 +417,7 @@ export class KrambambouliRepository extends Repository {
         dl.city
       ORDER BY po.created_at DESC, po.order_number DESC;
       `;
-    const result = await this.db.query<OrderQueryResult>(sql, [
-      pageSize,
-      offset,
-    ]);
+    const result = await this.db.query<OrderQueryResult>(sql, params);
     const rows = result.rows;
     const totalElements = rows.length > 0 ? Number(rows[0].totalElements) : 0;
     const totalPages = Math.ceil(totalElements / pageSize);
