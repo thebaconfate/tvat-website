@@ -41,6 +41,19 @@ const pickupOrderSchema = z4.object({
   pickupLocationName: z4.string(),
 });
 
+export const orderFilterSchema = z4
+  .object({
+    orderNumber: z4.coerce.number().int(),
+    fromDate: z4.coerce.date(),
+    toDate: z4.coerce.date(),
+    name: z4.string().nonempty(),
+    price: z4.coerce.number().int(),
+    received: z4.coerce.boolean(),
+    paid: z4.coerce.boolean(),
+  })
+  .partial()
+  .optional();
+
 export const orderSchema = z4.discriminatedUnion("deliveryOption", [
   deliveryOrderSchema,
   pickupOrderSchema,

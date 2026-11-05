@@ -6,7 +6,8 @@
   color: black;
 }
 
-.tr:nth-child(even) {
+/* Explicit Even Row Styling for both main row & drawer */
+.even {
   background-color: rgba(222, 208, 225, 1);
 }
 
@@ -23,4 +24,61 @@
   display: grid;
   grid-auto-flow: column;
   align-items: center;
+}
+
+.clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Detail Row Visibility */
+.detailRow {
+  display: none;
+}
+
+.open {
+  display: table-row;
+}
+
+/* Ensure detail cell stretches across all columns */
+.detailCell {
+  padding: 1rem 1.2rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.15);
+  color: black;
+}
+
+/* Drawer Content Layout */
+.detailContent {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.section {
+  flex: 1;
+}
+
+.sectionTitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.section p {
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+}
+
+.productList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.productListItem {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
