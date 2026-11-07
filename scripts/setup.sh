@@ -3,8 +3,8 @@
 #
 #   1. Tools: Node 24 and Docker (with compose). With mise installed, mise installs the
 #      versions pinned in mise.toml; without it, the script checks what's there.
-#   2. .env: created from .env.example (with a generated database password), or checked for
-#      keys that are missing.
+#   2. .env: created with local defaults and a generated database password, or checked for
+#      keys that are missing. The README explains every variable.
 #   3. npm ci
 #   4. The local database (Docker). A new one gets the schema and development data from
 #      dev/postgres/.
@@ -97,23 +97,40 @@ fi
 
 # --- 2. .env ------------------------------------------------------------------
 
+# The .env a new checkout gets: enough to run locally. Every key here is checked in an
+# existing .env too. The README ("Configuration") explains each one.
+env_template() {
+  cat <<EOF
+# Local settings, see "Configuration" in the README. Never commit this file.
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=tvat
+DB_PASSWORD=$1
+DB_DATABASE=tvat
+RESEND_API_KEY=re_development_placeholder
+DOMAIN=example.com
+VATMAIL=dev@example.com
+IBAN=BE00 0000 0000 0000
+BIC=GEBABEBB
+ACCOUNTHOLDER="'t VAT"
+BOOTSTRAP_TOKEN=
+EOF
+}
+
 step ".env"
 if [[ -f .env ]]; then
   missing_keys=()
   while IFS= read -r key; do
     grep -qE "^${key}=" .env || missing_keys+=("$key")
-  done < <(grep -oE '^[A-Z_]+=' .env.example | tr -d '=')
+  done < <(env_template x | grep -oE '^[A-Z_]+=' | tr -d '=')
   if ((${#missing_keys[@]})); then
-    info "exists, but lacks: ${missing_keys[*]} (see .env.example)"
+    info "exists, but lacks: ${missing_keys[*]} (see \"Configuration\" in the README)"
   else
-    info "exists and has every key in .env.example"
+    info "exists and has every key the site needs"
   fi
 else
-  password="$(head -c 18 /dev/urandom | od -An -tx1 | tr -d ' \n')"
-  # awk instead of sed -i, which differs between GNU and macOS
-  awk -v pw="$password" '/^DB_PASSWORD=$/ { print "DB_PASSWORD=" pw; next } { print }' \
-    .env.example > .env
-  info "created from .env.example, with a generated database password"
+  env_template "$(head -c 18 /dev/urandom | od -An -tx1 | tr -d ' \n')" > .env
+  info "created with local defaults and a generated database password"
   info "the email and payment values are placeholders: fill them in to send real emails"
 fi
 for key in DB_USER DB_PASSWORD DB_DATABASE; do
