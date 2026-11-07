@@ -100,7 +100,11 @@ export class KrambambouliRepository extends Repository {
     return result.rows;
   }
 
-  async createOrder(order: KrambambouliOrderFormData): Promise<OrderData> {
+  /**
+   * Creates the order. Returns null when an order with `order.id` already exists
+   * (a resubmission), in which case nothing is inserted.
+   */
+  async createOrder(order: KrambambouliOrderFormData): Promise<OrderData | null> {
     const sql = `
       WITH
 
@@ -110,7 +114,10 @@ export class KrambambouliRepository extends Repository {
           ON CONFLICT (email) DO UPDATE
             SET first_name = EXCLUDED.first_name,
                 last_name = EXCLUDED.last_name
-          RETURNING id as customer_id
+          -- Return the customer fields here: the final SELECT can't read a customer
+          -- inserted in this same statement from the customers table (all parts of a
+          -- WITH statement see the same snapshot), so it joins this CTE instead.
+          RETURNING id as customer_id, email, first_name, last_name
       ),
 
       cart AS (
@@ -149,6 +156,7 @@ export class KrambambouliRepository extends Repository {
 
       new_order AS (
           INSERT INTO krambambouli_orders (
+              id,
               customer_id,
               delivery_option,
               pickup_location_id,
@@ -156,12 +164,14 @@ export class KrambambouliRepository extends Repository {
               total_owed
           )
           SELECT
+            COALESCE($13::uuid, gen_random_uuid()),
             c.customer_id,
             $6::varchar,
             CASE WHEN $6 = 'pickup' THEN $7::int ELSE NULL END,
             ct.delivery_fee,
             ct.total_owed
           FROM upsert_customer c, cart_total ct
+          ON CONFLICT (id) DO NOTHING
           RETURNING *
       ),
 
@@ -223,7 +233,7 @@ export class KrambambouliRepository extends Repository {
             '[]'::json
         ) AS orders
         FROM new_order o
-        JOIN customers c ON c.id = o.customer_id
+        JOIN upsert_customer c ON c.customer_id = o.customer_id
         LEFT JOIN new_order_items oi ON oi.order_id = o.id
         LEFT JOIN products p ON p.id = oi.product_id
         LEFT JOIN new_delivery_address da ON da.order_id = o.id
@@ -270,9 +280,57 @@ export class KrambambouliRepository extends Repository {
       isPickup ? null : order.bus,
       isPickup ? null : order.postalCode,
       isPickup ? null : order.city,
+      order.id ?? null,
     ];
     const result = await this.db.query<OrderData>(sql, params);
     console.log(result.rows);
+    if (result.rows.length === 0) return null;
+    return orderSchema.parse(result.rows[0]);
+  }
+
+  async findOrderById(id: string): Promise<OrderData | null> {
+    const sql = `
+      SELECT
+        o.id,
+        o.order_number AS "orderNumber",
+        c.first_name AS "firstName",
+        c.last_name AS "lastName",
+        c.email,
+        o.delivery_option AS "deliveryOption",
+        o.pickup_location_id AS "pickupLocationId",
+        o.delivery_fee AS "deliveryFee",
+        o.total_owed AS "totalOwed",
+        o.paid,
+        o.received,
+        o.created_at AS "createdAt",
+        da.street_name AS "streetName",
+        da.house_number AS "houseNumber",
+        da.bus AS "bus",
+        da.postal_code AS "postalCode",
+        da.city AS "city",
+        pl.name as "pickupLocationName",
+        COALESCE(
+            json_agg(
+                json_build_object(
+                    'productId', p.id,
+                    'productName', p.name,
+                    'amount', oi.amount,
+                    'price', oi.price
+                )
+            ) FILTER (WHERE oi.product_id IS NOT NULL),
+            '[]'::json
+        ) AS orders
+      FROM krambambouli_orders o
+      JOIN customers c ON c.id = o.customer_id
+      LEFT JOIN krambambouli_order_items oi ON oi.order_id = o.id
+      LEFT JOIN products p ON p.id = oi.product_id
+      LEFT JOIN krambambouli_delivery_locations da ON da.order_id = o.id
+      LEFT JOIN krambambouli_pickup_locations pl ON pl.id = o.pickup_location_id
+      WHERE o.id = $1
+      GROUP BY o.id, c.id, da.order_id, pl.id;
+    `;
+    const result = await this.db.query<OrderData>(sql, [id]);
+    if (result.rows.length === 0) return null;
     return orderSchema.parse(result.rows[0]);
   }
 
