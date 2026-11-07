@@ -1,11 +1,17 @@
 [tools]
+node = "24" # same as the Dockerfile and CI
 railway = "5"
+
+[tasks.setup]
+description = "Set up the project for local development (see scripts/setup.sh --help)"
+run = "scripts/setup.sh"
 
 [tasks."db:up"]
 description = "Start the local Postgres container and wait until it accepts connections"
+# Over TCP: while a new volume is being initialised, Postgres listens on the Unix socket only
 run = """
 docker compose up -d database
-until docker compose exec -T database pg_isready -q; do sleep 1; done
+until docker compose exec -T database pg_isready -q -h 127.0.0.1; do sleep 1; done
 """
 
 [tasks."db:pull"]

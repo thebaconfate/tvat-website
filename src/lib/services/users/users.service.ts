@@ -48,7 +48,7 @@ class UserService {
       newUser.email,
       newUser.password,
       newUser.firstName,
-      newUser.lastName ?? null,
+      newUser.lastName ?? "", // last_name is NOT NULL (default '')
       newUser.role,
     ];
     const result = await database.query<UserData>(query, params);
