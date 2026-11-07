@@ -19,7 +19,7 @@ It's safe to re-run, and it:
 
 1. installs the tools pinned in `mise.toml` (Node 24, the Railway CLI) if you have
    [mise](https://mise.jdx.dev), and otherwise checks the tools on your `PATH`
-2. creates `.env` from `.env.example`, with a generated database password
+2. creates `.env` with local defaults and a generated database password
 3. runs `npm ci`
 4. starts the local database in Docker; a new one gets the schema and development data
 5. offers to copy the production data, if you have access to the Railway project
@@ -33,10 +33,28 @@ Then start the site with `npm run dev` and open <http://localhost:4321>.
 
 ## Configuration
 
-Settings come from `.env`, which is gitignored. `.env.example` lists every variable with a
-short explanation. The defaults are enough to run the site locally. Sending real emails needs
-a Resend API key; without one, sending an email fails and is logged, and orders still go
-through.
+Settings come from `.env`, which is gitignored: never commit it. `scripts/setup.sh` creates
+one with values that are enough to run the site locally, and on a re-run reports keys that
+are missing.
+
+| Variable          | What it's for                                                     | Local default              |
+| :---------------- | :---------------------------------------------------------------- | :------------------------- |
+| `DB_HOST`         | Database host                                                     | `localhost`                |
+| `DB_PORT`         | Database port; also the port Docker exposes the database on       | `5432`                     |
+| `DB_USER`         | Database user, created by Docker on a new volume                  | `tvat`                     |
+| `DB_PASSWORD`     | Database password, set by Docker on a new volume                  | generated                  |
+| `DB_DATABASE`     | Database name                                                     | `tvat`                     |
+| `RESEND_API_KEY`  | API key for sending emails with Resend                            | placeholder: sending fails |
+| `DOMAIN`          | Domain emails are sent from (`no-reply@DOMAIN`)                   | `example.com`              |
+| `VATMAIL`         | Address contact form messages are sent to                         | `dev@example.com`          |
+| `IBAN`            | Payment details shown in the order confirmation email             | placeholder                |
+| `BIC`             | (idem)                                                            | placeholder                |
+| `ACCOUNTHOLDER`   | (idem)                                                            | `'t VAT`                   |
+| `BOOTSTRAP_TOKEN` | Enables creating the first user, see below; leave empty otherwise | empty                      |
+
+With the placeholder Resend key, sending an email fails and is logged, and orders still go
+through. `scripts/db-pull.sh` also reads `RAILWAY_DB_SERVICE` (default `Postgres`) and
+`RAILWAY_DB_ENV` (default: the linked environment) when they're set.
 
 ## Database
 
