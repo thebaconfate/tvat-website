@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import styles from "./KrambambouliForm.module.css";
 import { Popup } from "@/components/popup/Popup";
 import { PopupEnum } from "@/lib/popup";
@@ -140,6 +140,9 @@ export default function KrambambouliForm({
     [pickupLocations, deliveryLocations],
   );
 
+  // Idempotency key for the order being submitted, tied to its exact contents.
+  const pendingOrder = useRef<{ payload: string; id: string } | null>(null);
+
   const form = useForm({
     defaultValues: {
       cart: products.map((p) => {
@@ -187,28 +190,61 @@ export default function KrambambouliForm({
               city: value.city,
               postalCode: value.postalCode,
             };
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+      // Reuse the same order id when the exact same order is submitted again
+      // (e.g. a retry after an error), so the server can't create a duplicate.
+      const serializedPayload = JSON.stringify(payload);
+      if (pendingOrder.current?.payload !== serializedPayload)
+        pendingOrder.current = {
+          payload: serializedPayload,
+          id: crypto.randomUUID(),
+        };
+      const retryText =
+        "Er is iets misgegaan tijdens het plaatsen van je bestelling. Probeer het opnieuw: je bestelling wordt niet dubbel geplaatst. Lukt het nog steeds niet, contacteer dan de paginabeheerder.";
+
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...payload, id: pendingOrder.current.id }),
+        });
+      } catch (e) {
+        setPopup({
+          title: PopupEnum.ERROR,
+          text: "Je bestelling kon niet verstuurd worden. Controleer je internetverbinding en probeer het opnieuw.",
+          show: true,
+        });
+        return;
+      }
+
+      if (!response.ok) {
+        // 4xx: the order was definitely not placed, so a new attempt gets a new id.
+        if (response.status < 500) pendingOrder.current = null;
+        setPopup({ title: PopupEnum.ERROR, text: retryText, show: true });
+        return;
+      }
+
+      let order;
+      let emailSent;
+      try {
+        const responsePayload = await response.json();
+        order = orderSchema.parse(responsePayload);
+        emailSent = responsePayload.emailSent;
+      } catch (e) {
+        setPopup({ title: PopupEnum.ERROR, text: retryText, show: true });
+        return;
+      }
+
+      setPopup({
+        title: PopupEnum.SUCCESS,
+        text:
+          emailSent === false
+            ? `Bedankt! Jouw bestelling (#${order.orderNumber}) is succesvol ontvangen.\n\nHelaas konden we je geen e-mail met de betalingsinstructies sturen. Contacteer ons om je bestelling te betalen.`
+            : `Bedankt! Jouw bestelling (#${order.orderNumber}) is succesvol ontvangen.\n\nWe hebben een e-mail gestuurd met de betalingsinstructies. Check ook je ongewenste mailbox (spam) als je deze niet meteen ziet.`,
+        show: true,
       });
-      if (response.ok)
-        try {
-          const responsePayload = await response.json();
-          const order = orderSchema.parse(responsePayload);
-          setPopup({
-            title: PopupEnum.SUCCESS,
-            text: `Bedankt! Jouw bestelling (#${order.orderNumber}) is succesvol ontvangen.\n\nWe hebben een e-mail gestuurd met de betalingsinstructies. Check ook je ongewenste mailbox (spam) als je deze niet meteen ziet.`,
-            show: true,
-          });
-          form.reset();
-        } catch (e) {
-          setPopup({
-            title: PopupEnum.ERROR,
-            text: "Er is iets misgegaan tijdens het plaatsen van de bestelling. Contacteer de paginabeheerder.",
-            show: true,
-          });
-        }
+      pendingOrder.current = null;
+      form.reset();
     },
     onSubmitInvalid: ({ formApi }) => {
       const fieldErrors = Object.values(formApi.state.fieldMeta)
@@ -219,7 +255,7 @@ export default function KrambambouliForm({
         .map((e) => (typeof e === "string" ? e : e?.message))
         .filter(Boolean);
 
-      const allErrors = [...fieldErrors, formErrors];
+      const allErrors = [...fieldErrors, ...formErrors];
 
       setPopup({
         title: PopupEnum.ERROR,
@@ -635,7 +671,13 @@ export default function KrambambouliForm({
             }}
           </form.Subscribe>
           <div className={styles.submitButtonContainer}>
-            <Button>Bestellen</Button>
+            <form.Subscribe selector={(state) => state.isSubmitting}>
+              {(isSubmitting) => (
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Bezig met bestellen…" : "Bestellen"}
+                </Button>
+              )}
+            </form.Subscribe>
           </div>
         </div>
       </form>

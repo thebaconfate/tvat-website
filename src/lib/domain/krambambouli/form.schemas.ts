@@ -3,6 +3,10 @@ import z4 from "zod/v4";
 export const deliveryOptionEnumSchema = z4.enum(["delivery", "pickup"]);
 
 const sharedFieldsSchema = z4.object({
+  // Client-generated idempotency key: resubmitting the same order with the same id
+  // returns the existing order instead of creating a duplicate. Optional so that
+  // pages loaded before this was introduced keep working.
+  id: z4.uuid().optional(),
   cart: z4
     .array(
       z4.object({
