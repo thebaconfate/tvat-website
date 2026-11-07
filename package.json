@@ -8,7 +8,8 @@
         "build": "astro check && astro build",
         "preview": "astro preview",
         "astro": "astro",
-        "email:dev": "email dev"
+        "email:dev": "email dev",
+        "db:pull": "scripts/db-pull.sh"
     },
     "dependencies": {
         "@astrojs/check": "^0.9.12",

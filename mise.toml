@@ -1,0 +1,14 @@
+[tools]
+railway = "5"
+
+[tasks."db:up"]
+description = "Start the local Postgres container and wait until it accepts connections"
+run = """
+docker compose up -d database
+until docker compose exec -T database pg_isready -q; do sleep 1; done
+"""
+
+[tasks."db:pull"]
+description = "Replace the local database with a copy of production (Railway)"
+depends = ["db:up"]
+run = "scripts/db-pull.sh"
