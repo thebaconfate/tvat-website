@@ -1,25 +1,25 @@
 import type { APIContext, MiddlewareNext } from "astro";
-import { APP_ROUTES, ROUTES } from "./lib/routes";
+import { API_ROUTES, APP_ROUTES, ROUTES } from "./lib/routes";
 import { authService } from "./lib/services/auth";
 
-const API_PREFIX = "/api";
+type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 /**
- * API routes that can be called without logging in. Every other /api route
+ * API routes that can be called without logging in. Every other API route
  * requires a valid session, so new endpoints are protected by default.
  * Paths are matched exactly (after normalisation), per HTTP method.
  */
-const PUBLIC_API_ROUTES: Record<string, string[]> = {
-  "/api/krambambouli/order": ["POST"], // the public order form
-  "/api/contact": ["POST"],
-  "/api/activites": ["GET"],
-  "/api/auth/login": ["POST"],
-  "/api/auth/authenticate": ["GET"], // only reports whether the caller's own cookie is valid
-  "/api/auth/forgot-password": ["POST"],
-  "/api/auth/reset-password": ["POST"],
-  "/api/auth/passage": ["POST"], // verifies the token it is given itself
-  "/api/auth/station": ["POST"], // guarded by BOOTSTRAP_TOKEN
-};
+const PUBLIC_API_ROUTES: [{ url: string }, Method[]][] = [
+  [API_ROUTES.KRAMBALBOULI.ORDER, ["POST"]], // the public order form
+  [API_ROUTES.CONTACT, ["POST"]],
+  [API_ROUTES.ACTIVITIES, ["GET"]],
+  [API_ROUTES.AUTH.LOGIN, ["POST"]],
+  [API_ROUTES.AUTH.AUTHENTICATE, ["GET"]], // only reports whether the caller's own cookie is valid
+  [API_ROUTES.AUTH.FORGOT_PASSWORD, ["POST"]],
+  [API_ROUTES.AUTH.RESET_PASSWORD, ["POST"]],
+  [API_ROUTES.AUTH.PASSAGE, ["POST"]], // verifies the token it is given itself
+  [API_ROUTES.AUTH.STATION, ["POST"]], // guarded by BOOTSTRAP_TOKEN
+];
 
 /** Lowercase, decode, collapse duplicate slashes and drop trailing slashes. */
 function normalizePath(pathname: string): string {
@@ -33,23 +33,37 @@ function normalizePath(pathname: string): string {
   return path.length > 1 ? path.replace(/\/+$/, "") : path;
 }
 
+const publicApiMethods = new Map<string, string[]>(
+  PUBLIC_API_ROUTES.map(([route, methods]) => [
+    normalizePath(route.url),
+    methods,
+  ]),
+);
+const apiPrefix = normalizePath(API_ROUTES.url);
+const appPrefix = normalizePath(APP_ROUTES.APP.url);
+
 function isUnder(path: string, prefix: string) {
   return path === prefix || path.startsWith(`${prefix}/`);
 }
 
 export async function onRequest(context: APIContext, next: MiddlewareNext) {
   const path = normalizePath(context.url.pathname);
-  const isApiRoute = isUnder(path, API_PREFIX);
-  const isAppRoute = isUnder(path, APP_ROUTES.APP.url);
+  const isApiRoute = isUnder(path, apiPrefix);
+  const isAppRoute = isUnder(path, appPrefix);
 
   // 1. Public pages, and API routes that are explicitly public.
   if (!isApiRoute && !isAppRoute) return next();
-  if (isApiRoute && PUBLIC_API_ROUTES[path]?.includes(context.request.method))
+  if (
+    isApiRoute &&
+    publicApiMethods.get(path)?.includes(context.request.method)
+  )
     return next();
 
   // 2. Everything else requires a valid session.
   const authCookie = context.cookies.get("Authorization")?.value;
-  const verifiedToken = authCookie ? authService.verifyToken(authCookie) : false;
+  const verifiedToken = authCookie
+    ? authService.verifyToken(authCookie)
+    : false;
 
   if (!verifiedToken) {
     if (authCookie) context.cookies.delete("Authorization", { path: "/" });
