@@ -45,13 +45,13 @@ export async function POST({ request }: APIContext) {
         ${html}`;
       try {
         const { error } = await resend.emails.send({
-          from: `'t VAT <contact-form${config.resend.domain}>`,
+          from: `'t VAT <contact-form@${config.resend.domain}>`,
           to: `${form.email}`,
           subject: `CONTACT FORM SUBMISSION`,
           html: `${submiteeHtml}`,
           replyTo: config.email,
         });
-        console.log(error);
+        if (error) console.error(error);
       } finally {
         return new Response(null, { status: 200 });
       }
