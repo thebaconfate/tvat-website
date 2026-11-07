@@ -20,8 +20,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24 # same as the Dockerfile
+          node-version: 24
           cache: npm
 
       - run: npm ci
-      - run: npm run build # astro check + astro build
+      - run: npm run build
