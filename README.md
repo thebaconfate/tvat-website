@@ -52,8 +52,17 @@ are missing.
 | `ACCOUNTHOLDER`   | (idem)                                                            | `'t VAT`                   |
 | `BOOTSTRAP_TOKEN` | Enables creating the first user, see below; leave empty otherwise | empty                      |
 
-With the placeholder Resend key, sending an email fails and is logged, and orders still go
-through. `scripts/db-pull.sh` also reads `RAILWAY_DB_SERVICE` (default `Postgres`) and
+**Real values for `DOMAIN`, `VATMAIL`, `IBAN`, `BIC` and `ACCOUNTHOLDER`** are kept as GitHub
+repository variables (Settings → Secrets and variables → Actions → Variables), which people
+with write access to the repo can read. They aren't secrets, but they don't belong in the
+public code either. When `gh` is installed and logged in, `setup.sh` fills them into a new
+`.env`. When one changes, update it there (`gh variable set IBAN`) and in Railway, where
+production reads it.
+
+Secrets, like the production `RESEND_API_KEY`, are only kept in Railway. With the placeholder
+Resend key, sending an email fails and is logged, and orders still go through.
+
+`scripts/db-pull.sh` also reads `RAILWAY_DB_SERVICE` (default `Postgres`) and
 `RAILWAY_DB_ENV` (default: the linked environment) when they're set.
 
 ## Database

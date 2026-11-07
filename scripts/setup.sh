@@ -117,6 +117,36 @@ BOOTSTRAP_TOKEN=
 EOF
 }
 
+# The real values of these (not secrets) are kept as GitHub repository variables, which
+# people with write access to the repo can read. A new .env gets them when gh can.
+GITHUB_VARIABLES=(DOMAIN VATMAIL IBAN BIC ACCOUNTHOLDER)
+fill_from_github_variables() {
+  local placeholders="the email and payment values are placeholders"
+  if ! command -v gh >/dev/null 2>&1 || ! gh auth status >/dev/null 2>&1; then
+    info "$placeholders (with gh installed and logged in, they come from the repo's GitHub variables)"
+    return 0
+  fi
+  local fetched name line filled=()
+  # One NAME="value" line per variable; JSON quoting is valid .env quoting for these values
+  if ! fetched="$(gh variable list --json name,value --jq '.[] | "\(.name)=\(.value | @json)"' 2>/dev/null)"; then
+    info "$placeholders (no access to this repo's GitHub variables)"
+    return 0
+  fi
+  for name in "${GITHUB_VARIABLES[@]}"; do
+    line="$(grep -E "^${name}=" <<<"$fetched" | head -n1 || true)"
+    [[ -n "$line" ]] || continue
+    # ENVIRON instead of awk -v, which would interpret backslashes in the value
+    key="$name" line="$line" awk 'index($0, ENVIRON["key"] "=") == 1 { print ENVIRON["line"]; next } { print }' \
+      .env > .env.tmp && mv .env.tmp .env
+    filled+=("$name")
+  done
+  if ((${#filled[@]})); then
+    info "filled in from the repo's GitHub variables: ${filled[*]}"
+  else
+    info "$placeholders (the repo has no GitHub variables for them)"
+  fi
+}
+
 step ".env"
 if [[ -f .env ]]; then
   missing_keys=()
@@ -131,7 +161,7 @@ if [[ -f .env ]]; then
 else
   env_template "$(head -c 18 /dev/urandom | od -An -tx1 | tr -d ' \n')" > .env
   info "created with local defaults and a generated database password"
-  info "the email and payment values are placeholders: fill them in to send real emails"
+  fill_from_github_variables
 fi
 for key in DB_USER DB_PASSWORD DB_DATABASE; do
   [[ -n "$(env_get "$key")" ]] || die "$key is empty in .env"
@@ -165,6 +195,17 @@ fi
 db_query() {
   docker compose exec -T database psql -XAtq -U "$(env_get DB_USER)" -d "$(env_get DB_DATABASE)" -c "$1"
 }
+# Docker sets the password only when the volume is created, so a .env recreated later can
+# hold a different one. Check through the container's network address: the image trusts
+# the socket and 127.0.0.1 without a password, but asks for one there.
+if ! docker compose exec -T -e PGPASSWORD="$(env_get DB_PASSWORD)" \
+  -e PGUSER="$(env_get DB_USER)" -e PGDATABASE="$(env_get DB_DATABASE)" database \
+  sh -c 'psql -XAtq -h "$(hostname -i | cut -d" " -f1)" -c "select 1"' >/dev/null 2>&1; then
+  info "the database doesn't accept the user and password in .env: it was created with others."
+  info "Put the old DB_PASSWORD back in .env, or recreate the database with"
+  info "'docker compose down -v' (deletes the local data) and run this again."
+  die "the site can't connect to the database with these settings"
+fi
 # A volume created with an older schema keeps it: init scripts only run on a new volume.
 if [[ "$(db_query "select count(*) from information_schema.columns where table_name = 'krambambouli_orders' and column_name = 'delivery_fee'")" != 1 ]]; then
   info "this database has an older schema than dev/postgres/initialize-postgres.sql."
