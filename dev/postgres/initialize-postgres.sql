@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS "krambambouli_order_items" (
   "order_id" UUID NOT NULL,
   "product_id" INTEGER NOT NULL,
   "amount" INTEGER NOT NULL,
+  "price" INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY ("order_id", "product_id")
 );
 
@@ -65,7 +66,8 @@ CREATE TABLE IF NOT EXISTS "krambambouli_orders" (
   "total_owed" INTEGER DEFAULT 0,
   "paid" BOOLEAN NOT NULL DEFAULT false,
   "received" BOOLEAN NOT NULL DEFAULT false,
-  "created_at" TIMESTAMPTZ NOT NULL DEFAULT (NOW())
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT (NOW()),
+  "delivery_fee" INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS "krambambouli_pickup_locations" (
