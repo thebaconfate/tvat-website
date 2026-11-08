@@ -1,0 +1,10 @@
+User-agent: *
+# Logged-in area and API endpoints
+Disallow: /app
+Disallow: /api
+# Account and error pages with nothing worth indexing
+Disallow: /logout
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /401
+Disallow: /403
