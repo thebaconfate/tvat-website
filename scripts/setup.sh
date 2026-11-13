@@ -87,12 +87,9 @@ docker compose version >/dev/null 2>&1 || die "the Docker compose plugin is miss
 docker info >/dev/null 2>&1 || die "Docker isn't running (start Docker Desktop, the docker service, or 'colima start')"
 info "docker: $(docker --version | sed 's/,.*//')"
 
-missing_optional=()
-for tool in railway pg_dump psql; do
-  command -v "$tool" >/dev/null 2>&1 || missing_optional+=("$tool")
-done
-if ((${#missing_optional[@]})); then
-  info "optional, only for copying production data: ${missing_optional[*]} not found"
+# The PostgreSQL tools db-pull.sh needs run inside the database container.
+if ! command -v railway >/dev/null 2>&1; then
+  info "optional, only for copying production data: railway not found"
 fi
 
 # --- 2. .env ------------------------------------------------------------------
