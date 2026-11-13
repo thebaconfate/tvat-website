@@ -9,11 +9,15 @@
 # and the dump is streamed back, so the database needs no public endpoint and no
 # credentials are stored locally. Runs `railway login` / `railway link` when needed.
 #
+# Local: the PostgreSQL tools (psql, pg_restore, pg_dump) run inside the docker compose
+# `database` container, so they needn't be installed and always match its Postgres version.
+#
 # Configuration (from the environment, falling back to the gitignored .env):
 #   RAILWAY_DB_SERVICE    Railway service holding the database (default: Postgres)
 #   RAILWAY_DB_ENV        Railway environment (default: the linked environment)
 #   REMOTE_DATABASE_URL   optional: dump from this URL directly instead of via Railway
-#   DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE   the local DB (same as the app uses)
+#                         (connects from inside the container, so not via localhost)
+#   DB_USER, DB_PASSWORD, DB_DATABASE   the local DB (same as the app uses)
 #
 # Usage: scripts/db-pull.sh [--yes]
 set -euo pipefail
@@ -24,7 +28,7 @@ ASSUME_YES=false
 for arg in "$@"; do
   case "$arg" in
     -y|--yes) ASSUME_YES=true ;;
-    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
     *) echo "Unknown argument: $arg" >&2; exit 1 ;;
   esac
 done
@@ -43,48 +47,49 @@ env_get() {
   printf '%s' "$value"
 }
 
-for tool in pg_dump pg_restore psql; do
-  command -v "$tool" >/dev/null || die "$tool not found (install the PostgreSQL client tools)"
-done
-
 # --- local database -----------------------------------------------------------
 
-LOCAL_HOST="$(env_get DB_HOST)"
-LOCAL_PORT="$(env_get DB_PORT)"
 LOCAL_USER="$(env_get DB_USER)"
 LOCAL_DB="$(env_get DB_DATABASE)"
 LOCAL_PASSWORD="$(env_get DB_PASSWORD)"
-for v in LOCAL_HOST LOCAL_PORT LOCAL_USER LOCAL_DB; do
+for v in LOCAL_USER LOCAL_DB; do
   [[ -n "${!v}" ]] || die "missing local DB setting (${v/LOCAL_/DB_})"
 done
 
-# Safety: only ever overwrite a database on this machine.
-case "$LOCAL_HOST" in
-  localhost|127.0.0.1|::1) ;;
-  *) die "refusing to overwrite non-local database host '$LOCAL_HOST'" ;;
-esac
+# The only database this script writes to is the one in the local `database` container.
+command -v docker >/dev/null || die "docker not found (the local database runs in Docker)"
+[[ -n "$(docker compose ps --status running -q database 2>/dev/null)" ]] \
+  || die "the local database isn't running (start it with 'docker compose up -d database')"
 
-# Run local commands with libpq env vars so the password never appears in argv.
+# Run a PostgreSQL tool inside the database container, connected to the local database.
+# stdin and stdout pass through (-T: no terminal, so binary dumps arrive unchanged).
+# PGPASSWORD is passed by name, so it doesn't appear in argv.
 local_pg() {
-  PGHOST="$LOCAL_HOST" PGPORT="$LOCAL_PORT" PGUSER="$LOCAL_USER" \
-    PGPASSWORD="$LOCAL_PASSWORD" PGDATABASE="$LOCAL_DB" "$@"
+  PGPASSWORD="$LOCAL_PASSWORD" docker compose exec -T \
+    -e PGHOST=127.0.0.1 -e PGUSER="$LOCAL_USER" -e PGDATABASE="$LOCAL_DB" -e PGPASSWORD \
+    database "$@"
 }
 
 db_identity="select inet_server_addr()::text || ':' || inet_server_port() || '/' || current_database() || '/' || (select system_identifier from pg_control_system())"
-local_id="$(local_pg psql -XAtqc "$db_identity" 2>/dev/null)" \
-  || die "could not connect to the local database (is 'docker compose up -d' running?)"
+local_id="$(local_pg psql -XAtqc "$db_identity" </dev/null 2>/dev/null)" \
+  || die "could not connect to the local database as '$LOCAL_USER' (does .env match the database?)"
 
 # --- remote database ----------------------------------------------------------
 
 REMOTE_URL="$(env_get REMOTE_DATABASE_URL)"
 
 if [[ -n "$REMOTE_URL" ]]; then
-  # Direct mode: the remote is reachable from this machine.
-  remote_id="$(psql "$REMOTE_URL" -XAtqc "$db_identity" 2>/dev/null)" \
+  # Direct mode: the remote is reachable from the database container.
+  # Run a PostgreSQL tool there against the remote; the URL goes in by environment.
+  remote_pg() {
+    REMOTE_URL="$REMOTE_URL" docker compose exec -T -e REMOTE_URL database \
+      sh -c 'exec "$@" -d "$REMOTE_URL"' sh "$@"
+  }
+  remote_id="$(remote_pg psql -XAtqc "$db_identity" </dev/null 2>/dev/null)" \
     || die "could not connect to the remote database"
   [[ "$remote_id" != "$local_id" ]] || die "remote and local point to the same database"
   remote_desc="$(sed -E 's#^[a-z]+://([^@]*@)?([^/?]+)(/[^?]*)?.*#\2\3#' <<<"$REMOTE_URL") (direct)"
-  dump_remote() { pg_dump -Fc --no-owner --no-acl -d "$REMOTE_URL"; }
+  dump_remote() { remote_pg pg_dump -Fc --no-owner --no-acl </dev/null; }
 else
   # Railway mode: run pg_dump inside the database service over `railway ssh`.
   command -v railway >/dev/null || die "railway CLI not found (install it, or set REMOTE_DATABASE_URL)"
@@ -93,7 +98,8 @@ else
   ssh_args=(ssh --service "$service")
   [[ -n "$railway_env" ]] && ssh_args+=(--environment "$railway_env")
   # pg_dump picks up PGUSER/PGPASSWORD/PGDATABASE from the service's own environment.
-  dump_remote() { railway "${ssh_args[@]}" -- pg_dump -Fc --no-owner --no-acl; }
+  # stdin is /dev/null so a railway prompt fails instead of waiting for input nobody sees.
+  dump_remote() { railway "${ssh_args[@]}" -- pg_dump -Fc --no-owner --no-acl </dev/null; }
 
   # Log in / link this directory if needed (interactive terminals only).
   interactive() { [[ -t 0 && -t 1 ]]; }
@@ -108,8 +114,30 @@ else
     railway link || die "railway link failed"
   fi
 
+  # `railway ssh` asks to register a local SSH key when none is registered. Below, its
+  # output is captured, which would hide that question and leave the script waiting on
+  # it, so register a key here, in the open, first.
+  # Succeeds when a key in ~/.ssh is registered, or when that can't be determined
+  # (then the preflight below reports whatever is wrong).
+  ssh_key_registered() {
+    local registered pub fp
+    command -v ssh-keygen >/dev/null || return 0
+    registered="$(railway ssh keys list </dev/null 2>/dev/null)" || return 0
+    for pub in ~/.ssh/*.pub; do
+      [[ -f "$pub" ]] || continue
+      fp="$(ssh-keygen -lf "$pub" 2>/dev/null | awk '{print $2}')"
+      [[ -n "$fp" && "$registered" == *"$fp"* ]] && return 0
+    done
+    return 1
+  }
+  if ! ssh_key_registered; then
+    interactive || die "none of your SSH keys is registered with Railway (run 'railway ssh keys add')"
+    echo "None of your SSH keys is registered with Railway, starting 'railway ssh keys add' ..."
+    railway ssh keys add || die "railway ssh keys add failed"
+  fi
+
   # Preflight: checks login, link, service name and that pg_dump exists there.
-  remote_version="$(railway "${ssh_args[@]}" -- pg_dump --version 2>&1)" || {
+  remote_version="$(railway "${ssh_args[@]}" -- pg_dump --version 2>&1 </dev/null)" || {
     echo "$remote_version" >&2
     die "could not run pg_dump in Railway service '$service' (run 'railway login' / 'railway link', or set RAILWAY_DB_SERVICE)"
   }
@@ -117,7 +145,7 @@ else
 fi
 
 echo "Remote: $remote_desc (read only)"
-echo "Local:  $LOCAL_DB@$LOCAL_HOST:$LOCAL_PORT (will be REPLACED)"
+echo "Local:  $LOCAL_DB in the docker compose 'database' container (will be REPLACED)"
 
 if ! $ASSUME_YES; then
   read -r -p "Continue? [y/N] " answer
@@ -132,20 +160,22 @@ trap 'rm -f "$tmp_dump"' EXIT
 echo "Dumping remote database ..."
 dump_remote > "$tmp_dump"
 # Make sure the archive arrived intact before touching the local database.
-pg_restore --list "$tmp_dump" >/dev/null 2>&1 \
+# The dump stays on this machine; the container's tools read it from stdin.
+local_pg pg_restore --list <"$tmp_dump" >/dev/null 2>&1 \
   || die "remote dump is empty or corrupted; local database left untouched"
 
 mkdir -p .db-backups
 backup=".db-backups/local-$(date +%Y%m%d-%H%M%S).dump"
 echo "Backing up local database to $backup ..."
-local_pg pg_dump -Fc --no-owner --no-acl -f "$backup"
+local_pg pg_dump -Fc --no-owner --no-acl </dev/null >"$backup" \
+  || { rm -f "$backup"; die "backing up the local database failed; it was left untouched"; }
 
 echo "Restoring into local database ..."
 {
   echo "SET client_min_messages = warning;"
   echo "DROP SCHEMA IF EXISTS public CASCADE;"
   echo "CREATE SCHEMA public;"
-  pg_restore --no-owner --no-acl -f - "$tmp_dump"
+  local_pg pg_restore --no-owner --no-acl -f - <"$tmp_dump"
 } | local_pg psql -X -q -v ON_ERROR_STOP=1 --single-transaction >/dev/null
 
 echo "Done. Local '$LOCAL_DB' now mirrors the remote. Previous local data: $backup"

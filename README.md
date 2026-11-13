@@ -89,7 +89,8 @@ database.
 database with a copy of production's. It runs `pg_dump` inside the Railway Postgres service
 over `railway ssh`, so the production database needs no public endpoint, and it backs up your
 local database to `.db-backups/` first. You need access to the Railway project
-(`railway login`, `railway link`) and the PostgreSQL client tools (`pg_dump`, `psql`).
+(`railway login`, `railway link`). The PostgreSQL tools it uses locally run inside the
+database container, so they needn't be installed.
 
 ## Creating the first user
 
