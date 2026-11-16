@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Sets up this project for local development. Safe to re-run.
 #
-#   1. Tools: Node 24, pnpm and Docker (with compose). With mise installed, mise installs the
+#   1. Tools: Node 26, pnpm and Docker (with compose). With mise installed, mise installs the
 #      versions pinned in mise.toml; without it, the script checks what's there.
 #   2. .env: created with local defaults and a generated database password, or checked for
 #      keys that are missing. The README explains every variable.
@@ -28,7 +28,7 @@ for arg in "$@"; do
   esac
 done
 
-NODE_MAJOR=24 # same as the Dockerfile and CI
+NODE_MAJOR=26 # same as the Dockerfile and CI
 
 step() { printf '\n==> %s\n' "$*"; }
 info() { printf '    %s\n' "$*"; }
@@ -82,7 +82,7 @@ else
   info "node: $(node --version), but production runs Node $NODE_MAJOR; things may differ"
 fi
 command -v pnpm >/dev/null 2>&1 ||
-  die "pnpm not found: install it with mise, 'corepack enable pnpm', or https://pnpm.io/installation"
+  die "pnpm not found: install it with mise, 'npm install -g corepack && corepack enable pnpm', or https://pnpm.io/installation"
 info "pnpm: $(pnpm --version)"
 
 command -v docker >/dev/null 2>&1 || die "Docker not found: install Docker (https://docs.docker.com/get-docker/)"

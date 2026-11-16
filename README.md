@@ -9,7 +9,7 @@ PostgreSQL database. Emails are sent with [Resend](https://resend.com). Producti
 
 ## Getting started
 
-You need **Node 24**, **pnpm** and **Docker** (with the compose plugin). Then:
+You need **Node 26**, **pnpm** and **Docker** (with the compose plugin). Then:
 
 ```sh
 scripts/setup.sh
@@ -17,7 +17,7 @@ scripts/setup.sh
 
 It's safe to re-run, and it:
 
-1. installs the tools pinned in `mise.toml` (Node 24, pnpm, the Railway CLI) if you have
+1. installs the tools pinned in `mise.toml` (Node 26, pnpm, the Railway CLI) if you have
    [mise](https://mise.jdx.dev), and otherwise checks the tools on your `PATH`
 2. creates `.env` with local defaults and a generated database password
 3. runs `pnpm install`
