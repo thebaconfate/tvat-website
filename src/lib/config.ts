@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import type { PoolConfig } from "pg";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 type ResendConfig = {
   apiKey: string;
