@@ -254,9 +254,6 @@ importers:
       '@types/bcrypt':
         specifier: ^6.0.0
         version: 6.0.0
-      '@types/dompurify':
-        specifier: ^3.2.0
-        version: 3.2.0
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10
@@ -1243,10 +1240,6 @@ packages:
 
   '@types/cors@2.8.19':
     resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
-
-  '@types/dompurify@3.2.0':
-    resolution: {integrity: sha512-Fgg31wv9QbLDA0SpTOXO3MaxySc4DKGLi8sna4/Utjo4r3ZRPdCt4UQee8BWr+Q5z21yifghREPJGYaEOEIACg==}
-    deprecated: This is a stub types definition. dompurify provides its own type definitions, so you do not need this installed.
 
   '@types/estree-jsx@1.0.5':
     resolution: {integrity: sha512-52CcUVNFyfb1A2ALocQw/Dd1BQFNmSdkuC3BkZ6iqhdMfQz7JWOFRuJFloOzjk+6WijU56m9oKXFAXc7o3Towg==}
@@ -3719,10 +3712,6 @@ snapshots:
   '@types/cors@2.8.19':
     dependencies:
       '@types/node': 24.19.2
-
-  '@types/dompurify@3.2.0':
-    dependencies:
-      dompurify: 3.4.17
 
   '@types/estree-jsx@1.0.5':
     dependencies:
