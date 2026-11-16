@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Sets up this project for local development. Safe to re-run.
 #
-#   1. Tools: Node 24 and Docker (with compose). With mise installed, mise installs the
+#   1. Tools: Node 24, pnpm and Docker (with compose). With mise installed, mise installs the
 #      versions pinned in mise.toml; without it, the script checks what's there.
 #   2. .env: created with local defaults and a generated database password, or checked for
 #      keys that are missing. The README explains every variable.
-#   3. npm ci
+#   3. pnpm install --frozen-lockfile
 #   4. The local database (Docker). A new one gets the schema and development data from
 #      dev/postgres/.
 #   5. Optionally a copy of the production data (scripts/db-pull.sh, needs Railway access).
@@ -81,6 +81,9 @@ if [[ "$node_major" == "$NODE_MAJOR" ]]; then
 else
   info "node: $(node --version), but production runs Node $NODE_MAJOR; things may differ"
 fi
+command -v pnpm >/dev/null 2>&1 ||
+  die "pnpm not found: install it with mise, 'corepack enable pnpm', or https://pnpm.io/installation"
+info "pnpm: $(pnpm --version)"
 
 command -v docker >/dev/null 2>&1 || die "Docker not found: install Docker (https://docs.docker.com/get-docker/)"
 docker compose version >/dev/null 2>&1 || die "the Docker compose plugin is missing"
@@ -166,8 +169,8 @@ done
 
 # --- 3. Dependencies ----------------------------------------------------------
 
-step "npm dependencies"
-npm ci --no-audit --no-fund
+step "Dependencies"
+pnpm install --frozen-lockfile
 
 # --- 4. Database --------------------------------------------------------------
 
@@ -220,5 +223,5 @@ if $PULL || { command -v railway >/dev/null 2>&1 &&
 fi
 
 step "Done"
-info "start the site:  npm run dev   (http://localhost:4321)"
+info "start the site:  pnpm dev   (http://localhost:4321)"
 info "first admin user: see 'Creating the first user' in the README"
