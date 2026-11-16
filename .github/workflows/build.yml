@@ -18,10 +18,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # Reads the version from packageManager in package.json
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
-      - run: npm run build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build

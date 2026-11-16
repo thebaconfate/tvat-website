@@ -3,26 +3,32 @@ FROM node:24-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json  ./
+# pnpm, at the version in packageManager (package.json)
+RUN corepack enable pnpm
+
+# Install dependencies. pnpm-workspace.yaml holds the build-script approvals
+# (bcrypt, esbuild) and the supply-chain policies, so it must come along.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY astro.config.* ./
 
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # Copy project files and build the app
 COPY . .
 
-RUN npm run build
+RUN pnpm build
 
 # Stage 2: Set up a production server
 FROM node:24-alpine
 
 WORKDIR /app
 
-# Install production dependencies
-COPY package*.json  ./
+RUN corepack enable pnpm
 
-RUN npm ci --omit=dev
+# Install production dependencies
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+RUN pnpm install --prod --frozen-lockfile
 
 # Copy build files from the build stage
 COPY --from=build /app/dist ./dist
