@@ -1,0 +1,14 @@
+# Dependencies allowed to run install scripts (pnpm blocks all others).
+allowBuilds:
+  bcrypt: true
+  esbuild: true
+
+# Supply-chain protection: don't resolve versions published less than
+# 7 days ago (in minutes), and refuse versions whose publish trust
+# (provenance / trusted publishing) is weaker than an earlier release.
+minimumReleaseAge: 10080
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  # Published 2024-11-13 by the undici lead; no 6.x release ever had
+  # provenance, so the check misfires. Pulled in by @types/node@22.
+  - undici-types@6.21.0

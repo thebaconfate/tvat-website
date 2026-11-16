@@ -9,7 +9,7 @@ PostgreSQL database. Emails are sent with [Resend](https://resend.com). Producti
 
 ## Getting started
 
-You need **Node 24** and **Docker** (with the compose plugin). Then:
+You need **Node 24**, **pnpm** and **Docker** (with the compose plugin). Then:
 
 ```sh
 scripts/setup.sh
@@ -17,14 +17,14 @@ scripts/setup.sh
 
 It's safe to re-run, and it:
 
-1. installs the tools pinned in `mise.toml` (Node 24, the Railway CLI) if you have
+1. installs the tools pinned in `mise.toml` (Node 24, pnpm, the Railway CLI) if you have
    [mise](https://mise.jdx.dev), and otherwise checks the tools on your `PATH`
 2. creates `.env` with local defaults and a generated database password
-3. runs `npm ci`
+3. runs `pnpm install`
 4. starts the local database in Docker; a new one gets the schema and development data
 5. offers to copy the production data, if you have access to the Railway project
 
-Then start the site with `npm run dev` and open <http://localhost:4321>.
+Then start the site with `pnpm dev` and open <http://localhost:4321>.
 
 `scripts/setup.sh --help` lists its options; with mise, `mise run setup` does the same.
 
@@ -97,7 +97,7 @@ database container, so they needn't be installed.
 The admin section needs an account. The first one (the root user) is created through a
 bootstrap route that only works while `BOOTSTRAP_TOKEN` is set and no root user exists yet:
 
-1. Set `BOOTSTRAP_TOKEN` in `.env` to a random value and restart `npm run dev`.
+1. Set `BOOTSTRAP_TOKEN` in `.env` to a random value and restart `pnpm dev`.
 2. Create the user:
 
    ```sh
@@ -117,10 +117,10 @@ bootstrap route that only works while `BOOTSTRAP_TOKEN` is set and no root user 
 | Command                | What it does                                                  |
 | :--------------------- | :------------------------------------------------------------ |
 | `scripts/setup.sh`     | Set up the project for local development                      |
-| `npm run dev`          | Start the dev server at `localhost:4321`                      |
-| `npm run build`        | Type-check (`astro check`) and build into `./dist/`           |
-| `npm run preview`      | Serve the production build locally                            |
-| `npm run email:dev`    | Preview the email templates (`emails/`)                       |
+| `pnpm dev`             | Start the dev server at `localhost:4321`                      |
+| `pnpm build`           | Type-check (`astro check`) and build into `./dist/`           |
+| `pnpm preview`         | Serve the production build locally                            |
+| `pnpm email:dev`       | Preview the email templates (`emails/`)                       |
 | `scripts/db-pull.sh`   | Replace the local database with a copy of production          |
 | `docker compose up -d` | Start the local database (`mise run db:up` also waits for it) |
 
