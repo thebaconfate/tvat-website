@@ -1,10 +1,11 @@
 # Stage 1: Build the application
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 
 WORKDIR /app
 
-# pnpm, at the version in packageManager (package.json)
-RUN corepack enable pnpm
+# pnpm, at the version in packageManager (package.json). Node 25+ no longer
+# bundles Corepack, so it comes from npm.
+RUN npm install -g corepack@0.36.0 && corepack enable pnpm
 
 # Install dependencies. pnpm-workspace.yaml holds the build-script approvals
 # (bcrypt, esbuild) and the supply-chain policies, so it must come along.
@@ -19,11 +20,11 @@ COPY . .
 RUN pnpm build
 
 # Stage 2: Set up a production server
-FROM node:24-alpine
+FROM node:26-alpine
 
 WORKDIR /app
 
-RUN corepack enable pnpm
+RUN npm install -g corepack@0.36.0 && corepack enable pnpm
 
 # Install production dependencies
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./

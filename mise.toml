@@ -1,5 +1,5 @@
 [tools]
-node = "24" # same as the Dockerfile and CI
+node = "26" # same as the Dockerfile and CI
 pnpm = "12.21.0" # same as packageManager in package.json
 railway = "5"
 
