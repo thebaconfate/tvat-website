@@ -13,7 +13,7 @@ export const API_ROUTES = {
     PASSAGE: { url: `${AUTH_PREFIX}/passage` },
     STATION: { url: `${AUTH_PREFIX}/station` },
   },
-  ACTIVITIES: { url: `${API_PREFIX}/activites` },
+  ACTIVITIES: { url: `${API_PREFIX}/activities` },
   CONTACT: { url: `${API_PREFIX}/contact` },
   KRAMBALBOULI: {
     url: `${API_PREFIX}`,

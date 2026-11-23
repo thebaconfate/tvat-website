@@ -1,0 +1,27 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dates {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.list {
+  display: grid;
+  gap: 2rem;
+}
+
+.item h3 {
+  display: flex;
+  justify-content: center;
+}
+
+.loading {
+  opacity: 0.6;
+}

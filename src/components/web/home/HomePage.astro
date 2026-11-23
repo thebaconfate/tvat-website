@@ -4,7 +4,7 @@ import MonogramBanner from "../shared/MonogramBanner.astro";
 import styles from "./HomePage.module.css";
 import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
-import ActivityItem from "./ActivityItem.astro";
+import ActivityItem from "@/components/web/activities/ActivityItem";
 
 const activities = await activityService.getActivities({
   page: 1,
