@@ -1,4 +1,7 @@
-import { krambambouliOrderFormSchema } from "@/lib/domain/krambambouli";
+import {
+  krambambouliOrderFormSchema,
+  orderQuerySchema,
+} from "@/lib/domain/krambambouli";
 import {
   krambambouliService,
   OrderConflictError,
@@ -9,7 +12,11 @@ import type { APIContext } from "astro";
 export async function GET({ url, locals }: APIContext) {
   // The middleware already rejects unauthenticated requests; this is a second line of defence.
   if (!locals.user) return new Response(null, { status: 401 });
-  const orders = await krambambouliService.getOrders(url.searchParams);
+  const query = orderQuerySchema.safeParse(
+    Object.fromEntries(url.searchParams),
+  );
+  if (!query.success) return new Response(null, { status: 400 });
+  const orders = await krambambouliService.getOrders(query.data);
   return new Response(JSON.stringify(orders), {
     headers: { "Content-Type": "application/json" },
   });

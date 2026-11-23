@@ -1,5 +1,4 @@
 import {
-  orderFilterSchema,
   type DeliveryZoneData,
   type KrambambouliOrderFormData,
   type KrambambouliProductData,
@@ -8,11 +7,11 @@ import {
 import type {
   OrderData,
   OrderPatch,
+  OrderQuery,
 } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
 import { KrambambouliRepository } from "@/lib/repositories/krambambouli";
 import { mailService } from "../mail";
-import type { URLSearchParams } from "node:url";
 
 /** An order with this id already exists but belongs to a different customer. */
 export class OrderConflictError extends Error {
@@ -106,14 +105,10 @@ class KrambambouliService {
     return this.repository.updateOrder(id, patch);
   }
 
-  async getOrders(urlSearchParams?: URLSearchParams): Promise<Page<OrderData>> {
-    const paramsObj = urlSearchParams
-      ? Object.fromEntries(urlSearchParams.entries())
-      : {};
-    const pageNumber = paramsObj.page ? parseInt(paramsObj.page) : 1;
-    const pageSize = paramsObj.pageSize ? parseInt(paramsObj.pageSize) : 100;
-    const filters = orderFilterSchema.parse(paramsObj);
-    return this.repository.getOrders(pageNumber, pageSize, filters);
+  /** A page of orders. Parse the query with `orderQuerySchema` first. */
+  async getOrders(query: OrderQuery = { page: 1 }): Promise<Page<OrderData>> {
+    const { page, pageSize, ...filters } = query;
+    return this.repository.getOrders(page, pageSize, filters);
   }
 }
 
