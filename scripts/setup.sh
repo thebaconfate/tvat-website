@@ -4,7 +4,7 @@
 #   1. Tools: Node 26, pnpm and Docker (with compose). With mise installed, mise installs the
 #      versions pinned in mise.toml; without it, the script checks what's there.
 #   2. .env: created with local defaults and a generated database password, or checked for
-#      keys that are missing. The README explains every variable.
+#      keys that are missing. docs/configuration.md explains every variable.
 #   3. pnpm install --frozen-lockfile
 #   4. The local database (Docker). A new one gets the schema and development data from
 #      dev/postgres/; then the migrations in migrations/ are applied (pnpm db:migrate).
@@ -99,10 +99,10 @@ fi
 # --- 2. .env ------------------------------------------------------------------
 
 # The .env a new checkout gets: enough to run locally. Every key here is checked in an
-# existing .env too. The README ("Configuration") explains each one.
+# existing .env too. docs/configuration.md explains each one.
 env_template() {
   cat <<EOF
-# Local settings, see "Configuration" in the README. Never commit this file.
+# Local settings, see docs/configuration.md. Never commit this file.
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=tvat
@@ -155,7 +155,7 @@ if [[ -f .env ]]; then
     grep -qE "^${key}=" .env || missing_keys+=("$key")
   done < <(env_template x | grep -oE '^[A-Z_]+=' | tr -d '=')
   if ((${#missing_keys[@]})); then
-    info "exists, but lacks: ${missing_keys[*]} (see \"Configuration\" in the README)"
+    info "exists, but lacks: ${missing_keys[*]} (see docs/configuration.md)"
   else
     info "exists and has every key the site needs"
   fi
@@ -229,4 +229,4 @@ fi
 
 step "Done"
 info "start the site:  pnpm dev   (http://localhost:4321)"
-info "first admin user: see 'Creating the first user' in the README"
+info "first admin user: see docs/first-user.md"
