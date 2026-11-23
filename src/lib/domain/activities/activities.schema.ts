@@ -10,7 +10,6 @@ export const activitySchema = z.object({
     address: z.string().nullish(),
     url: z.url().nullish(),
   }),
-  /** A page about the activity, usually its Facebook event. */
   facebook: z.url().nullish(),
 });
 
