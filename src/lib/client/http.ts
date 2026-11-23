@@ -5,19 +5,15 @@ export { HttpError };
 
 export type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-/** A value that can go into a query string. `undefined`, `null` and "" are left out. */
 type QueryValue = string | number | boolean | Date | null | undefined;
 export type QueryParams = Record<string, QueryValue>;
 
 type RequestOptions = {
-  /** Sent as JSON. */
   body?: unknown;
-  /** Appended to the url as a query string. */
   query?: QueryParams;
   signal?: AbortSignal;
 };
 
-/** `?a=1&b=true` for the given params, or "" when there are none to send. */
 export function toQueryString(query: QueryParams = {}): string {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
@@ -31,7 +27,6 @@ export function toQueryString(query: QueryParams = {}): string {
   return queryString ? `?${queryString}` : "";
 }
 
-/** Sends the request and returns the response; throws an `HttpError` unless it's 2xx. */
 export async function request(
   method: Method,
   url: string,
@@ -49,11 +44,6 @@ export async function request(
   return response;
 }
 
-/**
- * Sends the request and parses the JSON response with `schema`, so the result is
- * both validated and typed. Throws an `HttpError` unless it's 2xx, or a `ZodError`
- * when the response doesn't match the schema.
- */
 export async function requestJson<Schema extends ZodType>(
   method: Method,
   url: string,

@@ -29,11 +29,9 @@ const locale = getLocale(Astro.request);
         <h2>Activiteiten</h2>
       </div>
       <div class={styles.activityList}>
-        {
-          activities.content.map((a) => (
-            <ActivityItem activity={a} locale={locale} />
-          ))
-        }
+        {activities.content.map((a) => (
+          <ActivityItem activity={a} locale={locale} />
+        ))}
       </div>
       <!--     <a class={styles.allActivitiesLink} href={websiteRoutes.kalender.url}
         >Meer activiteiten</a
