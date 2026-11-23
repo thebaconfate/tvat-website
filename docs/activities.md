@@ -9,9 +9,16 @@ The site copies 't VAT's activities into its own `activities` table and shows th
 - **Source:** `GET https://www.bsk.brussels/api/public/calendar?kring=VAT&bsk=false`, public,
   no login ([BSK API docs](https://www.bsk.brussels/api/docs)). It returns all of our
   activities at once.
-- **When:** at most every 15 minutes, started in the background when someone views
-  activities. After a failure it waits a minute before trying again. `POST
-  /api/activities/sync` (logged in) syncs right away and returns what changed.
+- **When:** whenever `POST /api/activities/sync` is called with `SYNC_TOKEN` in the
+  `x-sync-token` header. A Railway cron job does that on a schedule
+  ([deployment.md](deployment.md)). It returns what changed. To sync right away:
+
+  ```sh
+  curl -X POST -H "x-sync-token: <SYNC_TOKEN>" https://www.tvat.be/api/activities/sync
+  ```
+
+  Without `SYNC_TOKEN` set (as locally by default), the endpoint answers 403 and nothing
+  syncs.
 - **What it does**, in one SQL statement (`ActivitiesRepository.syncBskActivities`): adds new
   BSK activities, updates changed ones, and deletes the ones the BSK no longer lists.
   Activities added here by hand (no `bsk_id`) are left alone. If the BSK returns no activities

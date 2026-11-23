@@ -7,8 +7,6 @@ import {
 } from "@/lib/repositories/activities";
 
 const BSK_KRING = "VAT";
-const SYNC_INTERVAL_MS = 15 * 60 * 1000;
-const RETRY_INTERVAL_MS = 60 * 1000;
 
 export type SyncResult = { fetched: number; changed: number; removed: number };
 
@@ -42,7 +40,6 @@ function toImportedActivity(
 }
 
 class ActivityService {
-  private nextSyncAt = 0;
   private runningSync: Promise<SyncResult> | null = null;
 
   constructor(
@@ -52,7 +49,6 @@ class ActivityService {
   async getActivities(
     query: ActivityQuery = { page: 1 },
   ): Promise<Page<ActivityData>> {
-    this.syncIfStale();
     const { page, pageSize, ...filters } = query;
     return this.repository.getActivities(page, pageSize, filters);
   }
@@ -64,15 +60,7 @@ class ActivityService {
     return this.runningSync;
   }
 
-  private syncIfStale() {
-    if (this.runningSync || Date.now() < this.nextSyncAt) return;
-    this.sync().catch((e) =>
-      console.error("Syncing activities from the BSK failed:", e),
-    );
-  }
-
   private async runSync(): Promise<SyncResult> {
-    this.nextSyncAt = Date.now() + RETRY_INTERVAL_MS;
     const fetchedAt = new Date().toISOString();
     const events = await fetchBskEvents(BSK_KRING);
     const byId = new Map<string, ImportedBSKActivity>();
@@ -87,7 +75,6 @@ class ActivityService {
     const { changed, removed } = await this.repository.syncBskActivities([
       ...byId.values(),
     ]);
-    this.nextSyncAt = Date.now() + SYNC_INTERVAL_MS;
     return { fetched: byId.size, changed, removed };
   }
 }
