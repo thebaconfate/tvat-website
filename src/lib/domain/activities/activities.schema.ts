@@ -3,13 +3,14 @@ import { listQuerySchema, pageSchema } from "../page/page.schema";
 
 export const activitySchema = z.object({
   id: z.int(),
-  name: z.string().min(3),
+  name: z.string().min(1),
   occursAt: z.coerce.date(),
   location: z.object({
-    name: z.string(),
+    name: z.string().nullable(),
     address: z.string().nullish(),
     url: z.url().nullish(),
   }),
+  /** A page about the activity, usually its Facebook event. */
   facebook: z.url().nullish(),
 });
 
