@@ -18,6 +18,7 @@ are missing.
 | `BIC`             | (idem)                                                            | placeholder                |
 | `ACCOUNTHOLDER`   | (idem)                                                            | `'t VAT`                   |
 | `BOOTSTRAP_TOKEN` | Enables creating the first user ([first-user.md](first-user.md)); leave empty otherwise | empty |
+| `SYNC_TOKEN`      | Secret for syncing the activities ([activities.md](activities.md)); empty disables syncing | empty |
 
 **Real values for `DOMAIN`, `VATMAIL`, `IBAN`, `BIC` and `ACCOUNTHOLDER`** are kept as GitHub
 repository variables (Settings → Secrets and variables → Actions → Variables), which people
