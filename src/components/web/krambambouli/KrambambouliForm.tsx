@@ -165,7 +165,7 @@ export default function KrambambouliForm({
       onChange: formSchema,
     },
     onSubmit: async ({ value }) => {
-      const url = API_ROUTES.KRAMBALBOULI.ORDER.url;
+      const url = API_ROUTES.KRAMBALBOULI.ORDERS.url;
       const commonPayload = {
         email: value.email,
         firstName: value.firstName,

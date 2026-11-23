@@ -17,7 +17,7 @@ export function useKrambambouliOrder(props: Props) {
   } = useResource<OrderData>({
     id: props.order.id,
     init: props.order,
-    baseUrl: API_ROUTES.KRAMBALBOULI.ORDER.url,
+    baseUrl: API_ROUTES.KRAMBALBOULI.ORDERS.url,
     schema: orderSchema,
   });
 
