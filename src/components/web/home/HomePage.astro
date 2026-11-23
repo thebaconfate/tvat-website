@@ -6,12 +6,11 @@ import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
 import ActivityItem from "./ActivityItem.astro";
 
-const activities = await activityService.fetchActivityPage(
-  new URLSearchParams([
-    ["dateAfter", new Date().toISOString().split("T")[0]],
-    ["size", String(2)],
-  ]),
-);
+const activities = await activityService.getActivities({
+  page: 1,
+  pageSize: 2,
+  fromDate: new Date(),
+});
 const locale = getLocale(Astro.request);
 ---
 
