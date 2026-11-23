@@ -8,7 +8,6 @@ type Props = {
   locale: string;
 };
 
-// Fixed, so the server and the browser render the same date (no hydration mismatch).
 const timeZone = "Europe/Brussels";
 
 const clock = new Intl.DateTimeFormat("en-GB", {
@@ -18,7 +17,6 @@ const clock = new Intl.DateTimeFormat("en-GB", {
   timeZone,
 });
 
-/** The BSK stores date-only activities at midnight, so 00:00 means "no time given". */
 function hasTime(date: Date) {
   return clock.format(date) !== "00:00";
 }
@@ -27,7 +25,6 @@ function mapUrl(query: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 }
 
-/** An activity's name, date, time and location: an h3 and a list, without a wrapper. */
 export default function ActivityItem({ activity, locale }: Props) {
   const { location } = activity;
 
@@ -64,9 +61,7 @@ export default function ActivityItem({ activity, locale }: Props) {
         {location.name && (
           <li>
             <a
-              href={
-                location.url || mapUrl(location.address || location.name)
-              }
+              href={location.url || mapUrl(location.address || location.name)}
               target="_blank"
             >
               {location.name}
