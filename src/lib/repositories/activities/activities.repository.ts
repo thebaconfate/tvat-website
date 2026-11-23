@@ -8,19 +8,16 @@ import z from "zod/v4";
 import { Repository } from "../repository";
 
 /** An activity from the BSK calendar, ready to store. */
-export type ImportedActivity = {
+export type ImportedBSKActivity = {
   bskId: string;
   name: string;
-  /** Brussels local time, e.g. "2025-10-08T20:00". */
   localTime: string;
   place: string | null;
   url: string | null;
-  /** When the BSK last edited it (ISO). */
   bskUpdatedAt: string;
 };
 
 export class ActivitiesRepository extends Repository {
-  /** A page of activities, soonest first. Dates filter on whole UTC days. */
   async getActivities(
     pageNumber: number = 1,
     pageSize: number = 10,
@@ -60,7 +57,6 @@ export class ActivitiesRepository extends Repository {
       conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     params.push(pageSize, (pageNumber - 1) * pageSize);
 
-    // COUNT(*) OVER () counts every matching row, before LIMIT and OFFSET apply.
     const sql = `
       SELECT
         id,
@@ -95,17 +91,8 @@ export class ActivitiesRepository extends Repository {
     };
   }
 
-  /**
-   * Makes the stored BSK activities match `activities`: inserts new ones, updates
-   * changed ones and deletes the ones the BSK no longer lists. Activities added
-   * here by hand (no `bsk_id`) are left alone. One statement, so it's atomic.
-   *
-   * The latest edit wins: a BSK version only replaces ours when the BSK edited it
-   * after we last changed our copy (`updated_at`). A stored BSK version gets the
-   * BSK's edit time as its `updated_at`; any other edit must set it to now().
-   */
   async syncBskActivities(
-    activities: ImportedActivity[],
+    activities: ImportedBSKActivity[],
   ): Promise<{ changed: number; removed: number }> {
     const sql = `
       WITH incoming AS (
