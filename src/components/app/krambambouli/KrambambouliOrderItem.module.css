@@ -82,3 +82,17 @@
   padding: 0.2rem 0;
   border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.errorCell {
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  color: var(--color-danger);
+}
