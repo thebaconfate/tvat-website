@@ -29,3 +29,10 @@ export async function PATCH({ params, request, locals }: APIContext) {
     return new Response(null, { status: 500 });
   }
 }
+
+/** Deletes an order. */
+export async function DELETE({ locals }: APIContext) {
+  if (!locals.user) return new Response(null, { status: 401 });
+  // TODO: implement deleting an order (and its items and delivery address).
+  return new Response(null, { status: 501 });
+}

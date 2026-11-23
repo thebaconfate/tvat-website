@@ -17,7 +17,7 @@ export const API_ROUTES = {
   CONTACT: { url: `${API_PREFIX}/contact` },
   KRAMBALBOULI: {
     url: `${API_PREFIX}`,
-    ORDER: { url: `${KRAMBALBOULI_PREFIX}/order` },
+    /** GET: a page of orders, POST: create an order; `${url}/:id` for one order. */
     ORDERS: { url: `${KRAMBALBOULI_PREFIX}/orders` },
   },
 } as const;

@@ -10,7 +10,9 @@ type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
  * Paths are matched exactly (after normalisation), per HTTP method.
  */
 const PUBLIC_API_ROUTES: [{ url: string }, Method[]][] = [
-  [API_ROUTES.KRAMBALBOULI.ORDER, ["POST"]], // the public order form
+  [API_ROUTES.KRAMBALBOULI.ORDERS, ["POST"]], // the public order form; GET stays protected
+  // TODO: remove after 2026-11-30, with src/pages/api/krambambouli/order.ts (old order form URL).
+  [{ url: "/api/krambambouli/order" }, ["POST"]],
   [API_ROUTES.CONTACT, ["POST"]],
   [API_ROUTES.ACTIVITIES, ["GET"]],
   [API_ROUTES.AUTH.LOGIN, ["POST"]],
