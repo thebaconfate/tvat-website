@@ -10,3 +10,18 @@ export class HttpError extends Error {
     Error.captureStackTrace?.(this, this.constructor);
   }
 }
+
+/**
+ * A message for a failed request, in the dashboard's language: `byStatus` for
+ * specific status codes, an expired session for 401, otherwise `fallback`.
+ */
+export function httpErrorMessage(
+  error: unknown,
+  fallback: string,
+  byStatus: Record<number, string> = {},
+): string {
+  if (!(error instanceof HttpError)) return fallback;
+  if (byStatus[error.status]) return byStatus[error.status];
+  if (error.status === 401) return "Sessie verlopen, log opnieuw in.";
+  return fallback;
+}
