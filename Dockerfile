@@ -35,6 +35,10 @@ RUN pnpm install --prod --frozen-lockfile
 COPY --from=build /app/dist ./dist
 COPY astro.config.* ./
 
+# The database migrations, for `pnpm db:migrate` (Railway's pre-deploy command)
+COPY migrations ./migrations
+COPY scripts/migrate.ts ./scripts/
+
 # Overrides default port (even though default is 4312)
 ENV PORT=4321
 
@@ -45,5 +49,6 @@ ENV HOST=0.0.0.0
 # Expose the app's port
 EXPOSE 4321
 
-# Start the server
-ENTRYPOINT ["node", "./dist/server/entry.mjs"]
+# Start the server. CMD rather than ENTRYPOINT, so another command (like Railway's
+# pre-deploy `pnpm db:migrate`) replaces it instead of being passed to it as arguments.
+CMD ["node", "./dist/server/entry.mjs"]

@@ -7,8 +7,9 @@
 #      keys that are missing. The README explains every variable.
 #   3. pnpm install --frozen-lockfile
 #   4. The local database (Docker). A new one gets the schema and development data from
-#      dev/postgres/.
-#   5. Optionally a copy of the production data (scripts/db-pull.sh, needs Railway access).
+#      dev/postgres/; then the migrations in migrations/ are applied (pnpm db:migrate).
+#   5. Optionally a copy of the production data (scripts/db-pull.sh, needs Railway access),
+#      followed by the migrations it doesn't have yet.
 #
 # Usage: scripts/setup.sh [--yes] [--pull]
 #   --yes    don't ask anything (no production copy unless --pull is given too)
@@ -212,6 +213,8 @@ if [[ "$(db_query "select count(*) from information_schema.columns where table_n
   info "Recreate it with 'docker compose down -v' (deletes the local data) and run this again,"
   info "or replace its data with a copy of production (--pull)."
 fi
+info "applying migrations ..."
+pnpm --silent db:migrate | sed 's/^/    /'
 info "ready on localhost:${DB_PORT:-$(env_get DB_PORT)}: $(db_query "select count(*) from products") products, $(db_query "select count(*) from krambambouli_orders") orders"
 
 # --- 5. Production data (optional) ----------------------------------------------
@@ -220,6 +223,8 @@ if $PULL || { command -v railway >/dev/null 2>&1 &&
   ask "Replace the local data with a copy of production (needs access to the Railway project)?" n; }; then
   step "Production data"
   scripts/db-pull.sh --yes
+  info "applying migrations production doesn't have yet ..."
+  pnpm --silent db:migrate | sed 's/^/    /'
 fi
 
 step "Done"
