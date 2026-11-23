@@ -59,7 +59,6 @@ export const orderSchema = z4.discriminatedUnion("deliveryOption", [
   pickupOrderSchema,
 ]);
 
-/** The order fields the dashboard may change. At least one must be given. */
 export const orderPatchSchema = z4
   .strictObject(sharedSchema.pick({ paid: true, received: true }).shape)
   .partial()
