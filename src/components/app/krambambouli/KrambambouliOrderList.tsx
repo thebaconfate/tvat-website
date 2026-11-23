@@ -149,7 +149,7 @@ export default function KrambambouliOrderList(props: Props) {
               krambambouliOrderPage.content.map((order, index) => (
                 <KrambambouliOrderItem
                   order={order}
-                  key={index}
+                  key={order.id}
                   index={index}
                   locale={props.locale}
                 />
