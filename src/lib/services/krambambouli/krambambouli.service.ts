@@ -5,7 +5,10 @@ import {
   type KrambambouliProductData,
   type PickupLocationData,
 } from "@/lib/domain/krambambouli";
-import type { OrderData } from "@/lib/domain/krambambouli/order.types";
+import type {
+  OrderData,
+  OrderPatch,
+} from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
 import { KrambambouliRepository } from "@/lib/repositories/krambambouli";
 import { mailService } from "../mail";
@@ -93,8 +96,15 @@ class KrambambouliService {
     }
   }
 
-  async patchOrder(order: Partial<KrambambouliOrderFormData>) {
-    // TODO: implement this
+  /**
+   * Updates the fields present in `patch` (see `orderPatchSchema`).
+   * Returns the updated order, or null when no order has this id.
+   */
+  async patchOrder(
+    id: string,
+    patch: OrderPatch,
+  ): Promise<OrderData | null> {
+    return this.repository.updateOrder(id, patch);
   }
 
   async getOrders(urlSearchParams?: URLSearchParams): Promise<Page<OrderData>> {

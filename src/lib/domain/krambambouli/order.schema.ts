@@ -58,3 +58,11 @@ export const orderSchema = z4.discriminatedUnion("deliveryOption", [
   deliveryOrderSchema,
   pickupOrderSchema,
 ]);
+
+/** The order fields the dashboard may change. At least one must be given. */
+export const orderPatchSchema = z4
+  .strictObject(sharedSchema.pick({ paid: true, received: true }).shape)
+  .partial()
+  .refine((patch) => Object.values(patch).some((v) => v !== undefined), {
+    message: "Provide at least one field to update",
+  });
