@@ -1,31 +1,50 @@
-import type { OrderData } from "@/lib/domain/krambambouli";
+import type { OrderData, OrderPatch } from "@/lib/domain/krambambouli";
 import styles from "./KrambambouliOrderItem.module.css";
-import { useMemo, useState } from "react";
+import { useMemo, useOptimistic, useState, useTransition } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { formatDate } from "@/lib/domain/datetime";
 import { formatCurrency, HttpError } from "@/lib/utils";
-import { useKrambambouliOrder } from "./useKrambambouliOrder";
 
 type Props = {
   order: OrderData;
   locale: string;
   index: number;
+  /** Saves the patch; rejects when saving fails. */
+  onUpdate: (patch: OrderPatch) => Promise<unknown>;
 };
 
 export default function KrambambouliOrderItem({
+  order: savedOrder,
   locale,
   index,
-  ...props
+  onUpdate,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const { order, updateOrder, error } = useKrambambouliOrder({
-    order: props.order,
-  });
+  const [error, setError] = useState<unknown>();
+  const [saving, startSaving] = useTransition();
+  // Show a patch right away; once the save settles this falls back to `savedOrder`,
+  // which the list replaces with the server's result, or keeps if the save failed.
+  const [order, applyPatch] = useOptimistic(
+    savedOrder,
+    (current, patch: OrderPatch) => ({ ...current, ...patch }),
+  );
+
+  const updateOrder = (patch: OrderPatch) => {
+    // useCollection doesn't drop stale responses, so allow one save at a time.
+    if (saving) return;
+    setError(undefined);
+    startSaving(async () => {
+      applyPatch(patch);
+      try {
+        await onUpdate(patch);
+      } catch (e) {
+        setError(e);
+      }
+    });
+  };
   const isEven = useMemo(() => index % 2 === 0, [index]);
   const rowClass = `${styles.tr} ${isEven ? styles.even : ""}`;
   const detailRowClass = `${styles.detailRow} ${expanded ? styles.open : ""} ${isEven ? styles.even : ""}`;
-
-  if (!order) return null;
 
   return (
     <>

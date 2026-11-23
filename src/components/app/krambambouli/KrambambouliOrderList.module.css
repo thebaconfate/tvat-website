@@ -30,3 +30,19 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.loading {
+  opacity: 0.6;
+}
+
+.error {
+  margin: 1rem;
+  color: var(--color-danger);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 1rem 1rem;
+}
