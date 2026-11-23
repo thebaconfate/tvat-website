@@ -1,0 +1,56 @@
+# Activities
+
+The activities on the homepage and the calendar (`/activities`) come from the calendar of the
+**BSK** (Brussels Senioren Konvent, the umbrella association), where the kringen upload them.
+The site copies 't VAT's activities into its own `activities` table and shows them from there.
+
+## The sync
+
+- **Source:** `GET https://www.bsk.brussels/api/public/calendar?kring=VAT&bsk=false`, public,
+  no login ([BSK API docs](https://www.bsk.brussels/api/docs)). It returns all of our
+  activities at once.
+- **When:** at most every 15 minutes, started in the background when someone views
+  activities. After a failure it waits a minute before trying again. `POST
+  /api/activities/sync` (logged in) syncs right away and returns what changed.
+- **What it does**, in one SQL statement (`ActivitiesRepository.syncBskActivities`): adds new
+  BSK activities, updates changed ones, and deletes the ones the BSK no longer lists.
+  Activities added here by hand (no `bsk_id`) are left alone. If the BSK returns no activities
+  at all, nothing is deleted.
+
+## Edited in both places: the latest edit wins
+
+`updated_at` is when our copy last changed. The sync sets it to the BSK's edit time, and only
+replaces our copy when the BSK edited it later than that.
+
+**So when you change an activity by hand, set `updated_at = now()` in the same `UPDATE`**, or
+the next sync replaces your change with the BSK's version:
+
+```sql
+UPDATE activities SET name = 'Nieuwe naam', updated_at = now() WHERE id = 42;
+```
+
+Deleting at the BSK always deletes our copy: the BSK doesn't say when something was deleted,
+so there is nothing to compare.
+
+## From their shape to ours
+
+`toImportedActivity` (`src/lib/services/activities/activities.service.ts`):
+
+| BSK            | Our column      | How                                                              |
+| :------------- | :-------------- | :--------------------------------------------------------------- |
+| `id`           | `bsk_id`        | as is; matches the activity on later syncs                       |
+| `title`        | `name`          | trimmed; activities without a title are skipped                  |
+| `dateTime`     | `occurs_at`     | Brussels local time without a zone (`2025-10-08T20:00`)          |
+| `place`        | `location_name` | trimmed; empty becomes NULL                                      |
+| `url`          | `facebook_url`  | only a valid http(s) link; often, but not always, Facebook       |
+| `updatedAt`    | `updated_at`    | the BSK's edit time; not in their docs                           |
+
+The BSK stores activities without a time at midnight (`T00:00`), so the site shows no time for
+an activity at exactly 00:00. `endDate` (activities spanning several days) is not stored: those
+show their first day.
+
+## Later: a two-way sync
+
+Activities created on our site could also be posted to the BSK (their API takes a kring
+login), so each activity exists once on both sides. That needs a `bsk_updated_at` column, to
+know which local changes the BSK doesn't have yet.
