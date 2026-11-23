@@ -30,7 +30,6 @@ pnpm-debug.log*
 
 populate-*.sql
 
-migrate/*.sql
 .venv/
 
 # local database backups/dumps (may contain production data)
