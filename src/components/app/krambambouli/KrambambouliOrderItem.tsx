@@ -1,29 +1,46 @@
-import type { OrderData } from "@/lib/domain/krambambouli";
+import type { OrderData, OrderPatch } from "@/lib/domain/krambambouli";
 import styles from "./KrambambouliOrderItem.module.css";
-import { useMemo, useState } from "react";
+import { useMemo, useOptimistic, useState, useTransition } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { formatDate } from "@/lib/domain/datetime";
-import { formatCurrency } from "@/lib/utils";
-import { useKrambambouliOrder } from "./useKrambambouliOrder";
+import { formatCurrency, httpErrorMessage } from "@/lib/utils";
 
 type Props = {
   order: OrderData;
   locale: string;
   index: number;
+  onUpdate: (patch: OrderPatch) => Promise<unknown>;
 };
 
 export default function KrambambouliOrderItem({
+  order: savedOrder,
   locale,
   index,
-  ...props
+  onUpdate,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const { order } = useKrambambouliOrder({ order: props.order });
+  const [error, setError] = useState<unknown>();
+  const [saving, startSaving] = useTransition();
+  const [order, applyPatch] = useOptimistic(
+    savedOrder,
+    (current, patch: OrderPatch) => ({ ...current, ...patch }),
+  );
+
+  const updateOrder = (patch: OrderPatch) => {
+    if (saving) return;
+    setError(undefined);
+    startSaving(async () => {
+      applyPatch(patch);
+      try {
+        await onUpdate(patch);
+      } catch (e) {
+        setError(e);
+      }
+    });
+  };
   const isEven = useMemo(() => index % 2 === 0, [index]);
   const rowClass = `${styles.tr} ${isEven ? styles.even : ""}`;
   const detailRowClass = `${styles.detailRow} ${expanded ? styles.open : ""} ${isEven ? styles.even : ""}`;
-
-  if (!order) return null;
 
   return (
     <>
@@ -42,9 +59,31 @@ export default function KrambambouliOrderItem({
           {`${order.firstName} ${order.lastName}`}
         </td>
         <td className={styles.td}>{formatCurrency(order.totalOwed / 100)}</td>
-        <td className={styles.td}>{order.received ? "Ja" : "Nee"}</td>
-        <td className={styles.td}>{order.paid ? "Ja" : "Nee"}</td>
+        <td className={styles.td}>
+          <StatusCheckbox
+            label="Ontvangen"
+            checked={order.received}
+            onChange={(received) => updateOrder({ received })}
+          />
+        </td>
+        <td className={styles.td}>
+          <StatusCheckbox
+            label="Betaald"
+            checked={order.paid}
+            onChange={(paid) => updateOrder({ paid })}
+          />
+        </td>
       </tr>
+
+      {error != null && (
+        <tr className={rowClass}>
+          <td colSpan={7} className={styles.errorCell} role="alert">
+            {httpErrorMessage(error, "Opslaan mislukt, probeer het opnieuw.", {
+              404: "Deze bestelling bestaat niet meer.",
+            })}
+          </td>
+        </tr>
+      )}
 
       {/* Expandable Details Drawer */}
       <tr className={detailRowClass}>
@@ -104,5 +143,23 @@ export default function KrambambouliOrderItem({
         </td>
       </tr>
     </>
+  );
+}
+
+type StatusCheckboxProps = {
+  /** What the status means, e.g. "Betaald". Announced by screen readers. */
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+};
+
+function StatusCheckbox({ label, checked, onChange }: StatusCheckboxProps) {
+  return (
+    <input
+      type="checkbox"
+      aria-label={label}
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+    />
   );
 }

@@ -10,3 +10,9 @@ export const pageSchema = <T extends z.ZodType>(itemSchema: T) =>
       totalPages: z.int(),
     }),
   });
+
+export const listQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  // Capped, because some lists are public.
+  pageSize: z.coerce.number().int().min(1).max(100).optional(),
+});

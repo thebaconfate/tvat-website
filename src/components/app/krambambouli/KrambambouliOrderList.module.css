@@ -30,3 +30,15 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.loading {
+  opacity: 0.6;
+}
+
+.error {
+  margin: 1rem;
+}
+
+.pagination {
+  margin: 0 1rem 1rem;
+}

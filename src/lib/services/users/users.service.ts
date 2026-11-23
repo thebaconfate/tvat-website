@@ -93,7 +93,6 @@ class UserService {
 
   async editUser(user: Partial<UserData>) {
     // TODO: implement this
-    console.log(user);
   }
   async deleteUser(userId: number) {
     const sql = `

@@ -9,6 +9,7 @@ import {
 import type {
   OrderData,
   OrderFilters,
+  OrderPatch,
 } from "@/lib/domain/krambambouli/order.types";
 import type { Page } from "@/lib/domain/page/page.types";
 import type { QueryResult } from "pg";
@@ -39,7 +40,60 @@ type OrderQueryResult = {
   pickupLocationName: string;
 };
 
+/**
+ * Which `krambambouli_orders` column each patchable field writes to.
+ * Column names are interpolated into SQL, so they must only ever come from here.
+ */
+const orderPatchColumns = {
+  paid: "paid",
+  received: "received",
+} as const satisfies Record<keyof OrderPatch, string>;
+
 export class KrambambouliRepository extends Repository {
+  private selectOrdersFrom(source: string): string {
+    return `
+      SELECT
+        o.id,
+        o.order_number AS "orderNumber",
+        c.first_name AS "firstName",
+        c.last_name AS "lastName",
+        c.email,
+        o.delivery_option AS "deliveryOption",
+        o.pickup_location_id AS "pickupLocationId",
+        o.delivery_fee AS "deliveryFee",
+        o.total_owed AS "totalOwed",
+        o.paid,
+        o.received,
+        o.created_at AS "createdAt",
+        da.street_name AS "streetName",
+        da.house_number AS "houseNumber",
+        da.bus AS "bus",
+        da.postal_code AS "postalCode",
+        da.city AS "city",
+        pl.name AS "pickupLocationName",
+        (
+          SELECT COALESCE(
+              json_agg(
+                  json_build_object(
+                      'productId', p.id,
+                      'productName', p.name,
+                      'amount', oi.amount,
+                      'price', oi.price
+                  )
+              ),
+              '[]'::json
+          )
+          FROM krambambouli_order_items oi
+          JOIN products p ON p.id = oi.product_id
+          WHERE oi.order_id = o.id
+        ) AS orders
+      FROM ${source} o
+      JOIN customers c ON c.id = o.customer_id
+      LEFT JOIN krambambouli_delivery_locations da ON da.order_id = o.id
+      LEFT JOIN krambambouli_pickup_locations pl ON pl.id = o.pickup_location_id
+    `;
+  }
+
   async isFormEnabled(): Promise<boolean> {
     const sql = `
         SELECT c.config_value AS "configValue"
@@ -104,7 +158,9 @@ export class KrambambouliRepository extends Repository {
    * Creates the order. Returns null when an order with `order.id` already exists
    * (a resubmission), in which case nothing is inserted.
    */
-  async createOrder(order: KrambambouliOrderFormData): Promise<OrderData | null> {
+  async createOrder(
+    order: KrambambouliOrderFormData,
+  ): Promise<OrderData | null> {
     const sql = `
       WITH
 
@@ -283,53 +339,41 @@ export class KrambambouliRepository extends Repository {
       order.id ?? null,
     ];
     const result = await this.db.query<OrderData>(sql, params);
-    console.log(result.rows);
     if (result.rows.length === 0) return null;
     return orderSchema.parse(result.rows[0]);
   }
 
   async findOrderById(id: string): Promise<OrderData | null> {
     const sql = `
-      SELECT
-        o.id,
-        o.order_number AS "orderNumber",
-        c.first_name AS "firstName",
-        c.last_name AS "lastName",
-        c.email,
-        o.delivery_option AS "deliveryOption",
-        o.pickup_location_id AS "pickupLocationId",
-        o.delivery_fee AS "deliveryFee",
-        o.total_owed AS "totalOwed",
-        o.paid,
-        o.received,
-        o.created_at AS "createdAt",
-        da.street_name AS "streetName",
-        da.house_number AS "houseNumber",
-        da.bus AS "bus",
-        da.postal_code AS "postalCode",
-        da.city AS "city",
-        pl.name as "pickupLocationName",
-        COALESCE(
-            json_agg(
-                json_build_object(
-                    'productId', p.id,
-                    'productName', p.name,
-                    'amount', oi.amount,
-                    'price', oi.price
-                )
-            ) FILTER (WHERE oi.product_id IS NOT NULL),
-            '[]'::json
-        ) AS orders
-      FROM krambambouli_orders o
-      JOIN customers c ON c.id = o.customer_id
-      LEFT JOIN krambambouli_order_items oi ON oi.order_id = o.id
-      LEFT JOIN products p ON p.id = oi.product_id
-      LEFT JOIN krambambouli_delivery_locations da ON da.order_id = o.id
-      LEFT JOIN krambambouli_pickup_locations pl ON pl.id = o.pickup_location_id
+      ${this.selectOrdersFrom("krambambouli_orders")}
       WHERE o.id = $1
-      GROUP BY o.id, c.id, da.order_id, pl.id;
     `;
     const result = await this.db.query<OrderData>(sql, [id]);
+    if (result.rows.length === 0) return null;
+    return orderSchema.parse(result.rows[0]);
+  }
+
+  async updateOrder(id: string, patch: OrderPatch): Promise<OrderData | null> {
+    const params: unknown[] = [id];
+    const assignments: string[] = [];
+    for (const [field, column] of Object.entries(orderPatchColumns)) {
+      const value = patch[field as keyof OrderPatch];
+      if (value === undefined) continue;
+      params.push(value);
+      assignments.push(`${column} = $${params.length}`);
+    }
+    if (assignments.length === 0) throw new Error("Empty order patch");
+
+    const sql = `
+      WITH updated AS (
+          UPDATE krambambouli_orders
+          SET ${assignments.join(", ")}
+          WHERE id = $1
+          RETURNING *
+      )
+      ${this.selectOrdersFrom("updated")}
+    `;
+    const result = await this.db.query<OrderData>(sql, params);
     if (result.rows.length === 0) return null;
     return orderSchema.parse(result.rows[0]);
   }
@@ -361,7 +405,7 @@ export class KrambambouliRepository extends Repository {
     if (filters.toDate && !isNaN(filters.toDate.getTime())) {
       const endOfDay = new Date(filters.toDate);
       endOfDay.setUTCHours(23, 59, 59, 999);
-      params.push(endOfDay.toISOString);
+      params.push(endOfDay.toISOString());
       conditions.push(`o.created_at <= $${params.length}::timestamptz`);
     }
 
@@ -432,7 +476,7 @@ export class KrambambouliRepository extends Repository {
                     'productId', oi.product_id,
                     'amount', oi.amount,
                     'productName', p.name,
-                    'price', p.price
+                    'price', oi.price
                 )
             ) FILTER (WHERE oi.order_id is NOT NULL),
             '[]'::json

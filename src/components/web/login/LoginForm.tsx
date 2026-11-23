@@ -22,7 +22,6 @@ export default function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(value),
       });
-      console.log(response);
       if (response.ok) {
         navigate(APP_ROUTES.APP.url);
       }

@@ -4,14 +4,13 @@ import MonogramBanner from "../shared/MonogramBanner.astro";
 import styles from "./HomePage.module.css";
 import { activityService } from "@/lib/services/activities";
 import { getLocale } from "@/lib/utils";
-import ActivityItem from "./ActivityItem.astro";
+import ActivityItem from "@/components/web/activities/ActivityItem";
 
-const activities = await activityService.fetchActivityPage(
-  new URLSearchParams([
-    ["dateAfter", new Date().toISOString().split("T")[0]],
-    ["size", String(2)],
-  ]),
-);
+const activities = await activityService.getActivities({
+  page: 1,
+  pageSize: 2,
+  fromDate: new Date(),
+});
 const locale = getLocale(Astro.request);
 ---
 
@@ -29,11 +28,9 @@ const locale = getLocale(Astro.request);
         <h2>Activiteiten</h2>
       </div>
       <div class={styles.activityList}>
-        {
-          activities.content.map((a) => (
-            <ActivityItem activity={a} locale={locale} />
-          ))
-        }
+        {activities.content.map((a) => (
+          <ActivityItem activity={a} locale={locale} />
+        ))}
       </div>
       <!--     <a class={styles.allActivitiesLink} href={websiteRoutes.kalender.url}
         >Meer activiteiten</a

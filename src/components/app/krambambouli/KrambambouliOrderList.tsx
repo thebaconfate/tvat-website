@@ -1,12 +1,23 @@
-import type { OrderData } from "@/lib/domain/krambambouli/order.types";
-import styles from "./KrambambouliOrderList.module.css";
-import { useMemo } from "react";
-import { formatCurrency } from "@/lib/utils";
-import type { Page } from "@/lib/domain/page";
-import useKrambambouliOrders from "./useKrambambouliOrders";
+import { useCollection } from "@/components/shared/hooks/useCollection";
 import Input from "@/components/shared/Input";
+import LoadError from "@/components/shared/LoadError";
+import Pagination from "@/components/shared/Pagination";
 import Select from "@/components/shared/Select";
+import { ordersApi } from "@/lib/client/krambambouli/orders.api";
+import type { OrderData, OrderFilters } from "@/lib/domain/krambambouli";
+import type { Page } from "@/lib/domain/page";
+import {
+  formatCurrency,
+  fromDateInput,
+  fromYesNo,
+  httpErrorMessage,
+  toDateInput,
+  toNumber,
+  toYesNo,
+  yesNoOptions,
+} from "@/lib/utils";
 import KrambambouliOrderItem from "./KrambambouliOrderItem";
+import styles from "./KrambambouliOrderList.module.css";
 
 type Props = {
   page: Page<OrderData>;
@@ -14,166 +25,145 @@ type Props = {
 };
 
 export default function KrambambouliOrderList(props: Props) {
-  const initialFromDate = useMemo(() => new Date(), []);
-  initialFromDate.setMonth(initialFromDate.getMonth() - 1);
-  const { krambambouliOrderPage, filters, setFilters, error } =
-    useKrambambouliOrders({
-      page: props.page,
-      filters: {
-        orderNumber: null,
-        fromDate: initialFromDate.toISOString().split("T")[0],
-        toDate: null,
-        name: "",
-        price: null,
-        received: null,
-        paid: null,
-      },
-    });
+  const {
+    items: orders,
+    filters,
+    setFilters,
+    loading,
+    error,
+    refetch,
+    page,
+    totalPages,
+    next,
+    prev,
+    updateItem,
+  } = useCollection(ordersApi, { initialPage: props.page });
 
-  console.log(filters);
+  const setFilter = <Key extends keyof OrderFilters>(
+    key: Key,
+    value: OrderFilters[Key],
+  ) => setFilters((current) => ({ ...current, [key]: value }));
 
   return (
     <>
-      {error ? (
-        error
-      ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr className={styles.tr}>
-              <th className={styles.th}></th>
-              <th className={styles.th}>
-                <Input
-                  placeholder="Order #"
-                  type="number"
-                  name="orderNumber"
-                  id="orderNumber"
-                  value={filters.orderNumber ?? ""}
-                  onChange={(e) =>
-                    setFilters((f) => {
-                      if (e.target.value === "")
-                        return { ...f, orderNumber: null };
-                      else
-                        return { ...f, orderNumber: parseInt(e.target.value) };
-                    })
-                  }
-                />
-              </th>
-              <th className={`${styles.th} ${styles.dateFilters}`}>
-                <Input
-                  type="date"
-                  value={filters.fromDate ?? ""}
-                  onChange={(e) =>
-                    setFilters({ ...filters, fromDate: e.target.value ?? null })
-                  }
-                />
-                -
-                <Input
-                  type="date"
-                  value={filters.toDate ?? ""}
-                  onChange={(e) =>
-                    setFilters({ ...filters, toDate: e.target.value ?? null })
-                  }
-                />
-              </th>
-              <th className={styles.th}>
-                <Input
-                  placeholder="Naam"
-                  type="text"
-                  value={filters.name ?? ""}
-                  onChange={(e) =>
-                    setFilters({ ...filters, name: e.target.value ?? null })
-                  }
-                />
-              </th>
-              <th className={styles.th}>
-                <Input
-                  placeholder="Prijs"
-                  type="number"
-                  step={"0.01"}
-                  value={filters.price != null ? filters.price / 100 : ""}
-                  onChange={(e) => {
-                    setFilters({
-                      ...filters,
-                      price:
-                        e.target.value === ""
-                          ? null
-                          : Math.round(parseFloat(e.target.value) * 100),
-                    });
-                  }}
-                />
-              </th>
-              <th className={styles.th}>
-                <Select
-                  placeholder={"Ontvangen?"}
-                  options={[
-                    { label: "Ja", value: "Ja" },
-                    { label: "Nee", value: "Nee" },
-                  ]}
-                  onChange={(e) => {
-                    setFilters((prev) => ({
-                      ...prev,
-                      received:
-                        e.target.value === "Ja"
-                          ? true
-                          : e.target.value === "Nee"
-                            ? false
-                            : null,
-                    }));
-                  }}
-                />
-              </th>
-              <th className={styles.th}>
-                <Select
-                  placeholder={"Betaald?"}
-                  options={[
-                    { label: "Ja", value: "Ja" },
-                    { label: "Nee", value: "Nee" },
-                  ]}
-                  onChange={(e) => {
-                    setFilters((prev) => ({
-                      ...prev,
-                      paid:
-                        e.target.value === "Ja"
-                          ? true
-                          : e.target.value === "Nee"
-                            ? false
-                            : null,
-                    }));
-                  }}
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {krambambouliOrderPage &&
-              krambambouliOrderPage.content.map((order, index) => (
-                <KrambambouliOrderItem
-                  order={order}
-                  key={index}
-                  index={index}
-                  locale={props.locale}
-                />
-              ))}
-            <tr className={styles.tr}>
-              <td></td>
-              <td className={`${styles.td} ${styles.name}`}>Totaal</td>
-              <td></td>
-              <td></td>
-              <td className={styles.td}>
-                {krambambouliOrderPage &&
-                  formatCurrency(
-                    krambambouliOrderPage.content.reduce(
-                      (acc, o) => acc + o.totalOwed,
-                      0,
-                    ) / 100,
-                  )}
-              </td>
-              <td></td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
+      {error != null && (
+        <LoadError
+          className={styles.error}
+          message={httpErrorMessage(error, "Bestellingen laden mislukt.")}
+          onRetry={refetch}
+        />
       )}
+      <table
+        className={`${styles.table} ${loading ? styles.loading : ""}`}
+        aria-busy={loading}
+      >
+        <thead>
+          <tr className={styles.tr}>
+            <th className={styles.th}></th>
+            <th className={styles.th}>
+              <Input
+                placeholder="Order #"
+                type="number"
+                name="orderNumber"
+                id="orderNumber"
+                value={filters.orderNumber ?? ""}
+                onChange={(e) =>
+                  setFilter("orderNumber", toNumber(e.target.value))
+                }
+              />
+            </th>
+            <th className={`${styles.th} ${styles.dateFilters}`}>
+              <Input
+                type="date"
+                value={toDateInput(filters.fromDate)}
+                onChange={(e) =>
+                  setFilter("fromDate", fromDateInput(e.target.value))
+                }
+              />
+              -
+              <Input
+                type="date"
+                value={toDateInput(filters.toDate)}
+                onChange={(e) =>
+                  setFilter("toDate", fromDateInput(e.target.value))
+                }
+              />
+            </th>
+            <th className={styles.th}>
+              <Input
+                placeholder="Naam"
+                type="text"
+                value={filters.name ?? ""}
+                onChange={(e) => setFilter("name", e.target.value || undefined)}
+              />
+            </th>
+            <th className={styles.th}>
+              <Input
+                placeholder="Prijs"
+                type="number"
+                step={"0.01"}
+                value={filters.price != null ? filters.price / 100 : ""}
+                onChange={(e) => {
+                  const euros = toNumber(e.target.value);
+                  setFilter(
+                    "price",
+                    euros === undefined ? undefined : Math.round(euros * 100),
+                  );
+                }}
+              />
+            </th>
+            <th className={styles.th}>
+              <Select
+                placeholder={"Ontvangen?"}
+                options={yesNoOptions}
+                value={toYesNo(filters.received)}
+                onChange={(e) =>
+                  setFilter("received", fromYesNo(e.target.value))
+                }
+              />
+            </th>
+            <th className={styles.th}>
+              <Select
+                placeholder={"Betaald?"}
+                options={yesNoOptions}
+                value={toYesNo(filters.paid)}
+                onChange={(e) => setFilter("paid", fromYesNo(e.target.value))}
+              />
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map((order, index) => (
+            <KrambambouliOrderItem
+              key={order.id}
+              order={order}
+              index={index}
+              locale={props.locale}
+              onUpdate={(patch) => updateItem(order.id, patch)}
+            />
+          ))}
+          <tr className={styles.tr}>
+            <td></td>
+            <td className={`${styles.td} ${styles.name}`}>Totaal</td>
+            <td></td>
+            <td></td>
+            <td className={styles.td}>
+              {formatCurrency(
+                orders.reduce((sum, order) => sum + order.totalOwed, 0) / 100,
+              )}
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      <Pagination
+        className={styles.pagination}
+        page={page}
+        totalPages={totalPages}
+        onPrev={prev}
+        onNext={next}
+      />
     </>
   );
 }

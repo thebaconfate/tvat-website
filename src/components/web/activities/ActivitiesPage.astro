@@ -1,5 +1,27 @@
 ---
+import { activityService } from "@/lib/services/activities";
+import type { ActivityFilters } from "@/lib/domain/activities";
+import { fromDateInput, getLocale } from "@/lib/utils";
+import ActivitiesList from "./ActivitiesList";
 import styles from "./ActivitiesPage.module.css";
+
+// Upcoming activities: from the start of today (UTC, like the date filters).
+const initialFilters: ActivityFilters = {
+  fromDate: fromDateInput(new Date().toISOString().slice(0, 10)),
+};
+const page = await activityService.getActivities({
+  page: 1,
+  ...initialFilters,
+});
+const locale = getLocale(Astro.request);
 ---
 
-<main class={styles.contentContentainer}>Work in progress</main>
+<main class={styles.main}>
+  <h1>Kalender</h1>
+  <ActivitiesList
+    page={page}
+    initialFilters={initialFilters}
+    locale={locale}
+    client:load
+  />
+</main>

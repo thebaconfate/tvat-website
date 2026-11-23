@@ -4,13 +4,10 @@ import { authService } from "./lib/services/auth";
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-/**
- * API routes that can be called without logging in. Every other API route
- * requires a valid session, so new endpoints are protected by default.
- * Paths are matched exactly (after normalisation), per HTTP method.
- */
 const PUBLIC_API_ROUTES: [{ url: string }, Method[]][] = [
-  [API_ROUTES.KRAMBALBOULI.ORDER, ["POST"]], // the public order form
+  [API_ROUTES.KRAMBALBOULI.ORDERS, ["POST"]], // the public order form; GET stays protected
+  // TODO: remove after 2026-11-30, with src/pages/api/krambambouli/order.ts (old order form URL).
+  [{ url: "/api/krambambouli/order" }, ["POST"]],
   [API_ROUTES.CONTACT, ["POST"]],
   [API_ROUTES.ACTIVITIES, ["GET"]],
   [API_ROUTES.AUTH.LOGIN, ["POST"]],
@@ -21,14 +18,11 @@ const PUBLIC_API_ROUTES: [{ url: string }, Method[]][] = [
   [API_ROUTES.AUTH.STATION, ["POST"]], // guarded by BOOTSTRAP_TOKEN
 ];
 
-/** Lowercase, decode, collapse duplicate slashes and drop trailing slashes. */
 function normalizePath(pathname: string): string {
   let path = pathname;
   try {
     path = decodeURIComponent(path);
-  } catch {
-    // Malformed encoding: keep it as is; it won't match a public route.
-  }
+  } catch {}
   path = path.toLowerCase().replace(/\/{2,}/g, "/");
   return path.length > 1 ? path.replace(/\/+$/, "") : path;
 }
@@ -51,7 +45,6 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
   const isApiRoute = isUnder(path, apiPrefix);
   const isAppRoute = isUnder(path, appPrefix);
 
-  // 1. Public pages, and API routes that are explicitly public.
   if (!isApiRoute && !isAppRoute) return next();
   if (
     isApiRoute &&
@@ -59,7 +52,6 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
   )
     return next();
 
-  // 2. Everything else requires a valid session.
   const authCookie = context.cookies.get("Authorization")?.value;
   const verifiedToken = authCookie
     ? authService.verifyToken(authCookie)
@@ -73,7 +65,6 @@ export async function onRequest(context: APIContext, next: MiddlewareNext) {
     );
   }
 
-  // 3. Attach user context and proceed.
   context.locals.user = {
     id: verifiedToken.sub,
     role: verifiedToken.role,

@@ -17,7 +17,6 @@ export default function Checkbox({
   const [checked, setChecked] = useState(currentValue);
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newValue = e.target.checked;
-    console.log(newValue);
     fetch(endpoint, {
       body: JSON.stringify({ customerId, [bodyKey]: newValue }),
       method: "PUT",

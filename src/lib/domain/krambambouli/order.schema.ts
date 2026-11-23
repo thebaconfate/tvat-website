@@ -1,4 +1,5 @@
 import z4 from "zod/v4";
+import { listQuerySchema } from "../page/page.schema";
 import { deliveryFormSchema, pickupFormSchema } from "./form.schemas";
 
 const itemSchema = z4.object({
@@ -41,6 +42,7 @@ const pickupOrderSchema = z4.object({
   pickupLocationName: z4.string(),
 });
 
+/** Filters for the order list. All optional; coerces, so it can parse a query string. */
 export const orderFilterSchema = z4
   .object({
     orderNumber: z4.coerce.number().int(),
@@ -48,13 +50,24 @@ export const orderFilterSchema = z4
     toDate: z4.coerce.date(),
     name: z4.string().nonempty(),
     price: z4.coerce.number().int(),
-    received: z4.coerce.boolean(),
-    paid: z4.coerce.boolean(),
+    // stringbool, not coerce.boolean: coerce turns any non-empty string, including
+    // "false", into true.
+    received: z4.stringbool(),
+    paid: z4.stringbool(),
   })
-  .partial()
-  .optional();
+  .partial();
+
+/** The query for the order list: the page number plus the filters. */
+export const orderQuerySchema = listQuerySchema.extend(orderFilterSchema.shape);
 
 export const orderSchema = z4.discriminatedUnion("deliveryOption", [
   deliveryOrderSchema,
   pickupOrderSchema,
 ]);
+
+export const orderPatchSchema = z4
+  .strictObject(sharedSchema.pick({ paid: true, received: true }).shape)
+  .partial()
+  .refine((patch) => Object.values(patch).some((v) => v !== undefined), {
+    message: "Provide at least one field to update",
+  });
