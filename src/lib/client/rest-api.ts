@@ -8,24 +8,12 @@ type RestApiConfig<
   PatchSchema extends ZodType,
   QuerySchema extends ZodType<ListQuery>,
 > = {
-  /** The list url; one item lives at `${url}/${id}`. */
   url: string;
-  /** Parses every item in a response. */
   itemSchema: ItemSchema;
-  /** Parses a patch before it's sent, so an invalid one fails before the request. */
   patchSchema: PatchSchema;
-  /**
-   * Gives `list` its query type. Not used to parse: the query is already typed, and
-   * this schema parses query *strings*, which the endpoint does on the server.
-   */
   querySchema: QuerySchema;
 };
 
-/**
- * A `CollectionApi` for an endpoint that follows the REST convention:
- * `GET url` (a page), `PATCH url/:id` and `DELETE url/:id`. The types come from
- * the schemas. Write the API object by hand for endpoints that don't fit.
- */
 export function createRestApi<
   ItemSchema extends ZodType<Identifiable>,
   PatchSchema extends ZodType,

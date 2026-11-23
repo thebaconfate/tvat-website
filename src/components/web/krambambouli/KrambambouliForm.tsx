@@ -140,7 +140,6 @@ export default function KrambambouliForm({
     [pickupLocations, deliveryLocations],
   );
 
-  // Idempotency key for the order being submitted, tied to its exact contents.
   const pendingOrder = useRef<{ payload: string; id: string } | null>(null);
 
   const form = useForm({
@@ -190,8 +189,6 @@ export default function KrambambouliForm({
               city: value.city,
               postalCode: value.postalCode,
             };
-      // Reuse the same order id when the exact same order is submitted again
-      // (e.g. a retry after an error), so the server can't create a duplicate.
       const serializedPayload = JSON.stringify(payload);
       if (pendingOrder.current?.payload !== serializedPayload)
         pendingOrder.current = {
@@ -208,7 +205,7 @@ export default function KrambambouliForm({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...payload, id: pendingOrder.current.id }),
         });
-      } catch (e) {
+      } catch (_: any) {
         setPopup({
           title: PopupEnum.ERROR,
           text: "Je bestelling kon niet verstuurd worden. Controleer je internetverbinding en probeer het opnieuw.",
@@ -218,7 +215,6 @@ export default function KrambambouliForm({
       }
 
       if (!response.ok) {
-        // 4xx: the order was definitely not placed, so a new attempt gets a new id.
         if (response.status < 500) pendingOrder.current = null;
         setPopup({ title: PopupEnum.ERROR, text: retryText, show: true });
         return;

@@ -9,7 +9,6 @@ import styles from "./KrambambouliOrderList.module.css";
 import { useOrders } from "./useOrders";
 
 type Props = {
-  /** The first page without filters, rendered on the server. */
   page: Page<OrderData>;
   locale: string;
 };
