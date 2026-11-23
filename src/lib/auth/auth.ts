@@ -40,7 +40,6 @@ export class Auth {
       const decoded = jwt.verify(token, this.secretKey);
       return decoded;
     } catch (e: any) {
-      console.log(e);
       return false;
     }
   }

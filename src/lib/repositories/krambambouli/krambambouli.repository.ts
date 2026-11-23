@@ -344,7 +344,6 @@ export class KrambambouliRepository extends Repository {
       order.id ?? null,
     ];
     const result = await this.db.query<OrderData>(sql, params);
-    console.log(result.rows);
     if (result.rows.length === 0) return null;
     return orderSchema.parse(result.rows[0]);
   }

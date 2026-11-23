@@ -63,7 +63,9 @@ class KrambambouliService {
    * - A failing email does not fail the order: it is already saved, so the
    *   caller gets the order with `emailSent: false`.
    */
-  async createOrder(order: KrambambouliOrderFormData): Promise<CreateOrderResult> {
+  async createOrder(
+    order: KrambambouliOrderFormData,
+  ): Promise<CreateOrderResult> {
     const savedOrder = await this.repository.createOrder(order);
     if (!savedOrder) {
       const existing = order.id
@@ -100,10 +102,7 @@ class KrambambouliService {
    * Updates the fields present in `patch` (see `orderPatchSchema`).
    * Returns the updated order, or null when no order has this id.
    */
-  async patchOrder(
-    id: string,
-    patch: OrderPatch,
-  ): Promise<OrderData | null> {
+  async patchOrder(id: string, patch: OrderPatch): Promise<OrderData | null> {
     return this.repository.updateOrder(id, patch);
   }
 
@@ -114,7 +113,6 @@ class KrambambouliService {
     const pageNumber = paramsObj.page ? parseInt(paramsObj.page) : 1;
     const pageSize = paramsObj.pageSize ? parseInt(paramsObj.pageSize) : 100;
     const filters = orderFilterSchema.parse(paramsObj);
-    console.log(filters);
     return this.repository.getOrders(pageNumber, pageSize, filters);
   }
 }

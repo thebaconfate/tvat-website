@@ -30,8 +30,6 @@ export default function KrambambouliOrderList(props: Props) {
       },
     });
 
-  console.log(filters);
-
   return (
     <>
       {error ? (
