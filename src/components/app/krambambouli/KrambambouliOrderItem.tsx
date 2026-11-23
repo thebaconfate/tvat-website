@@ -18,7 +18,7 @@ export default function KrambambouliOrderItem({
   ...props
 }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const { order, updateOrder, loading, error } = useKrambambouliOrder({
+  const { order, updateOrder, error } = useKrambambouliOrder({
     order: props.order,
   });
   const isEven = useMemo(() => index % 2 === 0, [index]);
@@ -48,7 +48,6 @@ export default function KrambambouliOrderItem({
           <StatusCheckbox
             label="Ontvangen"
             checked={order.received}
-            disabled={loading}
             onChange={(received) => updateOrder({ received })}
           />
         </td>
@@ -56,7 +55,6 @@ export default function KrambambouliOrderItem({
           <StatusCheckbox
             label="Betaald"
             checked={order.paid}
-            disabled={loading}
             onChange={(paid) => updateOrder({ paid })}
           />
         </td>
@@ -135,28 +133,17 @@ type StatusCheckboxProps = {
   /** What the status means, e.g. "Betaald". Announced by screen readers. */
   label: string;
   checked: boolean;
-  disabled: boolean;
   onChange: (checked: boolean) => void;
 };
 
-/** A checkbox with "Ja"/"Nee" next to it, for one status of an order. */
-function StatusCheckbox({
-  label,
-  checked,
-  disabled,
-  onChange,
-}: StatusCheckboxProps) {
+function StatusCheckbox({ label, checked, onChange }: StatusCheckboxProps) {
   return (
-    <label className={styles.status}>
-      <input
-        type="checkbox"
-        aria-label={label}
-        checked={checked}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.checked)}
-      />
-      {checked ? "Ja" : "Nee"}
-    </label>
+    <input
+      type="checkbox"
+      aria-label={label}
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+    />
   );
 }
 
