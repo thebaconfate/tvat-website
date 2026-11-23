@@ -40,21 +40,16 @@ type OrderQueryResult = {
   pickupLocationName: string;
 };
 
-export class KrambambouliRepository extends Repository {
-  /**
-   * Which `krambambouli_orders` column each patchable field writes to.
-   * Column names are interpolated into SQL, so they must only ever come from here.
-   */
-  private readonly orderPatchColumns = {
-    paid: "paid",
-    received: "received",
-  } as const satisfies Record<keyof OrderPatch, string>;
+/**
+ * Which `krambambouli_orders` column each patchable field writes to.
+ * Column names are interpolated into SQL, so they must only ever come from here.
+ */
+const orderPatchColumns = {
+  paid: "paid",
+  received: "received",
+} as const satisfies Record<keyof OrderPatch, string>;
 
-  /**
-   * SELECT for full orders, reading the order rows from `source` (a table or a CTE
-   * with the columns of `krambambouli_orders`), aliased `o`. Append a WHERE as needed.
-   * `source` is interpolated into SQL, so only ever pass a fixed name from this class.
-   */
+export class KrambambouliRepository extends Repository {
   private selectOrdersFrom(source: string): string {
     return `
       SELECT
@@ -358,14 +353,10 @@ export class KrambambouliRepository extends Repository {
     return orderSchema.parse(result.rows[0]);
   }
 
-  /**
-   * Updates the fields present in `patch`; fields left out keep their value.
-   * Returns the updated order, or null when no order has this id.
-   */
   async updateOrder(id: string, patch: OrderPatch): Promise<OrderData | null> {
     const params: unknown[] = [id];
     const assignments: string[] = [];
-    for (const [field, column] of Object.entries(this.orderPatchColumns)) {
+    for (const [field, column] of Object.entries(orderPatchColumns)) {
       const value = patch[field as keyof OrderPatch];
       if (value === undefined) continue;
       params.push(value);
@@ -373,8 +364,6 @@ export class KrambambouliRepository extends Repository {
     }
     if (assignments.length === 0) throw new Error("Empty order patch");
 
-    // Read the order from the CTE: every part of a WITH statement sees the data as it
-    // was before the statement, so joining krambambouli_orders would return old values.
     const sql = `
       WITH updated AS (
           UPDATE krambambouli_orders
@@ -416,7 +405,7 @@ export class KrambambouliRepository extends Repository {
     if (filters.toDate && !isNaN(filters.toDate.getTime())) {
       const endOfDay = new Date(filters.toDate);
       endOfDay.setUTCHours(23, 59, 59, 999);
-      params.push(endOfDay.toISOString);
+      params.push(endOfDay.toISOString());
       conditions.push(`o.created_at <= $${params.length}::timestamptz`);
     }
 
@@ -487,7 +476,7 @@ export class KrambambouliRepository extends Repository {
                     'productId', oi.product_id,
                     'amount', oi.amount,
                     'productName', p.name,
-                    'price', p.price
+                    'price', oi.price
                 )
             ) FILTER (WHERE oi.order_id is NOT NULL),
             '[]'::json
