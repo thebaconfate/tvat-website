@@ -1,4 +1,4 @@
-import { useResource } from "@/components/shared/hooks/useResource";
+import { useLegacyResource } from "@/components/shared/hooks/useLegacyResource";
 import {
   orderSchema,
   type OrderData,
@@ -14,7 +14,7 @@ export function useKrambambouliOrder(props: Props) {
     update,
     loading,
     error,
-  } = useResource<OrderData>({
+  } = useLegacyResource<OrderData>({
     id: props.order.id,
     init: props.order,
     baseUrl: API_ROUTES.KRAMBALBOULI.ORDERS.url,
