@@ -1,4 +1,4 @@
-import { usePage } from "@/components/shared/hooks/usePage";
+import { useLegacyPage } from "@/components/shared/hooks/useLegacyPage";
 import { orderSchema, type OrderData } from "@/lib/domain/krambambouli";
 import { pageSchema, type Page } from "@/lib/domain/page";
 import { API_ROUTES } from "@/lib/routes";
@@ -29,12 +29,13 @@ const initialFilters: Filters = {
 };
 
 export default function useKrambambouliOrders(props: Props) {
-  const { itemPage, filters, setFilters, setPage, error, loading } = usePage(
-    API_ROUTES.KRAMBALBOULI.ORDERS.url,
-    props.filters ?? initialFilters,
-    pageSchema(orderSchema),
-    props.page,
-  );
+  const { itemPage, filters, setFilters, setPage, error, loading } =
+    useLegacyPage(
+      API_ROUTES.KRAMBALBOULI.ORDERS.url,
+      props.filters ?? initialFilters,
+      pageSchema(orderSchema),
+      props.page,
+    );
 
   return {
     krambambouliOrderPage: itemPage,
