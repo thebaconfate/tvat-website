@@ -61,7 +61,7 @@ export function useCollection<
     items: data?.content ?? [],
     loading,
     error,
-    page,
+    page: data?.page.number ?? page,
     totalPages,
     next,
     prev,
