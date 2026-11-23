@@ -1,6 +1,9 @@
-import { Button } from "@/components/shared/Button";
+import { useCollection } from "@/components/shared/hooks/useCollection";
 import Input from "@/components/shared/Input";
+import LoadError from "@/components/shared/LoadError";
+import Pagination from "@/components/shared/Pagination";
 import Select from "@/components/shared/Select";
+import { ordersApi } from "@/lib/client/krambambouli/orders.api";
 import type { OrderData, OrderFilters } from "@/lib/domain/krambambouli";
 import type { Page } from "@/lib/domain/page";
 import {
@@ -15,7 +18,6 @@ import {
 } from "@/lib/utils";
 import KrambambouliOrderItem from "./KrambambouliOrderItem";
 import styles from "./KrambambouliOrderList.module.css";
-import { useOrders } from "./useOrders";
 
 type Props = {
   page: Page<OrderData>;
@@ -35,7 +37,7 @@ export default function KrambambouliOrderList(props: Props) {
     next,
     prev,
     updateItem,
-  } = useOrders(props.page);
+  } = useCollection(ordersApi, { initialPage: props.page });
 
   const setFilter = <Key extends keyof OrderFilters>(
     key: Key,
@@ -45,12 +47,11 @@ export default function KrambambouliOrderList(props: Props) {
   return (
     <>
       {error != null && (
-        <p className={styles.error} role="alert">
-          {httpErrorMessage(error, "Bestellingen laden mislukt.")}{" "}
-          <Button variant="secondary" onClick={refetch}>
-            Opnieuw proberen
-          </Button>
-        </p>
+        <LoadError
+          className={styles.error}
+          message={httpErrorMessage(error, "Bestellingen laden mislukt.")}
+          onRetry={refetch}
+        />
       )}
       <table
         className={`${styles.table} ${loading ? styles.loading : ""}`}
@@ -156,23 +157,13 @@ export default function KrambambouliOrderList(props: Props) {
           </tr>
         </tbody>
       </table>
-      {totalPages > 1 && (
-        <nav className={styles.pagination} aria-label="Pagina's">
-          <Button variant="secondary" onClick={prev} disabled={page <= 1}>
-            Vorige
-          </Button>
-          <span>
-            Pagina {page} van {totalPages}
-          </span>
-          <Button
-            variant="secondary"
-            onClick={next}
-            disabled={page >= totalPages}
-          >
-            Volgende
-          </Button>
-        </nav>
-      )}
+      <Pagination
+        className={styles.pagination}
+        page={page}
+        totalPages={totalPages}
+        onPrev={prev}
+        onNext={next}
+      />
     </>
   );
 }
