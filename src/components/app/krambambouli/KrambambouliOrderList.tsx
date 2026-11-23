@@ -3,7 +3,16 @@ import Input from "@/components/shared/Input";
 import Select from "@/components/shared/Select";
 import type { OrderData, OrderFilters } from "@/lib/domain/krambambouli";
 import type { Page } from "@/lib/domain/page";
-import { formatCurrency, HttpError } from "@/lib/utils";
+import {
+  formatCurrency,
+  fromDateInput,
+  fromYesNo,
+  httpErrorMessage,
+  toDateInput,
+  toNumber,
+  toYesNo,
+  yesNoOptions,
+} from "@/lib/utils";
 import KrambambouliOrderItem from "./KrambambouliOrderItem";
 import styles from "./KrambambouliOrderList.module.css";
 import { useOrders } from "./useOrders";
@@ -12,11 +21,6 @@ type Props = {
   page: Page<OrderData>;
   locale: string;
 };
-
-const yesNoOptions = [
-  { label: "Ja", value: "Ja" },
-  { label: "Nee", value: "Nee" },
-];
 
 export default function KrambambouliOrderList(props: Props) {
   const {
@@ -42,7 +46,7 @@ export default function KrambambouliOrderList(props: Props) {
     <>
       {error != null && (
         <p className={styles.error} role="alert">
-          {loadErrorMessage(error)}{" "}
+          {httpErrorMessage(error, "Bestellingen laden mislukt.")}{" "}
           <Button variant="secondary" onClick={refetch}>
             Opnieuw proberen
           </Button>
@@ -171,38 +175,4 @@ export default function KrambambouliOrderList(props: Props) {
       )}
     </>
   );
-}
-
-/** A number from an input, or undefined when it's empty or not a number. */
-function toNumber(value: string): number | undefined {
-  const number = parseFloat(value);
-  return Number.isNaN(number) ? undefined : number;
-}
-
-/** `yyyy-mm-dd` for a date input. Filter dates are UTC midnight (see fromDateInput). */
-function toDateInput(date: Date | undefined): string {
-  return date ? date.toISOString().slice(0, 10) : "";
-}
-
-/** A date input's `yyyy-mm-dd`, parsed as UTC midnight, or undefined when empty. */
-function fromDateInput(value: string): Date | undefined {
-  return value ? new Date(value) : undefined;
-}
-
-function toYesNo(value: boolean | undefined): string {
-  if (value === undefined) return "";
-  return value ? "Ja" : "Nee";
-}
-
-function fromYesNo(value: string): boolean | undefined {
-  if (value === "Ja") return true;
-  if (value === "Nee") return false;
-  return undefined;
-}
-
-/** A message for a list that failed to load, in the dashboard's language. */
-function loadErrorMessage(error: unknown): string {
-  if (error instanceof HttpError && error.status === 401)
-    return "Sessie verlopen, log opnieuw in.";
-  return "Bestellingen laden mislukt.";
 }

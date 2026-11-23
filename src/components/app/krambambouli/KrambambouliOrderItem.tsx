@@ -3,13 +3,12 @@ import styles from "./KrambambouliOrderItem.module.css";
 import { useMemo, useOptimistic, useState, useTransition } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { formatDate } from "@/lib/domain/datetime";
-import { formatCurrency, HttpError } from "@/lib/utils";
+import { formatCurrency, httpErrorMessage } from "@/lib/utils";
 
 type Props = {
   order: OrderData;
   locale: string;
   index: number;
-  /** Saves the patch; rejects when saving fails. */
   onUpdate: (patch: OrderPatch) => Promise<unknown>;
 };
 
@@ -22,15 +21,12 @@ export default function KrambambouliOrderItem({
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState<unknown>();
   const [saving, startSaving] = useTransition();
-  // Show a patch right away; once the save settles this falls back to `savedOrder`,
-  // which the list replaces with the server's result, or keeps if the save failed.
   const [order, applyPatch] = useOptimistic(
     savedOrder,
     (current, patch: OrderPatch) => ({ ...current, ...patch }),
   );
 
   const updateOrder = (patch: OrderPatch) => {
-    // useCollection doesn't drop stale responses, so allow one save at a time.
     if (saving) return;
     setError(undefined);
     startSaving(async () => {
@@ -82,7 +78,9 @@ export default function KrambambouliOrderItem({
       {error != null && (
         <tr className={rowClass}>
           <td colSpan={7} className={styles.errorCell} role="alert">
-            {saveErrorMessage(error)}
+            {httpErrorMessage(error, "Opslaan mislukt, probeer het opnieuw.", {
+              404: "Deze bestelling bestaat niet meer.",
+            })}
           </td>
         </tr>
       )}
@@ -164,13 +162,4 @@ function StatusCheckbox({ label, checked, onChange }: StatusCheckboxProps) {
       onChange={(e) => onChange(e.target.checked)}
     />
   );
-}
-
-/** A message for a failed save, in the dashboard's language. */
-function saveErrorMessage(error: unknown): string {
-  if (error instanceof HttpError) {
-    if (error.status === 401) return "Sessie verlopen, log opnieuw in.";
-    if (error.status === 404) return "Deze bestelling bestaat niet meer.";
-  }
-  return "Opslaan mislukt, probeer het opnieuw.";
 }
