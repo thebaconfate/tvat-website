@@ -1,6 +1,6 @@
 [tools]
-node = "26" # same as the Dockerfile and CI
-pnpm = "12.21.0" # same as packageManager in package.json
+node = "26"
+pnpm = "12.21.0"
 railway = "5"
 
 [tasks.setup]
@@ -14,6 +14,11 @@ run = """
 docker compose up -d database
 until docker compose exec -T database pg_isready -q -h 127.0.0.1; do sleep 1; done
 """
+
+[tasks."db:migrate"]
+description = "Apply the migrations in migrations/ that the local database doesn't have yet"
+depends = ["db:up"]
+run = "pnpm db:migrate"
 
 [tasks."db:pull"]
 description = "Replace the local database with a copy of production (Railway)"

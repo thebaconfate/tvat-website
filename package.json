@@ -10,7 +10,8 @@
         "preview": "astro preview",
         "astro": "astro",
         "email:dev": "email dev",
-        "db:pull": "scripts/db-pull.sh"
+        "db:pull": "scripts/db-pull.sh",
+        "db:migrate": "node --env-file-if-exists=.env scripts/migrate.ts"
     },
     "dependencies": {
         "@astrojs/check": "^0.9.12",
