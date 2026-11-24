@@ -47,4 +47,10 @@
   .textarea {
     height: clamp(10rem, calc(0.25 * 100dvh), 15rem);
   }
+  /* On large screens: no wider than this, centred. */
+  .formContainer {
+    width: 100%;
+    max-width: 48rem;
+    margin-inline: auto;
+  }
 }
