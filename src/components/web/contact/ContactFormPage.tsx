@@ -1,5 +1,5 @@
 import styles from "./ContactFormPage.module.css";
-import { useForm } from "@tanstack/react-form";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { contactFormSchema } from "@/lib/domain/contact";
 import { Button } from "@/components/shared/Button";
 import { useState } from "react";
@@ -20,8 +20,11 @@ export default function ContactFormPage() {
       subject: "",
       message: "",
     },
+    // Validate on submit; after a submit, re-check on every change, so a
+    // field's error goes away once it's fixed.
+    validationLogic: revalidateLogic(),
     validators: {
-      onSubmit: contactFormSchema,
+      onDynamic: contactFormSchema,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -84,7 +87,11 @@ export default function ContactFormPage() {
             <h1 className={styles.title}>Contact</h1>
             <form.Field name="name">
               {(field) => (
-                <Field label="Naam" error={firstError(field.state.meta.errors)}>
+                <Field
+                  label="Naam"
+                  className={styles.inlineField}
+                  error={firstError(field.state.meta.errors)}
+                >
                   <Input
                     id={field.name}
                     type="text"
@@ -100,6 +107,7 @@ export default function ContactFormPage() {
               {(field) => (
                 <Field
                   label="E-mail"
+                  className={styles.inlineField}
                   error={firstError(field.state.meta.errors)}
                 >
                   <Input
@@ -117,6 +125,7 @@ export default function ContactFormPage() {
               {(field) => (
                 <Field
                   label="Onderwerp"
+                  className={styles.inlineField}
                   error={firstError(field.state.meta.errors)}
                 >
                   <Input
