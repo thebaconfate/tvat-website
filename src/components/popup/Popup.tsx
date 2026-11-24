@@ -1,3 +1,4 @@
+import { Button } from "@/components/shared/Button";
 import styles from "./Popup.module.css";
 import { PopupEnum } from "../../lib/popup";
 
@@ -33,7 +34,13 @@ export function Popup({
         <div className={styles.popup}>
           <h2>{title}</h2>
           <p>{message}</p>
-          <button onClick={onClose}> Sluiten </button>
+          <Button
+            variant="secondary"
+            className={styles.close}
+            onClick={onClose}
+          >
+            Sluiten
+          </Button>
         </div>
       </div>
     </div>

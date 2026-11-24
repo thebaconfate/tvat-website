@@ -1,14 +1,15 @@
 import { credentialsSchema } from "@/lib/domain/auth";
 import styles from "./LoginForm.module.css";
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
-import { Eye, EyeClosed, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { Button } from "@/components/shared/Button";
+import Field from "@/components/shared/Field";
+import Input from "@/components/shared/Input";
+import PasswordInput from "@/components/shared/PasswordInput";
 import { API_ROUTES, APP_ROUTES } from "@/lib/routes";
 import { navigate } from "astro:transitions/client";
 
 export default function LoginForm() {
-  const [visible, setVisible] = useState(false);
   const form = useForm({
     defaultValues: {
       password: "",
@@ -39,11 +40,12 @@ export default function LoginForm() {
           form.handleSubmit();
         }}
       >
+        {/* TODO: give login and forgot/reset password the same title size (h2 here, h1 there). */}
         <h2 className={styles.formTitle}>Inloggen</h2>
         <form.Field name="email">
           {(field) => (
-            <div className={`${styles.inputContainer} ${styles.container}`}>
-              <input
+            <Field label="E-mailadres" hideLabel>
+              <Input
                 type="email"
                 id={field.name}
                 name={field.name}
@@ -53,18 +55,15 @@ export default function LoginForm() {
                 placeholder="Email"
                 autoComplete="email"
                 required
+                trailing={<Mail aria-hidden="true" className={styles.icon} />}
               />
-              <div className={styles.inputIcon}>
-                <Mail></Mail>
-              </div>
-            </div>
+            </Field>
           )}
         </form.Field>
         <form.Field name="password">
           {(field) => (
-            <div className={styles.inputContainer}>
-              <input
-                type={visible ? "text" : "password"}
+            <Field label="Wachtwoord" hideLabel>
+              <PasswordInput
                 id={field.name}
                 name={field.name}
                 value={field.state.value}
@@ -74,14 +73,7 @@ export default function LoginForm() {
                 onChange={(e) => field.handleChange(e.target.value)}
                 autoComplete="current-password"
               />
-              <button
-                className={styles.inputIcon}
-                type="button"
-                onClick={() => setVisible((v) => !v)}
-              >
-                {visible ? <Eye /> : <EyeClosed />}
-              </button>
-            </div>
+            </Field>
           )}
         </form.Field>
         <form.Subscribe selector={(state) => state.errors}>

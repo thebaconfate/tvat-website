@@ -13,17 +13,6 @@
   margin: 0 10%;
 }
 
-.inputContainer {
-  display: grid;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.messageContainer {
-  display: grid;
-  gap: 0.4rem;
-}
-
 .title {
   text-align: center;
   margin-bottom: 1rem;
@@ -35,16 +24,19 @@
 }
 
 @media (min-width: 768px) {
-  .inputContainer {
-    grid-template-columns: 2fr 3fr;
-    gap: 1rem;
-  }
-
-  .messageContainer {
-    gap: 1rem;
-  }
   .title {
     margin-bottom: 2rem;
+  }
+  /* Label beside the field (2fr 3fr); an error goes under the field.
+     Two classes, so this wins over Field's own layout. */
+  .formContainer .inlineField {
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    align-items: center;
+    column-gap: 1rem;
+  }
+  .formContainer .inlineField > :nth-child(n + 3) {
+    grid-column: 2;
   }
   .textarea {
     min-height: 30%;
@@ -53,12 +45,12 @@
 
 @media (min-width: 1024px) {
   .textarea {
-    resize: both;
-    width: clamp(10rem, calc(0.5 * 100dvw), 30rem);
     height: clamp(10rem, calc(0.25 * 100dvh), 15rem);
   }
-
+  /* On large screens: no wider than this, centred. */
   .formContainer {
-    justify-content: center;
+    width: 100%;
+    max-width: 40rem;
+    margin-inline: auto;
   }
 }

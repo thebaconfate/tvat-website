@@ -1,3 +1,4 @@
+import Checkbox from "@/components/shared/Checkbox";
 import type { OrderData, OrderPatch } from "@/lib/domain/krambambouli";
 import styles from "./KrambambouliOrderItem.module.css";
 import { useMemo, useOptimistic, useState, useTransition } from "react";
@@ -155,9 +156,9 @@ type StatusCheckboxProps = {
 
 function StatusCheckbox({ label, checked, onChange }: StatusCheckboxProps) {
   return (
-    <input
-      type="checkbox"
-      aria-label={label}
+    <Checkbox
+      label={label}
+      hideLabel
       checked={checked}
       onChange={(e) => onChange(e.target.checked)}
     />

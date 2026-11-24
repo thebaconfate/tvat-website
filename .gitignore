@@ -35,3 +35,6 @@ populate-*.sql
 # local database backups/dumps (may contain production data)
 .db-backups/
 *.dump
+
+# Plans and specs from AI planning tools; docs/ is only for project documentation.
+docs/superpowers/

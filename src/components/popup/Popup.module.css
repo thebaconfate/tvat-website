@@ -43,11 +43,9 @@
   text-align: center;
 }
 
-.popup > button {
-  margin-left: auto;
+.close {
   display: block;
-  margin-right: auto;
-  padding: 0.3rem 0.6rem;
+  margin-inline: auto;
 }
 
 .errorPopup {

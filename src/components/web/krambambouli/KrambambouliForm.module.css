@@ -4,20 +4,28 @@
   justify-items: center;
 }
 
+/*
+ * Each product takes four rows of the products grid (image, title, details,
+ * quantity) through subgrid, so products side by side line up row by row:
+ * a longer description pushes the whole row down, not just its own buttons.
+ */
 .product {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 0.3rem;
   width: max(13rem, 40%);
 }
 
+/* Its title, details and quantity take part in the product's rows directly. */
 .productInfo {
-  display: grid;
-  gap: 0.3rem;
+  display: contents;
 }
 
+/* At the bottom of its row, so it stays close to its details when another title wraps. */
 .productTitle {
-  display: flex;
-  justify-content: center;
+  align-self: end;
+  text-align: start;
 }
 
 .product > picture {
@@ -34,7 +42,7 @@
 .productDetails {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.3rem;
 }
 
@@ -45,47 +53,41 @@
   font-weight: 500;
 }
 
-.productButtonContainer {
-  display: flex;
-  justify-content: space-evenly;
+/* The bottom of the card: the price, with the quantity under it. */
+.productFooter {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
 }
 
-.formContainer select,
-.formContainer input {
-  font-size: 1rem;
-}
-
-.productButtonContainer > * {
-  border-radius: 5px;
-  text-align: center;
+.productPrice {
+  font-weight: 600;
 }
 
 /*
-.productButtonContainer > button {
-  width: 2.5rem;
-  height: 2.5rem;
-  font-weight: 900;
+ * Centred in the card (the text above is left-aligned).
+ * stretch: − / + and the quantity get the same height, so their edges line up.
+ */
+.productButtonContainer {
   display: flex;
-  justify-content: center;
-  align-items: center;
-}
-*/
-
-.productButtonContainer > input {
-  width: clamp(3rem, 20%, 4rem);
+  justify-self: center;
+  align-items: stretch;
+  gap: 0.5rem;
 }
 
-.productButtonContainer > input[type="number"]::-webkit-inner-spin-button,
-.productButtonContainer > input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Hide the spinner in Firefox */
-.productButtonContainer > input[type="number"] {
+/* The quantity between − and +: narrow, centred, without the browser's spinner. */
+/* Two classes, so this width wins over the shared control's width: 100%. */
+.productButtonContainer .productInput {
+  width: 4rem;
+  text-align: center;
   appearance: textfield;
   -moz-appearance: textfield;
-  /* Remove default styling */
+}
+
+.productInput::-webkit-inner-spin-button,
+.productInput::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .formContainer form {
@@ -105,17 +107,22 @@
   gap: calc(var(--gap) / 2);
 }
 
-.fieldsContainer > :first-child {
+.nameRow {
   gap: var(--gap);
 }
 
-.fieldsContainer > :first-child > * {
+/* The pickup/delivery choices: a fieldset without its default frame. */
+.choiceGroup {
   display: grid;
-  grid-template-rows: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
-.radioButton {
-  margin-right: 5px;
+.choiceGroup legend {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
 }
 
 .deliveryRow {
@@ -134,62 +141,21 @@
   gap: 1rem;
 }
 
-.addressRow > :first-child {
+/* Street, number, bus: the street spans the row on phones. */
+.streetRow {
   display: grid;
-  grid-template-areas:
-    "address-label address-label"
-    "address-input address-input"
-    "housenumber-label bus-label"
-    "housenumber-input bus-input";
   grid-template-columns: 1fr 1fr;
-  gap: 2%;
+  gap: 0.75rem 1rem;
 }
 
-.addressRow > :first-child > :first-child {
-  grid-area: address-label;
+.street {
+  grid-column: 1 / -1;
 }
 
-.addressRow > :first-child > :nth-child(2) {
-  grid-area: address-input;
-}
-
-.addressRow:first-child > :nth-child(3) {
-  grid-area: housenumber-label;
-}
-
-.addressRow > :first-child > :nth-child(4) {
-  grid-area: housenumber-input;
-}
-
-.addressRow > :first-child > :nth-child(5) {
-  grid-area: bus-label;
-}
-
-.addressRow > :first-child > :nth-child(6) {
-  grid-area: bus-input;
-}
-
-.addressRow > :first-child > *,
-.addressRow > :last-child > * {
-  display: flex;
-  width: 100%;
-}
-
-.addressRow > :last-child {
+.cityRow {
   display: grid;
-  grid-template-areas:
-    "postcode-label city-label"
-    "postcode-input city-input";
-  grid-template-columns: 2fr 3fr; /* ← this is what you’re missing */
-  gap: 2%;
-}
-
-.addressRow > :last-child > :first-child {
-  grid-area: postcode-label;
-}
-
-.addressRow > :last-child > :nth-child(2) {
-  grid-area: postcode-input;
+  grid-template-columns: 2fr 3fr;
+  gap: 0.75rem 1rem;
 }
 
 .submitButtonContainer {
@@ -198,60 +164,13 @@
   margin-top: 1rem;
 }
 
-/*
-.submitButtonContainer > * {
-  padding: 0.5rem 1rem;
-  background-color: rgb(104, 41, 154);
-  color: white;
-  border: 0;
-  border-radius: 5px;
-  cursor: pointer;
-}
-*/
-
-#post::-webkit-outer-spin-button,
-#post::-webkit-inner-spin-button,
-#post {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-#post {
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-
-.formContainer input:not([type="radio"]) {
-  font-size: 1rem;
-  outline: none;
-  border-radius: 0.3rem;
-  border: solid lightgray 1px;
-  display: flex;
-  padding: 0.2rem 0.5rem;
-}
-
-.formCpntainer input:not(.productInput):not([type="radio"]) {
-  width: 100%;
-}
-
-.formContainer input::placeholder {
-  color: rgba(0, 0, 0, 0.45);
-}
-
-.formContainer input:focus-within:not([type="radio"]),
-.formContainer input:hover:not([type="radio"]) {
-  border-color: var(--main); /* change border when input focused */
-  box-shadow: 0 0 0 3px rgba(100, 53, 152, 0.15);
-}
-
 @media (min-width: 767px) {
   .productsContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .fieldsContainer > :first-child {
+  .nameRow {
     grid-template-columns: repeat(2, 1fr);
   }
   .deliveryRow {
@@ -263,13 +182,11 @@
     display: unset;
     gap: unset;
   }
-  .addressRow > :first-child {
-    display: grid;
-    grid-template-areas:
-      "address-label housenumber-label bus-label"
-      "address-input housenumber-input bus-input";
+  .streetRow {
     grid-template-columns: 2fr 1fr 1fr;
-    gap: 2%;
+  }
+  .street {
+    grid-column: auto;
   }
   .submitButtonContainer {
     display: flex;
