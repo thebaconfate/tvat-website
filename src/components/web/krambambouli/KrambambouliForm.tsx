@@ -326,44 +326,55 @@ export default function KrambambouliForm({
                     <h3 className={styles.productTitle}>{product.name}</h3>
                     <div className={styles.productDetails}>
                       <p>{product.description}</p>
-                      <p>{formatCurrency(product.price)}</p>
                     </div>
-                    <form.Field name={`cart[${i}].amount`}>
-                      {(field) => (
-                        <div className={styles.productButtonContainer}>
-                          <Button
-                            variant="stepper"
-                            type="button"
-                            onClick={() =>
-                              field.handleChange((old) => Math.max(0, old - 1))
-                            }
-                          >
-                            -
-                          </Button>
-                          <Input
-                            className={styles.productInput}
-                            type="number"
-                            aria-label={`Aantal ${product.name}`}
-                            value={field.state.value}
-                            onChange={(e) =>
-                              field.handleChange(
-                                Math.max(0, Math.trunc(Number(e.target.value))),
-                              )
-                            }
-                            name={`${product.id}-quantity`}
-                          />
-                          <Button
-                            variant="stepper"
-                            type="button"
-                            onClick={() =>
-                              field.handleChange((old) => Math.max(0, old + 1))
-                            }
-                          >
-                            +
-                          </Button>
-                        </div>
-                      )}
-                    </form.Field>
+                    <div className={styles.productFooter}>
+                      <p className={styles.productPrice}>
+                        {formatCurrency(product.price)}
+                      </p>
+                      <form.Field name={`cart[${i}].amount`}>
+                        {(field) => (
+                          <div className={styles.productButtonContainer}>
+                            <Button
+                              variant="stepper"
+                              type="button"
+                              onClick={() =>
+                                field.handleChange((old) =>
+                                  Math.max(0, old - 1),
+                                )
+                              }
+                            >
+                              -
+                            </Button>
+                            <Input
+                              className={styles.productInput}
+                              type="number"
+                              aria-label={`Aantal ${product.name}`}
+                              value={field.state.value}
+                              onChange={(e) =>
+                                field.handleChange(
+                                  Math.max(
+                                    0,
+                                    Math.trunc(Number(e.target.value)),
+                                  ),
+                                )
+                              }
+                              name={`${product.id}-quantity`}
+                            />
+                            <Button
+                              variant="stepper"
+                              type="button"
+                              onClick={() =>
+                                field.handleChange((old) =>
+                                  Math.max(0, old + 1),
+                                )
+                              }
+                            >
+                              +
+                            </Button>
+                          </div>
+                        )}
+                      </form.Field>
+                    </div>
                   </div>
                 </div>
               ))}

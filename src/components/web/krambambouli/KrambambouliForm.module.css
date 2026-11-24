@@ -53,10 +53,21 @@
   font-weight: 500;
 }
 
+/* The bottom of the card: the price, with the quantity under it. */
+.productFooter {
+  display: grid;
+  justify-items: start;
+  gap: 1rem;
+}
+
+.productPrice {
+  font-weight: 600;
+}
+
+/* stretch: − / + and the quantity get the same height, so their edges line up. */
 .productButtonContainer {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  align-items: stretch;
   gap: 0.5rem;
 }
 
