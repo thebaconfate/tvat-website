@@ -18,6 +18,7 @@ export default function ComponentsShowcase() {
   const [showPassword, setShowPassword] = useState(false);
   const [paid, setPaid] = useState(true);
   const [delivery, setDelivery] = useState("pickup");
+  const [amount, setAmount] = useState(2);
 
   return (
     <main className={styles.page}>
@@ -129,9 +130,34 @@ export default function ComponentsShowcase() {
           <Button variant="secondary">Secondary</Button>
           <Button variant="tertiary">Tertiary</Button>
           <Button variant="danger">Danger</Button>
-          <Button variant="stepper">+</Button>
           <Button variant="primary" disabled>
             Uitgeschakeld
+          </Button>
+          <Button variant="secondary" disabled>
+            Uitgeschakeld
+          </Button>
+        </div>
+        <div className={styles.stepper}>
+          <Button
+            variant="stepper"
+            aria-label="Eén minder"
+            onClick={() => setAmount((a) => Math.max(0, a - 1))}
+          >
+            −
+          </Button>
+          <Input
+            type="number"
+            aria-label="Aantal"
+            className={styles.amount}
+            value={amount}
+            onChange={(e) => setAmount(Number(e.target.value))}
+          />
+          <Button
+            variant="stepper"
+            aria-label="Eén meer"
+            onClick={() => setAmount((a) => a + 1)}
+          >
+            +
           </Button>
         </div>
       </section>
