@@ -4,6 +4,8 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { Eye, EyeClosed, Mail } from "lucide-react";
 import { Button } from "@/components/shared/Button";
+import Field from "@/components/shared/Field";
+import Input from "@/components/shared/Input";
 import { API_ROUTES, APP_ROUTES } from "@/lib/routes";
 import { navigate } from "astro:transitions/client";
 
@@ -42,8 +44,8 @@ export default function LoginForm() {
         <h2 className={styles.formTitle}>Inloggen</h2>
         <form.Field name="email">
           {(field) => (
-            <div className={`${styles.inputContainer} ${styles.container}`}>
-              <input
+            <Field label="E-mailadres">
+              <Input
                 type="email"
                 id={field.name}
                 name={field.name}
@@ -53,17 +55,15 @@ export default function LoginForm() {
                 placeholder="Email"
                 autoComplete="email"
                 required
+                trailing={<Mail aria-hidden="true" className={styles.icon} />}
               />
-              <div className={styles.inputIcon}>
-                <Mail></Mail>
-              </div>
-            </div>
+            </Field>
           )}
         </form.Field>
         <form.Field name="password">
           {(field) => (
-            <div className={styles.inputContainer}>
-              <input
+            <Field label="Wachtwoord">
+              <Input
                 type={visible ? "text" : "password"}
                 id={field.name}
                 name={field.name}
@@ -73,15 +73,25 @@ export default function LoginForm() {
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
                 autoComplete="current-password"
+                trailing={
+                  <Button
+                    type="button"
+                    variant="tertiary"
+                    className={styles.toggle}
+                    onClick={() => setVisible((v) => !v)}
+                    aria-label={
+                      visible ? "Verberg wachtwoord" : "Toon wachtwoord"
+                    }
+                  >
+                    {visible ? (
+                      <Eye aria-hidden="true" className={styles.icon} />
+                    ) : (
+                      <EyeClosed aria-hidden="true" className={styles.icon} />
+                    )}
+                  </Button>
+                }
               />
-              <button
-                className={styles.inputIcon}
-                type="button"
-                onClick={() => setVisible((v) => !v)}
-              >
-                {visible ? <Eye /> : <EyeClosed />}
-              </button>
-            </div>
+            </Field>
           )}
         </form.Field>
         <form.Subscribe selector={(state) => state.errors}>
