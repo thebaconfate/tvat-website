@@ -3,6 +3,8 @@ import { useForm } from "@tanstack/react-form";
 import { contactFormSchema } from "@/lib/domain/contact";
 import { Button } from "@/components/shared/Button";
 import { useState } from "react";
+import Field from "@/components/shared/Field";
+import { firstError } from "@/components/shared/firstError";
 import Input from "@/components/shared/Input";
 import Textarea from "@/components/shared/Textarea";
 import { API_ROUTES } from "@/lib/routes";
@@ -82,8 +84,7 @@ export default function ContactFormPage() {
             <h1 className={styles.title}>Contact</h1>
             <form.Field name="name">
               {(field) => (
-                <label htmlFor={field.name} className={styles.inputContainer}>
-                  Naam
+                <Field label="Naam" error={firstError(field.state.meta.errors)}>
                   <Input
                     id={field.name}
                     type="text"
@@ -92,13 +93,15 @@ export default function ContactFormPage() {
                     required
                     placeholder="Jane Doe"
                   />
-                </label>
+                </Field>
               )}
             </form.Field>
             <form.Field name="email">
               {(field) => (
-                <label htmlFor={field.name} className={styles.inputContainer}>
-                  E-mail
+                <Field
+                  label="E-mail"
+                  error={firstError(field.state.meta.errors)}
+                >
                   <Input
                     id={field.name}
                     type="email"
@@ -107,13 +110,15 @@ export default function ContactFormPage() {
                     required
                     placeholder="example@mail.com"
                   />
-                </label>
+                </Field>
               )}
             </form.Field>
             <form.Field name="subject">
               {(field) => (
-                <label htmlFor={field.name} className={styles.inputContainer}>
-                  Onderwerp
+                <Field
+                  label="Onderwerp"
+                  error={firstError(field.state.meta.errors)}
+                >
                   <Input
                     id={field.name}
                     type="text"
@@ -124,13 +129,15 @@ export default function ContactFormPage() {
                     required
                     placeholder="Onderwerp"
                   />
-                </label>
+                </Field>
               )}
             </form.Field>
             <form.Field name="message">
               {(field) => (
-                <div className={styles.messageContainer}>
-                  <label htmlFor="message">Bericht</label>
+                <Field
+                  label="Bericht"
+                  error={firstError(field.state.meta.errors)}
+                >
                   <Textarea
                     id="message"
                     name="message"
@@ -140,7 +147,7 @@ export default function ContactFormPage() {
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                   ></Textarea>
-                </div>
+                </Field>
               )}
             </form.Field>
             <Button>Opsturen</Button>
