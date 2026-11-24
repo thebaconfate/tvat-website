@@ -15,10 +15,6 @@
   --btn-primary-hover-bg: rgb(80, 40, 125);
   --btn-primary-text: white;
 
-  --btn-secondary-bg: rgb(235, 230, 245);
-  --btn-secondary-hover-bg: rgb(220, 215, 235);
-  --btn-secondary-text: var(--color-primary);
-
   --btn-tertiary-bg: transparent;
   --btn-tertiary-text: var(--color-primary);
   --btn-tertiary-hover-bg: rgba(100, 53, 152, 0.1);
