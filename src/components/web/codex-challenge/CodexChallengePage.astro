@@ -1,7 +1,13 @@
 ---
+import { getImage } from "astro:assets";
 import styles from "./CodexChallengePage.module.css";
 import CodexChallenge from "./CodexChallenge.tsx";
 import type { Song } from "@/lib/codex-challenge";
+import vlaamseLeeuw from "@/assets/images/vlaamse-leeuw.jpg";
+import waalseHaan from "@/assets/images/waalse-haan.png";
+import duitseDinges from "@/assets/images/duitse-dinges.png";
+import internationaal from "@/assets/images/internationaal.png";
+import type { FlagImages } from "./RandomSongPicker";
 
 interface Props {
   dutchSongs: Song[];
@@ -9,9 +15,19 @@ interface Props {
   germanSongs: Song[];
   otherSongs: Song[];
 }
+
+// The flags are shown at most ~150px wide; 300px stays sharp on high-density screens.
+const flag = async (src: ImageMetadata) =>
+  (await getImage({ src, width: 300 })).src;
+const flagImages: FlagImages = {
+  dutch: await flag(vlaamseLeeuw),
+  french: await flag(waalseHaan),
+  german: await flag(duitseDinges),
+  other: await flag(internationaal),
+};
 ---
 
 <main class={styles.contentContainer}>
   <h1 class={styles.title}>Codex Challenge</h1>
-  <CodexChallenge {...Astro.props} client:load />
+  <CodexChallenge {...Astro.props} flagImages={flagImages} client:load />
 </main>

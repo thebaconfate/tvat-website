@@ -2,6 +2,14 @@ import React, { useState } from "react";
 import styles from "./RandomSongPicker.module.css";
 import { LanguageEnum, type Language, type Song } from "@/lib/codex-challenge";
 
+/** The flag image URLs, prepared with getImage() by CodexChallengePage.astro. */
+export type FlagImages = {
+  dutch: string;
+  french: string;
+  german: string;
+  other: string;
+};
+
 interface Props {
   dutchSongs: Song[];
   frenchSongs: Song[];
@@ -10,6 +18,7 @@ interface Props {
   song?: Song;
   alreadySelectedSongs?: Set<Song>;
   setSong: (s: Song) => void;
+  flagImages: FlagImages;
 }
 
 const limit: Record<Language, number> = {
@@ -43,6 +52,7 @@ export default function RandomSongPicker({
   song,
   alreadySelectedSongs,
   setSong,
+  flagImages,
 }: Props) {
   const [error, setError] = useState<boolean>(false);
 
@@ -75,7 +85,7 @@ export default function RandomSongPicker({
         <div className={styles.langContainer}>
           <img
             className={styles.lang}
-            src="/vlaamse-leeuw.jpg"
+            src={flagImages.dutch}
             onClick={makeRandomFunction(dutchSongs)}
             alt="vlaamse leeuw"
           ></img>
@@ -94,7 +104,7 @@ export default function RandomSongPicker({
         <div className={styles.langContainer}>
           <img
             className={styles.lang}
-            src="/waalse-haan.png"
+            src={flagImages.french}
             onClick={makeRandomFunction(frenchSongs)}
             alt="waalse haan"
           ></img>
@@ -113,7 +123,7 @@ export default function RandomSongPicker({
         <div className={styles.langContainer}>
           <img
             className="lang"
-            src="/duitse-dinges.png"
+            src={flagImages.german}
             onClick={makeRandomFunction(germanSongs)}
             alt="duitse gemeenschap logo"
           ></img>
@@ -131,7 +141,7 @@ export default function RandomSongPicker({
         </div>
         <div className={styles.langContainer}>
           <img
-            src="/internationaal.png"
+            src={flagImages.other}
             onClick={makeRandomFunction(otherSongs)}
             alt="anders"
           ></img>

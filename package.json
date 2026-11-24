@@ -34,6 +34,7 @@
         "react-hook-form": "^7.92.0",
         "resend": "^6.38.1",
         "sanitize-html": "^2.18.2",
+        "sharp": "^0.35.5",
         "vscode-css-languageservice": "^6.3.10",
         "zed": "^0.1.0",
         "zod": "^4.6.7"
