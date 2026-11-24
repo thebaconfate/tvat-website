@@ -7,13 +7,14 @@ import {
   type Language,
   type Song,
 } from "@/lib/codex-challenge";
-import RandomSongPicker from "./RandomSongPicker";
+import RandomSongPicker, { type FlagImages } from "./RandomSongPicker";
 
 interface Props {
   dutchSongs: Song[];
   frenchSongs: Song[];
   germanSongs: Song[];
   otherSongs: Song[];
+  flagImages: FlagImages;
 }
 
 enum Mode {
@@ -36,6 +37,7 @@ export default function CodexChallenge({
   frenchSongs,
   germanSongs,
   otherSongs,
+  flagImages,
 }: Props) {
   const [mode, setMode] = useState<Mode>(Mode.Menu);
   const [totalScore, setTotalScore] = useState<Score>(initScores);
@@ -77,6 +79,7 @@ export default function CodexChallenge({
                   frenchSongs={frenchSongs}
                   germanSongs={germanSongs}
                   otherSongs={otherSongs}
+                  flagImages={flagImages}
                   song={song}
                   alreadySelectedSongs={songSet}
                   setSong={(newSong: Song) => {
@@ -129,6 +132,7 @@ export default function CodexChallenge({
                   frenchSongs={frenchSongs}
                   germanSongs={germanSongs}
                   otherSongs={otherSongs}
+                  flagImages={flagImages}
                   song={song}
                   setSong={setSong}
                 />

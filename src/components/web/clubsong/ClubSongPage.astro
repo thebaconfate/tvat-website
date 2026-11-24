@@ -1,10 +1,12 @@
 ---
+import { Image } from "astro:assets";
+import brussel from "@/assets/images/brussel.png";
 import styles from "./ClubSongPage.module.css";
 ---
 
 <main class={styles.contentContainer}>
   <picture class={styles.imgContainer}>
-    <img src="/brussel.png" alt="Grote markt" />
+    <Image src={brussel} alt="Grote markt" />
   </picture>
   <div class={styles.shoutContainer}>
     <h1>Kreet</h1>
