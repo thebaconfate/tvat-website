@@ -4,20 +4,30 @@
   justify-items: center;
 }
 
+/*
+ * Each product takes four rows of the products grid (image, title, details,
+ * quantity) through subgrid, so products side by side line up row by row:
+ * a longer description pushes the whole row down, not just its own buttons.
+ */
 .product {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  row-gap: 0.3rem;
   width: max(13rem, 40%);
 }
 
+/* Its title, details and quantity take part in the product's rows directly. */
 .productInfo {
-  display: grid;
-  gap: 0.3rem;
+  display: contents;
 }
 
+/* At the bottom of its row, so it stays close to its details when another title wraps. */
 .productTitle {
   display: flex;
   justify-content: center;
+  align-self: end;
+  text-align: center;
 }
 
 .product > picture {
