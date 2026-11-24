@@ -64,9 +64,13 @@
   font-weight: 600;
 }
 
-/* stretch: − / + and the quantity get the same height, so their edges line up. */
+/*
+ * Centred in the card (the text above is left-aligned).
+ * stretch: − / + and the quantity get the same height, so their edges line up.
+ */
 .productButtonContainer {
   display: flex;
+  justify-self: center;
   align-items: stretch;
   gap: 0.5rem;
 }
