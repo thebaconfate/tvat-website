@@ -6,7 +6,7 @@ name: Sync activities
 on:
   schedule:
     # Every hour at :17, not :00: GitHub delays more scheduled runs at the top of the hour.
-    - cron: "57 * * * *"
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions: {}
