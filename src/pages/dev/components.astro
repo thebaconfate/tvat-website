@@ -1,0 +1,11 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ComponentsShowcase from "@/components/dev/ComponentsShowcase";
+
+// Only for looking at the shared components while developing; production gets a 404.
+if (!import.meta.env.DEV) return new Response(null, { status: 404 });
+---
+
+<Layout title="Componenten">
+  <ComponentsShowcase client:load />
+</Layout>
