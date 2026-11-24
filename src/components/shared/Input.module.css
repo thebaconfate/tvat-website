@@ -9,10 +9,13 @@
   padding-inline-end: 2.75rem;
 }
 
+/* One fixed column, centred, so every trailing icon or button lands in the same place. */
 .trailing {
   position: absolute;
   inset-block: 0;
   inset-inline-end: 0.25rem;
+  width: 2rem;
   display: flex;
   align-items: center;
+  justify-content: center;
 }

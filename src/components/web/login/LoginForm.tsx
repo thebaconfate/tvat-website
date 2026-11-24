@@ -40,10 +40,11 @@ export default function LoginForm() {
           form.handleSubmit();
         }}
       >
+        {/* TODO: give login and forgot/reset password the same title size (h2 here, h1 there). */}
         <h2 className={styles.formTitle}>Inloggen</h2>
         <form.Field name="email">
           {(field) => (
-            <Field label="E-mailadres">
+            <Field label="E-mailadres" hideLabel>
               <Input
                 type="email"
                 id={field.name}
@@ -61,7 +62,7 @@ export default function LoginForm() {
         </form.Field>
         <form.Field name="password">
           {(field) => (
-            <Field label="Wachtwoord">
+            <Field label="Wachtwoord" hideLabel>
               <PasswordInput
                 id={field.name}
                 name={field.name}

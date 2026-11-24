@@ -73,7 +73,11 @@ export default function ResetPasswordForm({ token = "" }: Props) {
         <>
           <form.Field name="password">
             {(field) => (
-              <Field label="Nieuw wachtwoord" className={styles.field}>
+              <Field
+                label="Nieuw wachtwoord"
+                hideLabel
+                className={styles.field}
+              >
                 <PasswordInput
                   value={field.state.value}
                   placeholder="Password"
@@ -85,7 +89,11 @@ export default function ResetPasswordForm({ token = "" }: Props) {
           </form.Field>
           <form.Field name="passwordConfirm">
             {(field) => (
-              <Field label="Bevestig wachtwoord" className={styles.field}>
+              <Field
+                label="Bevestig wachtwoord"
+                hideLabel
+                className={styles.field}
+              >
                 <Input
                   type="password"
                   value={field.state.value}

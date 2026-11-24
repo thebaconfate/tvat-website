@@ -8,6 +8,8 @@ type FieldProps = {
   error?: ReactNode;
   /** Help text under the control, e.g. "Minstens 8 tekens". */
   hint?: ReactNode;
+  /** Keep the label for screen readers only, when the placeholder already says it. */
+  hideLabel?: boolean;
   className?: string;
   /** One control: Input, Select or Textarea. */
   children: ReactElement<{
@@ -25,6 +27,7 @@ export default function Field({
   label,
   error,
   hint,
+  hideLabel = false,
   className,
   children,
 }: FieldProps) {
@@ -36,7 +39,10 @@ export default function Field({
 
   return (
     <div className={cx(styles.field, className)}>
-      <label htmlFor={id} className={styles.label}>
+      <label
+        htmlFor={id}
+        className={hideLabel ? styles.visuallyHidden : styles.label}
+      >
         {label}
       </label>
       {cloneElement(children, {
