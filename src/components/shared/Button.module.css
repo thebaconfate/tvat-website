@@ -37,38 +37,45 @@
   background-color: var(--btn-primary-hover-bg);
 }
 
-/* Outlined; filled purple on hover. */
-.secondary {
+/*
+ * Secondary and stepper: outlined in --btn-accent, filled with it on hover.
+ * --btn-accent defaults to --color-accent (plum); --btn-accent-text is the text on the fill.
+ */
+.secondary,
+.stepper {
   background-color: white;
-  color: var(--color-primary);
-  box-shadow: inset 0 0 0 2px var(--color-primary);
+  color: var(--btn-accent, var(--color-accent));
+  box-shadow: inset 0 0 0 2px var(--btn-accent, var(--color-accent));
 }
 
-.secondary:hover:not(:disabled) {
-  background-color: var(--color-primary);
-  color: white;
+.secondary:hover:not(:disabled),
+.stepper:hover:not(:disabled) {
+  background-color: var(--btn-accent, var(--color-accent));
+  color: var(--btn-accent-text, white);
 }
 
+/* Text in the accent colour, with a light tint on hover. */
+/* A light tint of the accent, stronger on hover. */
 .tertiary {
-  background-color: var(--btn-tertiary-bg);
-  color: var(--btn-tertiary-text);
+  background-color: color-mix(
+    in srgb,
+    var(--btn-accent, var(--color-accent)) 8%,
+    white
+  );
+  color: var(--btn-accent, var(--color-accent));
 }
 
 /* The − and + next to a quantity: like secondary, but bold. */
 .stepper {
-  background-color: white;
-  color: var(--color-primary);
-  box-shadow: inset 0 0 0 2px var(--color-primary);
   font-weight: 700;
 }
 
-.stepper:hover:not(:disabled) {
-  background-color: var(--color-primary);
-  color: white;
-}
-
 .tertiary:hover:not(:disabled) {
-  background-color: var(--btn-tertiary-hover-bg);
+  background-color: color-mix(
+    in srgb,
+    var(--btn-accent, var(--color-accent)) 18%,
+    white
+  );
 }
 
 .danger {

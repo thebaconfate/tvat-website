@@ -7,6 +7,8 @@
 
 :root {
   --color-primary: rgb(100, 53, 152);
+  /* Plum (wine purple): secondary, tertiary and stepper buttons. */
+  --color-accent: #6b1f4f;
   --color-success: rgb(54, 149, 34);
   --color-warning: rgb(255, 239, 62);
   --color-danger: rgb(175, 36, 36);
@@ -15,9 +17,6 @@
   --btn-primary-hover-bg: rgb(80, 40, 125);
   --btn-primary-text: white;
 
-  --btn-tertiary-bg: transparent;
-  --btn-tertiary-text: var(--color-primary);
-  --btn-tertiary-hover-bg: rgba(100, 53, 152, 0.1);
 
   --color-success-bg: rgba(54, 149, 34, 0.1);
   --color-success-text: rgb(54, 149, 34);
