@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+import pinnen from "@/assets/images/pinnen.png";
 import Layout from "../layouts/Layout.astro";
 
 const title = "Geschiedenis";
@@ -7,7 +9,7 @@ const title = "Geschiedenis";
 <Layout title={title}>
   <main>
     <picture>
-      <img src="pinnen.png" alt="" />
+      <Image src={pinnen} alt="" />
     </picture>
     <div class="history-container">
       <p>

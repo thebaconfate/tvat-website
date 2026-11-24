@@ -1,4 +1,6 @@
 ---
+import { Image } from "astro:assets";
+import bannerforms from "@/assets/images/bannerforms.png";
 import Layout from "../layouts/Layout.astro";
 
 const title = "Lustrumgalabal";
@@ -39,7 +41,7 @@ function fmtDateDiff() {
 <Layout title={title}>
   <main>
     <picture class="banner-container">
-      <img class="banner" src="/bannerforms.png" alt="" />
+      <Image class="banner" src={bannerforms} alt="" />
     </picture>
     <div class="form-container">
       <h1>Inschrijven voor het Lustrumgalabal</h1>

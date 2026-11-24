@@ -2,32 +2,42 @@
 import { ROUTES } from "@/lib/routes";
 import styles from "./AboutUsPage.module.css";
 import Banner from "../shared/Banner.astro";
+import { Image } from "astro:assets";
+import stVePin2018 from "@/assets/images/st-ve-pin-2018.png";
+import lustrumPin50 from "@/assets/images/tvat-50-jr-lustrumpin.png";
+import stVPin2008 from "@/assets/images/St-V-Pin-2008.png";
+import lustrumSchild55 from "@/assets/images/Lustrum-schild-55jr.png";
+import stMichTekening from "@/assets/images/st-mich-tekening-tshirt.jpg";
+import lustrumEtiket from "@/assets/images/Lustrum-Etiket.png";
+import vliegendVat from "@/assets/images/vliegend-vat.jpg";
+import pinnen from "@/assets/images/pinnen.png";
+import krambambouliLogo from "@/assets/images/krambambouli_logo_short.jpg";
 ---
 
 <main>
   <Banner class={styles.banner}>
     <picture>
-      <img src="/st-ve-pin-2018.png" alt="st-ve-pin-2018" />
+      <Image src={stVePin2018} alt="st-ve-pin-2018" width={800} />
     </picture>
     <picture>
       <img src="/tvat-55-jr-lustrumpin.svg" alt="tvat-55-jr-lustrumpin" />
     </picture>
     <picture>
-      <img src="/tvat-50-jr-lustrumpin.png" alt="tvat-50-jr-lustrumpin" />
+      <Image src={lustrumPin50} alt="tvat-50-jr-lustrumpin" width={800} />
     </picture>
   </Banner>
   <Banner class={styles.laptopBanner}>
     <picture>
-      <img src="/St-V-Pin-2008.png" alt="tvat-55-jr-lustrumpin" />
+      <Image src={stVPin2008} alt="tvat-55-jr-lustrumpin" width={800} />
     </picture>
     <picture>
-      <img src="/st-ve-pin-2018.png" alt="st-ve-pin-2018" />
+      <Image src={stVePin2018} alt="st-ve-pin-2018" width={800} />
     </picture>
     <picture>
       <img src="/codexkennis-challenge-pin.svg" alt="tvat-50-jr-lustrumpin" />
     </picture>
     <picture>
-      <img src="/tvat-50-jr-lustrumpin.png" alt="tvat-50-jr-lustrumpin" />
+      <Image src={lustrumPin50} alt="tvat-50-jr-lustrumpin" width={800} />
     </picture>
     <picture>
       <img src="/tvat-55-jr-lustrumpin.svg" alt="tvat-55-jr-lustrumpin" />
@@ -35,7 +45,7 @@ import Banner from "../shared/Banner.astro";
   </Banner>
   <div class={styles.paragraph}>
     <picture class={styles.largeScreenPicture}>
-      <img src="/Lustrum-schild-55jr.png" alt="st-ve-pin-2018" />
+      <Image src={lustrumSchild55} alt="st-ve-pin-2018" width={800} />
     </picture>
     <p>
       <span class={styles.title}>'t VAT</span>
@@ -49,18 +59,18 @@ import Banner from "../shared/Banner.astro";
   </div>
   <div class={styles.banner}>
     <picture>
-      <img src="/st-mich-tekening-tshirt.jpg" alt="st-mich-tekening-tshirt" />
+      <Image src={stMichTekening} alt="st-mich-tekening-tshirt" />
     </picture>
     <picture>
-      <img src="/Lustrum-Etiket.png" alt="lustrum-etiket" />
+      <Image src={lustrumEtiket} alt="lustrum-etiket" width={800} />
     </picture>
     <picture>
-      <img src="/vliegend-vat.jpg" alt="vliegend-vat" />
+      <Image src={vliegendVat} alt="vliegend-vat" width={800} />
     </picture>
   </div>
   <div class={`${styles.paragraph} ${styles.reverse} `}>
     <picture class={styles.largeScreenPicture}>
-      <img src="/vliegend-vat.jpg" alt="vliegend-vat" />
+      <Image src={vliegendVat} alt="vliegend-vat" width={800} />
     </picture>
     <p>
       Een van de dingen die ’t VAT het meest onderscheidt van andere kringen is
@@ -77,11 +87,11 @@ import Banner from "../shared/Banner.astro";
     </p>
   </div>
   <picture class={styles.oldPins}>
-    <img src="/pinnen.png" alt="pinnen" />
+    <Image src={pinnen} alt="pinnen" />
   </picture>
   <div class={styles.paragraph}>
     <picture class={styles.largeScreenPicture}>
-      <img src="/st-mich-tekening-tshirt.jpg" alt="st-mich-tekening-tshirt" />
+      <Image src={stMichTekening} alt="st-mich-tekening-tshirt" />
     </picture>
     <p>
       Verder wordt ’t VAT gekenmerkt door zijn prominente aanwezigheid op menig
@@ -95,10 +105,10 @@ import Banner from "../shared/Banner.astro";
   </div>
   <Banner class={styles.banner}>
     <picture>
-      <img src="/St-V-Pin-2008.png" alt="tvat-55-jr-lustrumpin" />
+      <Image src={stVPin2008} alt="tvat-55-jr-lustrumpin" width={800} />
     </picture>
     <picture>
-      <img src="/Lustrum-schild-55jr.png" alt="st-ve-pin-2018" />
+      <Image src={lustrumSchild55} alt="st-ve-pin-2018" width={800} />
     </picture>
     <picture>
       <img src="/codexkennis-challenge-pin.svg" alt="tvat-50-jr-lustrumpin" />
@@ -106,7 +116,7 @@ import Banner from "../shared/Banner.astro";
   </Banner>
   <div class={`${styles.paragraph} ${styles.reverse}`}>
     <picture class={styles.largeScreenPicture}>
-      <img src="/krambambouli_logo_short.jpg" alt="krambambouli_logo_short" />
+      <Image src={krambambouliLogo} alt="krambambouli_logo_short" width={800} />
     </picture>
     <div class={styles.krambambouliParagraph}>
       <p>
