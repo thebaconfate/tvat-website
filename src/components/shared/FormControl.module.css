@@ -14,11 +14,11 @@
 }
 
 .control:hover,
-.control:focus-visible {
+.control:focus {
   border-color: var(--color-primary);
 }
 
-.control:focus-visible {
+.control:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
 }
 
@@ -26,7 +26,7 @@
   border-color: var(--color-danger);
 }
 
-.control[aria-invalid="true"]:focus-visible {
+.control[aria-invalid="true"]:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 15%, transparent);
 }
 
