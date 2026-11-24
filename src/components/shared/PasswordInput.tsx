@@ -1,5 +1,5 @@
 import { useState, type InputHTMLAttributes } from "react";
-import { Eye, EyeClosed } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import Input from "./Input";
 import styles from "./PasswordInput.module.css";
 
@@ -8,7 +8,7 @@ type PasswordInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
 /** A password field with a button inside it that shows or hides the password. */
 export default function PasswordInput(props: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
-  const Icon = visible ? Eye : EyeClosed;
+  const Icon = visible ? Eye : EyeOff;
   return (
     <Input
       {...props}

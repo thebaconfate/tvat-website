@@ -42,12 +42,13 @@ export default function ForgotPasswordForm() {
       }}
       className={styles.form}
     >
+      {/* TODO: give login and forgot/reset password the same title size (h1 here, h2 on login). */}
       <h1 className={styles.formTitle}>Forgot password</h1>
       {!submitted ? (
         <>
           <form.Field name="email">
             {(field) => (
-              <Field label="E-mailadres" className={styles.field}>
+              <Field label="E-mailadres" hideLabel className={styles.field}>
                 <Input
                   type="email"
                   id={field.name}
