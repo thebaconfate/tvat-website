@@ -7,8 +7,17 @@ import type { Page } from "@/lib/domain/page";
 import z from "zod/v4";
 import { Repository } from "../repository";
 
+/** An activity from the BSK calendar, ready to store. */
+export type ImportedBSKActivity = {
+  bskId: string;
+  name: string;
+  localTime: string;
+  place: string | null;
+  url: string | null;
+  bskUpdatedAt: string;
+};
+
 export class ActivitiesRepository extends Repository {
-  /** A page of activities, soonest first. Dates filter on whole UTC days. */
   async getActivities(
     pageNumber: number = 1,
     pageSize: number = 10,
@@ -48,7 +57,6 @@ export class ActivitiesRepository extends Repository {
       conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     params.push(pageSize, (pageNumber - 1) * pageSize);
 
-    // COUNT(*) OVER () counts every matching row, before LIMIT and OFFSET apply.
     const sql = `
       SELECT
         id,
@@ -80,6 +88,59 @@ export class ActivitiesRepository extends Repository {
         totalElements,
         totalPages: Math.ceil(totalElements / pageSize),
       },
+    };
+  }
+
+  async syncBskActivities(
+    activities: ImportedBSKActivity[],
+  ): Promise<{ changed: number; removed: number }> {
+    const sql = `
+      WITH incoming AS (
+        SELECT *
+        FROM UNNEST(
+          $1::text[], $2::text[], $3::timestamp[], $4::text[], $5::text[],
+          $6::timestamptz[]
+        ) AS i(bsk_id, name, local_time, place, url, bsk_edited_at)
+      ),
+      changed AS (
+        INSERT INTO activities (bsk_id, name, occurs_at, location_name, facebook_url, updated_at)
+        SELECT bsk_id, name, local_time AT TIME ZONE 'Europe/Brussels', place, url, bsk_edited_at
+        FROM incoming
+        ON CONFLICT (bsk_id) DO UPDATE SET
+          name = EXCLUDED.name,
+          occurs_at = EXCLUDED.occurs_at,
+          location_name = EXCLUDED.location_name,
+          facebook_url = EXCLUDED.facebook_url,
+          updated_at = EXCLUDED.updated_at
+        WHERE EXCLUDED.updated_at > activities.updated_at
+          AND (activities.name, activities.occurs_at, activities.location_name, activities.facebook_url)
+          IS DISTINCT FROM
+              (EXCLUDED.name, EXCLUDED.occurs_at, EXCLUDED.location_name, EXCLUDED.facebook_url)
+        RETURNING 1
+      ),
+      removed AS (
+        DELETE FROM activities a
+        WHERE a.bsk_id IS NOT NULL
+          AND NOT EXISTS (SELECT 1 FROM incoming i WHERE i.bsk_id = a.bsk_id)
+        RETURNING 1
+      )
+      SELECT
+        (SELECT COUNT(*) FROM changed) AS changed,
+        (SELECT COUNT(*) FROM removed) AS removed`;
+    const { rows } = await this.db.query<{ changed: string; removed: string }>(
+      sql,
+      [
+        activities.map((a) => a.bskId),
+        activities.map((a) => a.name),
+        activities.map((a) => a.localTime),
+        activities.map((a) => a.place),
+        activities.map((a) => a.url),
+        activities.map((a) => a.bskUpdatedAt),
+      ],
+    );
+    return {
+      changed: Number(rows[0].changed),
+      removed: Number(rows[0].removed),
     };
   }
 }

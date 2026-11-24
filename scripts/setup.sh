@@ -4,11 +4,12 @@
 #   1. Tools: Node 26, pnpm and Docker (with compose). With mise installed, mise installs the
 #      versions pinned in mise.toml; without it, the script checks what's there.
 #   2. .env: created with local defaults and a generated database password, or checked for
-#      keys that are missing. The README explains every variable.
+#      keys that are missing. docs/configuration.md explains every variable.
 #   3. pnpm install --frozen-lockfile
 #   4. The local database (Docker). A new one gets the schema and development data from
-#      dev/postgres/.
-#   5. Optionally a copy of the production data (scripts/db-pull.sh, needs Railway access).
+#      dev/postgres/; then the migrations in migrations/ are applied (pnpm db:migrate).
+#   5. Optionally a copy of the production data (scripts/db-pull.sh, needs Railway access),
+#      followed by the migrations it doesn't have yet.
 #
 # Usage: scripts/setup.sh [--yes] [--pull]
 #   --yes    don't ask anything (no production copy unless --pull is given too)
@@ -98,10 +99,10 @@ fi
 # --- 2. .env ------------------------------------------------------------------
 
 # The .env a new checkout gets: enough to run locally. Every key here is checked in an
-# existing .env too. The README ("Configuration") explains each one.
+# existing .env too. docs/configuration.md explains each one.
 env_template() {
   cat <<EOF
-# Local settings, see "Configuration" in the README. Never commit this file.
+# Local settings, see docs/configuration.md. Never commit this file.
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=tvat
@@ -114,6 +115,7 @@ IBAN=BE00 0000 0000 0000
 BIC=GEBABEBB
 ACCOUNTHOLDER="'t VAT"
 BOOTSTRAP_TOKEN=
+SYNC_TOKEN=
 EOF
 }
 
@@ -154,7 +156,7 @@ if [[ -f .env ]]; then
     grep -qE "^${key}=" .env || missing_keys+=("$key")
   done < <(env_template x | grep -oE '^[A-Z_]+=' | tr -d '=')
   if ((${#missing_keys[@]})); then
-    info "exists, but lacks: ${missing_keys[*]} (see \"Configuration\" in the README)"
+    info "exists, but lacks: ${missing_keys[*]} (see docs/configuration.md)"
   else
     info "exists and has every key the site needs"
   fi
@@ -212,6 +214,8 @@ if [[ "$(db_query "select count(*) from information_schema.columns where table_n
   info "Recreate it with 'docker compose down -v' (deletes the local data) and run this again,"
   info "or replace its data with a copy of production (--pull)."
 fi
+info "applying migrations ..."
+pnpm --silent db:migrate | sed 's/^/    /'
 info "ready on localhost:${DB_PORT:-$(env_get DB_PORT)}: $(db_query "select count(*) from products") products, $(db_query "select count(*) from krambambouli_orders") orders"
 
 # --- 5. Production data (optional) ----------------------------------------------
@@ -220,8 +224,10 @@ if $PULL || { command -v railway >/dev/null 2>&1 &&
   ask "Replace the local data with a copy of production (needs access to the Railway project)?" n; }; then
   step "Production data"
   scripts/db-pull.sh --yes
+  info "applying migrations production doesn't have yet ..."
+  pnpm --silent db:migrate | sed 's/^/    /'
 fi
 
 step "Done"
 info "start the site:  pnpm dev   (http://localhost:4321)"
-info "first admin user: see 'Creating the first user' in the README"
+info "first admin user: see docs/first-user.md"

@@ -10,6 +10,7 @@ const PUBLIC_API_ROUTES: [{ url: string }, Method[]][] = [
   [{ url: "/api/krambambouli/order" }, ["POST"]],
   [API_ROUTES.CONTACT, ["POST"]],
   [API_ROUTES.ACTIVITIES, ["GET"]],
+  [API_ROUTES.ACTIVITIES.SYNC, ["POST"]], // guarded by SYNC_TOKEN (.github/workflows/sync-activities.yml)
   [API_ROUTES.AUTH.LOGIN, ["POST"]],
   [API_ROUTES.AUTH.AUTHENTICATE, ["GET"]], // only reports whether the caller's own cookie is valid
   [API_ROUTES.AUTH.FORGOT_PASSWORD, ["POST"]],

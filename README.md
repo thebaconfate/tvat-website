@@ -20,97 +20,19 @@ It's safe to re-run, and it:
 1. installs the tools pinned in `mise.toml` (Node 26, pnpm, the Railway CLI) if you have
    [mise](https://mise.jdx.dev), and otherwise checks the tools on your `PATH`
 2. creates `.env` with local defaults and a generated database password
+   ([configuration](docs/configuration.md))
 3. runs `pnpm install`
-4. starts the local database in Docker; a new one gets the schema and development data
+4. starts the local database in Docker; a new one gets the schema and development data, and
+   then the migrations ([database](docs/database.md))
 5. offers to copy the production data, if you have access to the Railway project
 
-Then start the site with `pnpm dev` and open <http://localhost:4321>.
+Then start the site with `pnpm dev` and open <http://localhost:4321>. To log in to the admin
+section, [create the first user](docs/first-user.md).
 
 `scripts/setup.sh --help` lists its options; with mise, `mise run setup` does the same.
 
 > **colima** (Docker without Docker Desktop) only shares your home directory with its VM by
 > default, so keep the repo somewhere under `~`.
-
-## Configuration
-
-Settings come from `.env`, which is gitignored: never commit it. `scripts/setup.sh` creates
-one with values that are enough to run the site locally, and on a re-run reports keys that
-are missing.
-
-| Variable          | What it's for                                                     | Local default              |
-| :---------------- | :---------------------------------------------------------------- | :------------------------- |
-| `DB_HOST`         | Database host                                                     | `localhost`                |
-| `DB_PORT`         | Database port; also the port Docker exposes the database on       | `5432`                     |
-| `DB_USER`         | Database user, created by Docker on a new volume                  | `tvat`                     |
-| `DB_PASSWORD`     | Database password, set by Docker on a new volume                  | generated                  |
-| `DB_DATABASE`     | Database name                                                     | `tvat`                     |
-| `RESEND_API_KEY`  | API key for sending emails with Resend                            | placeholder: sending fails |
-| `DOMAIN`          | Domain emails are sent from (`no-reply@DOMAIN`)                   | `example.com`              |
-| `VATMAIL`         | Address contact form messages are sent to                         | `dev@example.com`          |
-| `IBAN`            | Payment details shown in the order confirmation email             | placeholder                |
-| `BIC`             | (idem)                                                            | placeholder                |
-| `ACCOUNTHOLDER`   | (idem)                                                            | `'t VAT`                   |
-| `BOOTSTRAP_TOKEN` | Enables creating the first user, see below; leave empty otherwise | empty                      |
-
-**Real values for `DOMAIN`, `VATMAIL`, `IBAN`, `BIC` and `ACCOUNTHOLDER`** are kept as GitHub
-repository variables (Settings → Secrets and variables → Actions → Variables), which people
-with write access to the repo can read. They aren't secrets, but they don't belong in the
-public code either. When `gh` is installed and logged in, `setup.sh` fills them into a new
-`.env`. When one changes, update it there (`gh variable set IBAN`) and in Railway, where
-production reads it.
-
-Secrets, like the production `RESEND_API_KEY`, are only kept in Railway. With the placeholder
-Resend key, sending an email fails and is logged, and orders still go through.
-
-`scripts/db-pull.sh` also reads `RAILWAY_DB_SERVICE` (default `Postgres`) and
-`RAILWAY_DB_ENV` (default: the linked environment) when they're set.
-
-## Database
-
-The local database runs in Docker (`docker-compose.yml`). When its volume is first created,
-Postgres loads:
-
-- `dev/postgres/initialize-postgres.sql`: the schema
-- `dev/postgres/seed.sql`: reference data (roles, products, delivery zones, pickup points),
-  without any personal data
-
-These scripts only run on a new volume. To start over with a fresh database (this deletes
-your local data):
-
-```sh
-docker compose down -v && scripts/setup.sh
-```
-
-**Changing the schema:** update `initialize-postgres.sql` (and `seed.sql` if needed) in the
-same commit as the code that needs the change, and apply the same change to the production
-database.
-
-**A copy of production:** `scripts/db-pull.sh` (or `mise run db:pull`) replaces your local
-database with a copy of production's. It runs `pg_dump` inside the Railway Postgres service
-over `railway ssh`, so the production database needs no public endpoint, and it backs up your
-local database to `.db-backups/` first. You need access to the Railway project
-(`railway login`, `railway link`). The PostgreSQL tools it uses locally run inside the
-database container, so they needn't be installed.
-
-## Creating the first user
-
-The admin section needs an account. The first one (the root user) is created through a
-bootstrap route that only works while `BOOTSTRAP_TOKEN` is set and no root user exists yet:
-
-1. Set `BOOTSTRAP_TOKEN` in `.env` to a random value and restart `pnpm dev`.
-2. Create the user:
-
-   ```sh
-   curl -X POST http://localhost:4321/api/auth/station \
-     -H "Content-Type: application/json" \
-     -H "x-bootstrap-token: <your BOOTSTRAP_TOKEN>" \
-     -d '{"email": "you@example.com", "firstName": "First", "lastName": "Last", "password": "<password>"}'
-   ```
-
-   The password needs at least 8 characters, with a lowercase and an uppercase letter, a
-   number and a special character.
-
-3. Clear `BOOTSTRAP_TOKEN` again, and log in at <http://localhost:4321/login>.
 
 ## Commands
 
@@ -121,12 +43,14 @@ bootstrap route that only works while `BOOTSTRAP_TOKEN` is set and no root user 
 | `pnpm build`           | Type-check (`astro check`) and build into `./dist/`           |
 | `pnpm preview`         | Serve the production build locally                            |
 | `pnpm email:dev`       | Preview the email templates (`emails/`)                       |
+| `pnpm db:migrate`      | Apply the database migrations the database doesn't have yet   |
 | `scripts/db-pull.sh`   | Replace the local database with a copy of production          |
 | `docker compose up -d` | Start the local database (`mise run db:up` also waits for it) |
 
-## Deployment
+## Documentation
 
-Pushing to `main` deploys to production. The **Build** workflow
-(`.github/workflows/build.yml`) type-checks and builds every pull request and every push to
-`main`. After a successful build of `main`, **Deploy to railway** (`deploy.yml`) runs
-`railway up`, and Railway builds the `Dockerfile` and deploys it.
+- [Configuration](docs/configuration.md): the `.env` variables, and where the real values live
+- [Database](docs/database.md): the local database, migrations, copying production
+- [Activities](docs/activities.md): the sync with the BSK calendar
+- [Creating the first user](docs/first-user.md): the first admin account
+- [Deployment](docs/deployment.md): how `main` reaches production, and its migrations
