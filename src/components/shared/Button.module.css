@@ -13,6 +13,11 @@
   text-decoration: none;
 }
 
+.button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .button:active {
   transform: translateY(1px);
 }
