@@ -13,6 +13,10 @@ import { useForm } from "@tanstack/react-form";
 import z4 from "zod/v4";
 import { productSchema } from "@/lib/domain/products";
 import { Button } from "@/components/shared/Button";
+import Field from "@/components/shared/Field";
+import { firstError } from "@/components/shared/firstError";
+import Input from "@/components/shared/Input";
+import Radio from "@/components/shared/Radio";
 import type { PriceData } from "@/lib/domain/price";
 import { API_ROUTES } from "@/lib/routes";
 import { orderSchema } from "@/lib/domain/krambambouli/order.schema";
@@ -334,9 +338,10 @@ export default function KrambambouliForm({
                           >
                             -
                           </Button>
-                          <input
+                          <Input
                             className={styles.productInput}
                             type="number"
+                            aria-label={`Aantal ${product.name}`}
                             value={field.state.value}
                             onChange={(e) =>
                               field.handleChange(
@@ -364,12 +369,14 @@ export default function KrambambouliForm({
           )}
         </form.Field>
         <div className={styles.fieldsContainer}>
-          <div className={styles.fieldRow}>
+          <div className={styles.nameRow}>
             <form.Field name="firstName">
               {(field) => (
-                <div className={styles.fieldCol}>
-                  <label htmlFor={field.name}>Voornaam</label>
-                  <input
+                <Field
+                  label="Voornaam"
+                  error={firstError(field.state.meta.errors)}
+                >
+                  <Input
                     id={field.name}
                     type="text"
                     placeholder="John"
@@ -378,14 +385,16 @@ export default function KrambambouliForm({
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
-                </div>
+                </Field>
               )}
             </form.Field>
             <form.Field name="lastName">
               {(field) => (
-                <div className={styles.fieldCol}>
-                  <label htmlFor={field.name}>Achternaam</label>
-                  <input
+                <Field
+                  label="Achternaam"
+                  error={firstError(field.state.meta.errors)}
+                >
+                  <Input
                     id={field.name}
                     type="text"
                     placeholder="Doe"
@@ -394,69 +403,53 @@ export default function KrambambouliForm({
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
-                </div>
+                </Field>
               )}
             </form.Field>
           </div>
           <form.Field name="email">
             {(field) => (
-              <div className={styles.fieldRow}>
-                <label htmlFor={field.name}>E-mail</label>
-                <input
+              <Field label="E-mail" error={firstError(field.state.meta.errors)}>
+                <Input
                   id={field.name}
                   type="email"
                   required
-                  className={styles.input}
                   placeholder="john.doe@hotmail.com"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   name={field.name}
                   autoComplete="email"
                 />
-              </div>
+              </Field>
             )}
           </form.Field>
           <form.Field name="deliveryOption">
             {(field) => (
-              <div>
-                <h4>Leveringsopties</h4>
-                <label htmlFor={`${field.name}-${DeliveryOptionEnum.pickup}`}>
-                  <input
-                    type="radio"
-                    className={styles.radioButton}
-                    name={field.name}
-                    id={`${field.name}-${DeliveryOptionEnum.pickup}`}
-                    required
-                    value={DeliveryOptionEnum.pickup}
-                    checked={field.state.value === DeliveryOptionEnum.pickup}
-                    onChange={() =>
-                      field.handleChange(DeliveryOptionEnum.pickup)
-                    }
-                  />
-                  {`Afhalen tussen ${dateToDDMM(krambambouliCantusDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
-                </label>
+              <fieldset className={styles.choiceGroup}>
+                <legend>Leveringsopties</legend>
+                <Radio
+                  name={field.name}
+                  id={`${field.name}-${DeliveryOptionEnum.pickup}`}
+                  required
+                  value={DeliveryOptionEnum.pickup}
+                  checked={field.state.value === DeliveryOptionEnum.pickup}
+                  onChange={() => field.handleChange(DeliveryOptionEnum.pickup)}
+                  label={`Afhalen tussen ${dateToDDMM(krambambouliCantusDate)} en ${dateToDDMMYYYY(pickupEndDate)}`}
+                />
                 {uniqueDeliveryOptions && (
-                  <label
-                    htmlFor={`${field.name}-${DeliveryOptionEnum.delivery}`}
-                  >
-                    <input
-                      type="radio"
-                      className={styles.radioButton}
-                      id={`${field.name}-${DeliveryOptionEnum.delivery}`}
-                      name={field.name}
-                      required
-                      value={DeliveryOptionEnum.delivery}
-                      checked={
-                        field.state.value === DeliveryOptionEnum.delivery
-                      }
-                      onChange={() =>
-                        field.handleChange(DeliveryOptionEnum.delivery)
-                      }
-                    />
-                    {`Leveren tussen ${dateToDDMM(deliveryStartDate)} en ${dateToDDMM(deliveryEndDate)}`}
-                  </label>
+                  <Radio
+                    id={`${field.name}-${DeliveryOptionEnum.delivery}`}
+                    name={field.name}
+                    required
+                    value={DeliveryOptionEnum.delivery}
+                    checked={field.state.value === DeliveryOptionEnum.delivery}
+                    onChange={() =>
+                      field.handleChange(DeliveryOptionEnum.delivery)
+                    }
+                    label={`Leveren tussen ${dateToDDMM(deliveryStartDate)} en ${dateToDDMM(deliveryEndDate)}`}
+                  />
                 )}
-              </div>
+              </fieldset>
             )}
           </form.Field>
           <form.Subscribe selector={(state) => state.values.deliveryOption}>
@@ -465,73 +458,68 @@ export default function KrambambouliForm({
                 (deliveryOption === DeliveryOptionEnum.pickup && (
                   <form.Field name="pickupLocation">
                     {(field) => (
-                      <div className={styles.fieldRow}>
-                        <h4>Afhaallocatie</h4>
+                      <fieldset className={styles.choiceGroup}>
+                        <legend>Afhaallocatie</legend>
                         {pickupLocations.map((loc, index) => {
                           return (
-                            <label
+                            <Radio
                               key={index}
-                              htmlFor={`${field.name}-${index}`}
-                            >
-                              <input
-                                type="radio"
-                                className={styles.radioButton}
-                                name={field.name}
-                                id={`${field.name}-${index}`}
-                                value={loc.id}
-                                required
-                                checked={field.state.value === loc.id}
-                                onChange={() => field.handleChange(loc.id)}
-                              />
-                              {krambambouliCantus.name === loc.name
-                                ? krambambouliCantus.name
-                                : `Bij ${loc.name} vanaf ${pickupStartDate.getDate()}/${pickupStartDate.getMonth() + 1}`}
-                            </label>
+                              name={field.name}
+                              id={`${field.name}-${index}`}
+                              value={loc.id}
+                              required
+                              checked={field.state.value === loc.id}
+                              onChange={() => field.handleChange(loc.id)}
+                              label={
+                                krambambouliCantus.name === loc.name
+                                  ? krambambouliCantus.name
+                                  : `Bij ${loc.name} vanaf ${pickupStartDate.getDate()}/${pickupStartDate.getMonth() + 1}`
+                              }
+                            />
                           );
                         })}
-                      </div>
+                      </fieldset>
                     )}
                   </form.Field>
                 )) ||
                 (uniqueDeliveryOptions &&
                   deliveryOption === DeliveryOptionEnum.delivery && (
                     <>
-                      <div className={styles.fieldRow}>
-                        <h4>Leveroptie</h4>
+                      <fieldset className={styles.choiceGroup}>
+                        <legend>Leveroptie</legend>
                         {uniqueDeliveryOptions.map((loc, idx) => {
                           return (
                             <form.Field key={loc.name} name="deliveryZone">
                               {(field) => (
                                 <span className={styles.deliveryRow}>
-                                  <label htmlFor={`${field.name}-${idx}`}>
-                                    <input
-                                      id={`${field.name}-${idx}`}
-                                      type="radio"
-                                      className={styles.radioButton}
-                                      name={field.name}
-                                      value={loc.name}
-                                      required
-                                      checked={loc.name === field.state.value}
-                                      onChange={() =>
-                                        field.handleChange(loc.name)
-                                      }
-                                    />
-                                    {`Levering ${loc.name}`}
-                                  </label>
+                                  <Radio
+                                    id={`${field.name}-${idx}`}
+                                    name={field.name}
+                                    value={loc.name}
+                                    required
+                                    checked={loc.name === field.state.value}
+                                    onChange={() =>
+                                      field.handleChange(loc.name)
+                                    }
+                                    label={`Levering ${loc.name}`}
+                                  />
                                   <p>{formatCurrency(loc.price)}</p>
                                 </span>
                               )}
                             </form.Field>
                           );
                         })}
-                      </div>
+                      </fieldset>
                       <div className={styles.addressRow}>
-                        <div className={styles.fieldRow}>
+                        <div className={styles.streetRow}>
                           <form.Field name="streetName">
                             {(field) => (
-                              <>
-                                <label htmlFor={field.name}>Straatnaam</label>
-                                <input
+                              <Field
+                                label="Straatnaam"
+                                error={firstError(field.state.meta.errors)}
+                                className={styles.street}
+                              >
+                                <Input
                                   id={field.name}
                                   type="text"
                                   value={field.state.value}
@@ -541,14 +529,16 @@ export default function KrambambouliForm({
                                     field.handleChange(e.target.value)
                                   }
                                 />
-                              </>
+                              </Field>
                             )}
                           </form.Field>
                           <form.Field name="houseNumber">
                             {(field) => (
-                              <>
-                                <label htmlFor={field.name}>Nummer</label>
-                                <input
+                              <Field
+                                label="Nummer"
+                                error={firstError(field.state.meta.errors)}
+                              >
+                                <Input
                                   id={field.name}
                                   type="text"
                                   name={field.name}
@@ -558,14 +548,16 @@ export default function KrambambouliForm({
                                     field.handleChange(e.target.value)
                                   }
                                 />
-                              </>
+                              </Field>
                             )}
                           </form.Field>
                           <form.Field name="bus">
                             {(field) => (
-                              <>
-                                <label htmlFor={field.name}>Bus</label>
-                                <input
+                              <Field
+                                label="Bus"
+                                error={firstError(field.state.meta.errors)}
+                              >
+                                <Input
                                   id={field.name}
                                   type="text"
                                   name={field.name}
@@ -574,16 +566,18 @@ export default function KrambambouliForm({
                                     field.handleChange(e.target.value)
                                   }
                                 />
-                              </>
+                              </Field>
                             )}
                           </form.Field>
                         </div>
-                        <div className={styles.fieldRow}>
+                        <div className={styles.cityRow}>
                           <form.Field name="postalCode">
                             {(field) => (
-                              <>
-                                <label htmlFor={field.name}>Postcode</label>
-                                <input
+                              <Field
+                                label="Postcode"
+                                error={firstError(field.state.meta.errors)}
+                              >
+                                <Input
                                   id={field.name}
                                   type="number"
                                   name={field.name}
@@ -593,14 +587,16 @@ export default function KrambambouliForm({
                                   }
                                   required
                                 />
-                              </>
+                              </Field>
                             )}
                           </form.Field>
                           <form.Field name="city">
                             {(field) => (
-                              <>
-                                <label htmlFor="city">Stad</label>
-                                <input
+                              <Field
+                                label="Stad"
+                                error={firstError(field.state.meta.errors)}
+                              >
+                                <Input
                                   id="city"
                                   type="text"
                                   required
@@ -610,7 +606,7 @@ export default function KrambambouliForm({
                                     field.handleChange(e.target.value)
                                   }
                                 />
-                              </>
+                              </Field>
                             )}
                           </form.Field>
                         </div>
