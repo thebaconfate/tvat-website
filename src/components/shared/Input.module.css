@@ -1,22 +1,18 @@
-.input {
-  border-radius: 8px;
-  padding: 0.3rem 0.5rem;
+/* An input with something inside its end, e.g. a show/hide password button. */
+.wrapper {
   position: relative;
-  border: solid rgba(100, 53, 152, 0.35) 2px;
-  background: white;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-  outline: none;
+  display: block;
   width: 100%;
-  font-size: 1rem;
 }
 
-.input:hover,
-.input:focus-within {
-  border-color: var(--color-primary);
+.withTrailing {
+  padding-inline-end: 2.75rem;
 }
 
-.input:focus-within {
-  box-shadow: 0 0 0 3px rgba(100, 53, 152, 0.15);
+.trailing {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0.25rem;
+  display: flex;
+  align-items: center;
 }
