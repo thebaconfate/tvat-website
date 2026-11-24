@@ -21,11 +21,13 @@ A separate Railway service, a **cron job**, syncs the activities from the BSK
 ([activities.md](activities.md)) by calling the site's sync endpoint:
 
 - **Source:** the Docker image `curlimages/curl`
+- **Serverless:** off (Settings → Deploy). Railway offers no cron schedule for a serverless
+  service, and a cron job exits after each run anyway.
 - **Cron schedule** (Settings): e.g. `0 * * * *` (every hour, in UTC)
 - **Start command:**
 
   ```sh
-  sh -c 'curl -fsS -X POST -H "x-sync-token: $SYNC_TOKEN" https://www.tvat.be/api/activities/sync'
+  sh -c 'curl -fsS --retry 3 --retry-delay 15 --retry-all-errors -X POST -H "x-sync-token: $SYNC_TOKEN" https://www.tvat.be/api/activities/sync'
   ```
 
 - **Variables:** `SYNC_TOKEN`, the same value as on the site's service (a reference variable,
@@ -33,4 +35,5 @@ A separate Railway service, a **cron job**, syncs the activities from the BSK
 
 The site's service needs `SYNC_TOKEN` too: a long random value (`openssl rand -hex 32`).
 `curl -f` makes the job fail when the endpoint answers with an error, so a failed sync shows
-up in the cron service's logs.
+up in the cron service's logs. The retries are for a sleeping (serverless) site: Railway says
+the first request to it may get a 502 while it wakes up.
