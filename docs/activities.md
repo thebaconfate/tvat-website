@@ -10,8 +10,9 @@ The site copies 't VAT's activities into its own `activities` table and shows th
   no login ([BSK API docs](https://www.bsk.brussels/api/docs)). It returns all of our
   activities at once.
 - **When:** whenever `POST /api/activities/sync` is called with `SYNC_TOKEN` in the
-  `x-sync-token` header. A Railway cron job does that on a schedule
-  ([deployment.md](deployment.md)). It returns what changed. To sync right away:
+  `x-sync-token` header. The **Sync activities** workflow does that every hour
+  ([deployment.md](deployment.md)). It returns what changed. To sync right away, run that
+  workflow from the Actions tab (or `gh workflow run sync-activities.yml`), or:
 
   ```sh
   curl -X POST -H "x-sync-token: <SYNC_TOKEN>" https://www.tvat.be/api/activities/sync

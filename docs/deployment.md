@@ -17,23 +17,20 @@ How migrations work: [database.md](database.md).
 
 ## Scheduled activity sync
 
-A separate Railway service, a **cron job**, syncs the activities from the BSK
-([activities.md](activities.md)) by calling the site's sync endpoint:
+The **Sync activities** workflow (`.github/workflows/sync-activities.yml`) syncs the
+activities from the BSK ([activities.md](activities.md)) every hour, by calling the site's
+sync endpoint with `curl`. It can also be run by hand from the Actions tab, or with
+`gh workflow run sync-activities.yml`.
 
-- **Source:** the Docker image `curlimages/curl`
-- **Serverless:** off (Settings → Deploy). Railway offers no cron schedule for a serverless
-  service, and a cron job exits after each run anyway.
-- **Cron schedule** (Settings): e.g. `0 * * * *` (every hour, in UTC)
-- **Start command:**
+It needs `SYNC_TOKEN`, the same value in two places:
 
-  ```sh
-  sh -c 'curl -fsS --retry 3 --retry-delay 15 --retry-all-errors -X POST -H "x-sync-token: $SYNC_TOKEN" https://www.tvat.be/api/activities/sync'
-  ```
+- on the site's Railway service, as a variable
+- in the repo, as an Actions secret: `gh secret set SYNC_TOKEN`
 
-- **Variables:** `SYNC_TOKEN`, the same value as on the site's service (a reference variable,
-  `${{<site service>.SYNC_TOKEN}}`, keeps them in sync)
+Make it a long random value (`openssl rand -hex 32`). A failed sync shows up as a failed
+run, and GitHub emails about it. The `curl` retries are for a sleeping (serverless) site:
+Railway says the first request to it may get a 502 while it wakes up.
 
-The site's service needs `SYNC_TOKEN` too: a long random value (`openssl rand -hex 32`).
-`curl -f` makes the job fail when the endpoint answers with an error, so a failed sync shows
-up in the cron service's logs. The retries are for a sleeping (serverless) site: Railway says
-the first request to it may get a 502 while it wakes up.
+GitHub only runs scheduled workflows from the default branch, can start them a few minutes
+late, and disables them in a public repo after 60 days without commits (it emails a warning
+first; re-enable it from the Actions tab).
