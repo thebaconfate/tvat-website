@@ -9,7 +9,7 @@ import {
   type KrambambouliProductData,
   type PickupLocationData,
 } from "@/lib/domain/krambambouli";
-import { useForm } from "@tanstack/react-form";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
 import z4 from "zod/v4";
 import { productSchema } from "@/lib/domain/products";
 import { Button } from "@/components/shared/Button";
@@ -163,9 +163,11 @@ export default function KrambambouliForm({
       postalCode: "",
       city: "",
     },
+    // Validate on submit; after a submit, re-check on every change, so a
+    // field's error goes away once it's fixed.
+    validationLogic: revalidateLogic(),
     validators: {
-      onSubmit: formSchema,
-      onChange: formSchema,
+      onDynamic: formSchema,
     },
     onSubmit: async ({ value }) => {
       const url = API_ROUTES.KRAMBALBOULI.ORDERS.url;

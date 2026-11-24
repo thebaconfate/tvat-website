@@ -47,12 +47,15 @@
 
 .productButtonContainer {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* The quantity between − and +: narrow, centred, without the browser's spinner. */
-.productInput {
-  width: clamp(3rem, 20%, 4rem);
+/* Two classes, so this width wins over the shared control's width: 100%. */
+.productButtonContainer .productInput {
+  width: 4rem;
   text-align: center;
   appearance: textfield;
   -moz-appearance: textfield;
