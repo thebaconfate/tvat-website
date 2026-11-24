@@ -1,11 +1,11 @@
 import { Button } from "@/components/shared/Button";
 import Field from "@/components/shared/Field";
 import Input from "@/components/shared/Input";
+import PasswordInput from "@/components/shared/PasswordInput";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import styles from "./ResetPasswordForm.module.css";
 import z4 from "zod/v4";
-import { Eye, EyeClosed } from "lucide-react";
 import { API_ROUTES, ROUTES } from "@/lib/routes";
 import { passwordSchema } from "@/lib/domain/users";
 import { navigate } from "astro:transitions/client";
@@ -16,7 +16,6 @@ type Props = {
 export default function ResetPasswordForm({ token = "" }: Props) {
   const [serverError, setServerError] = useState<string | undefined>();
   const [success, setSuccess] = useState<true | undefined>();
-  const [visible, setVisible] = useState(false);
   const form = useForm({
     defaultValues: {
       password: "",
@@ -75,29 +74,11 @@ export default function ResetPasswordForm({ token = "" }: Props) {
           <form.Field name="password">
             {(field) => (
               <Field label="Nieuw wachtwoord" className={styles.field}>
-                <Input
-                  type={visible ? "text" : "password"}
+                <PasswordInput
                   value={field.state.value}
                   placeholder="Password"
                   onChange={(e) => field.handleChange(e.target.value)}
                   autoComplete="new-password"
-                  trailing={
-                    <Button
-                      type="button"
-                      variant="tertiary"
-                      className={styles.toggle}
-                      onClick={() => setVisible((v) => !v)}
-                      aria-label={
-                        visible ? "Verberg wachtwoord" : "Toon wachtwoord"
-                      }
-                    >
-                      {visible ? (
-                        <Eye aria-hidden="true" className={styles.icon} />
-                      ) : (
-                        <EyeClosed aria-hidden="true" className={styles.icon} />
-                      )}
-                    </Button>
-                  }
                 />
               </Field>
             )}
