@@ -1,0 +1,27 @@
+/* Checkbox and Radio: the browser's own control, in the site's purple, with its label. */
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.input:disabled,
+.input:disabled + span {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
