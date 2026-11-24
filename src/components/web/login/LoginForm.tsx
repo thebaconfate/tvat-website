@@ -1,16 +1,15 @@
 import { credentialsSchema } from "@/lib/domain/auth";
 import styles from "./LoginForm.module.css";
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
-import { Eye, EyeClosed, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { Button } from "@/components/shared/Button";
 import Field from "@/components/shared/Field";
 import Input from "@/components/shared/Input";
+import PasswordInput from "@/components/shared/PasswordInput";
 import { API_ROUTES, APP_ROUTES } from "@/lib/routes";
 import { navigate } from "astro:transitions/client";
 
 export default function LoginForm() {
-  const [visible, setVisible] = useState(false);
   const form = useForm({
     defaultValues: {
       password: "",
@@ -63,8 +62,7 @@ export default function LoginForm() {
         <form.Field name="password">
           {(field) => (
             <Field label="Wachtwoord">
-              <Input
-                type={visible ? "text" : "password"}
+              <PasswordInput
                 id={field.name}
                 name={field.name}
                 value={field.state.value}
@@ -73,23 +71,6 @@ export default function LoginForm() {
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
                 autoComplete="current-password"
-                trailing={
-                  <Button
-                    type="button"
-                    variant="tertiary"
-                    className={styles.toggle}
-                    onClick={() => setVisible((v) => !v)}
-                    aria-label={
-                      visible ? "Verberg wachtwoord" : "Toon wachtwoord"
-                    }
-                  >
-                    {visible ? (
-                      <Eye aria-hidden="true" className={styles.icon} />
-                    ) : (
-                      <EyeClosed aria-hidden="true" className={styles.icon} />
-                    )}
-                  </Button>
-                }
               />
             </Field>
           )}

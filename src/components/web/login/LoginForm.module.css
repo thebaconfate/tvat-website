@@ -28,15 +28,11 @@ main {
   }
 }
 
-/* The mail icon and the show/hide password button inside the fields. */
+/* The mail icon inside the e-mail field, muted like the password toggle. */
 .icon {
   width: 1.15rem;
   height: 1.15rem;
-}
-
-.toggle {
-  display: flex;
-  padding: 0.3rem;
+  color: var(--color-muted);
 }
 
 .formTitle {

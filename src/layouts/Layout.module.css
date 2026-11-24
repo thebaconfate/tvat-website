@@ -9,6 +9,8 @@
   --color-primary: rgb(100, 53, 152);
   /* Plum (wine purple): secondary, tertiary and stepper buttons. */
   --color-accent: #6b1f4f;
+  /* Muted grey for icons inside fields. */
+  --color-muted: #77727e;
   --color-success: rgb(54, 149, 34);
   --color-warning: rgb(255, 239, 62);
   --color-danger: rgb(175, 36, 36);
