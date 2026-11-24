@@ -1,0 +1,31 @@
+name: Sync activities
+
+# Copies 't VAT's activities from the BSK calendar into the database, by calling the
+# site's sync endpoint with SYNC_TOKEN (docs/activities.md). GitHub only runs scheduled
+# workflows from the default branch.
+on:
+  schedule:
+    # Every hour at :17, not :00: GitHub delays more scheduled runs at the top of the hour.
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: sync-activities
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The retries are for a sleeping (serverless) site: Railway says the first request
+      # to it may get a 502 while it wakes up.
+      - name: Sync
+        run: >-
+          curl -fsS --retry 3 --retry-delay 15 --retry-all-errors
+          -X POST -H "x-sync-token: $SYNC_TOKEN"
+          https://www.tvat.be/api/activities/sync
+        env:
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}

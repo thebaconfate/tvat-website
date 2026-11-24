@@ -11,9 +11,10 @@ function isSyncToken(given: string | null, expected: string): boolean {
 }
 
 /**
- * Syncs the activities from the BSK calendar. Called on a schedule by a Railway cron
- * job, which sends SYNC_TOKEN in the x-sync-token header. The middleware lets this
- * route through without a login, so this check is the only one.
+ * Syncs the activities from the BSK calendar. Called on a schedule by the "Sync
+ * activities" workflow (.github/workflows/sync-activities.yml), which sends SYNC_TOKEN
+ * in the x-sync-token header. The middleware lets this route through without a login,
+ * so this check is the only one.
  */
 export async function POST({ request }: APIContext) {
   const syncToken = process.env.SYNC_TOKEN;
