@@ -23,6 +23,16 @@ function toUrl(value: string | null | undefined): string | null {
   }
 }
 
+/** Today in Brussels, e.g. "2026-11-24". */
+function todayInBrussels(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Brussels",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 function toImportedActivity(
   event: BskEvent,
   fetchedAt: string,
@@ -62,19 +72,23 @@ class ActivityService {
 
   private async runSync(): Promise<SyncResult> {
     const fetchedAt = new Date().toISOString();
+    const fromDay = todayInBrussels();
     const events = await fetchBskEvents(BSK_KRING);
-    const byId = new Map<string, ImportedBSKActivity>();
-    for (const event of events) {
-      const activity = toImportedActivity(event, fetchedAt);
-      if (activity) byId.set(activity.bskId, activity);
-    }
-    if (byId.size === 0)
+    if (events.length === 0)
       throw new Error(
         "The BSK returned no activities; keeping the stored ones",
       );
-    const { changed, removed } = await this.repository.syncBskActivities([
-      ...byId.values(),
-    ]);
+    // Only today and later: the BSK decides what's coming up, the past stays as it is.
+    const byId = new Map<string, ImportedBSKActivity>();
+    for (const event of events) {
+      if (event.dateTime.slice(0, 10) < fromDay) continue;
+      const activity = toImportedActivity(event, fetchedAt);
+      if (activity) byId.set(activity.bskId, activity);
+    }
+    const { changed, removed } = await this.repository.syncBskActivities(
+      [...byId.values()],
+      fromDay,
+    );
     return { fetched: byId.size, changed, removed };
   }
 }

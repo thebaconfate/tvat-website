@@ -91,8 +91,10 @@ export class ActivitiesRepository extends Repository {
     };
   }
 
+  /** `fromDay`: the first day (`yyyy-mm-dd`, Brussels) `activities` covers; earlier ones are left alone. */
   async syncBskActivities(
     activities: ImportedBSKActivity[],
+    fromDay: string,
   ): Promise<{ changed: number; removed: number }> {
     const sql = `
       WITH incoming AS (
@@ -121,6 +123,7 @@ export class ActivitiesRepository extends Repository {
       removed AS (
         DELETE FROM activities a
         WHERE a.bsk_id IS NOT NULL
+          AND a.occurs_at >= $7::date::timestamp AT TIME ZONE 'Europe/Brussels'
           AND NOT EXISTS (SELECT 1 FROM incoming i WHERE i.bsk_id = a.bsk_id)
         RETURNING 1
       )
@@ -136,6 +139,7 @@ export class ActivitiesRepository extends Repository {
         activities.map((a) => a.place),
         activities.map((a) => a.url),
         activities.map((a) => a.bskUpdatedAt),
+        fromDay,
       ],
     );
     return {
