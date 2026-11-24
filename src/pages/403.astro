@@ -1,12 +1,14 @@
 ---
 import LayoutAstroComponent from "@/layouts/Layout.astro";
+// A plain button element (it uses an inline onclick), styled like the shared secondary Button.
+import buttonStyles from "@/components/shared/Button.module.css";
 ---
 
 <LayoutAstroComponent title="Forbidden">
   <main>
     <div>
       Forbidden
-      <button onclick="history.back()">Go back</button>
+      <button class={`${buttonStyles.button} ${buttonStyles.secondary}`} onclick="history.back()">Go back</button>
     </div>
   </main>
 </LayoutAstroComponent>
