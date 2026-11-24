@@ -3,6 +3,8 @@ import styles from "./ForgotPasswordForm.module.css";
 import z4 from "zod/v4";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/shared/Button";
+import Field from "@/components/shared/Field";
+import Input from "@/components/shared/Input";
 import { useState } from "react";
 import { API_ROUTES, ROUTES } from "@/lib/routes";
 import { navigate } from "astro/virtual-modules/transitions-router.js";
@@ -45,8 +47,8 @@ export default function ForgotPasswordForm() {
         <>
           <form.Field name="email">
             {(field) => (
-              <div className={`${styles.inputContainer} ${styles.container}`}>
-                <input
+              <Field label="E-mailadres" className={styles.field}>
+                <Input
                   type="email"
                   id={field.name}
                   name={field.name}
@@ -56,11 +58,9 @@ export default function ForgotPasswordForm() {
                   placeholder="Email"
                   autoComplete="email"
                   required
+                  trailing={<Mail aria-hidden="true" className={styles.icon} />}
                 />
-                <div className={styles.inputIcon}>
-                  <Mail></Mail>
-                </div>
-              </div>
+              </Field>
             )}
           </form.Field>
           <a href="/login">Back to login</a>

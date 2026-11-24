@@ -1,4 +1,6 @@
 import { Button } from "@/components/shared/Button";
+import Field from "@/components/shared/Field";
+import Input from "@/components/shared/Input";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import styles from "./ResetPasswordForm.module.css";
@@ -65,40 +67,52 @@ export default function ResetPasswordForm({ token = "" }: Props) {
     >
       <h1 className={styles.formTitle}> Reset password</h1>
       {success ? (
-        <div className={styles.container}>
+        <div>
           <p>Wachtwoord successvol gereset</p>
         </div>
       ) : (
         <>
           <form.Field name="password">
             {(field) => (
-              <div className={`${styles.inputContainer} ${styles.container}`}>
-                <input
+              <Field label="Nieuw wachtwoord" className={styles.field}>
+                <Input
                   type={visible ? "text" : "password"}
                   value={field.state.value}
                   placeholder="Password"
                   onChange={(e) => field.handleChange(e.target.value)}
+                  autoComplete="new-password"
+                  trailing={
+                    <Button
+                      type="button"
+                      variant="tertiary"
+                      className={styles.toggle}
+                      onClick={() => setVisible((v) => !v)}
+                      aria-label={
+                        visible ? "Verberg wachtwoord" : "Toon wachtwoord"
+                      }
+                    >
+                      {visible ? (
+                        <Eye aria-hidden="true" className={styles.icon} />
+                      ) : (
+                        <EyeClosed aria-hidden="true" className={styles.icon} />
+                      )}
+                    </Button>
+                  }
                 />
-                <button
-                  className={styles.inputIcon}
-                  type="button"
-                  onClick={() => setVisible((v) => !v)}
-                >
-                  {visible ? <Eye /> : <EyeClosed />}
-                </button>
-              </div>
+              </Field>
             )}
           </form.Field>
           <form.Field name="passwordConfirm">
             {(field) => (
-              <div className={`${styles.inputContainer} ${styles.container}`}>
-                <input
+              <Field label="Bevestig wachtwoord" className={styles.field}>
+                <Input
                   type="password"
                   value={field.state.value}
                   placeholder="Password bevestingen"
                   onChange={(e) => field.handleChange(e.target.value)}
+                  autoComplete="new-password"
                 />
-              </div>
+              </Field>
             )}
           </form.Field>
           <form.Subscribe selector={(state) => state.fieldMeta}>
@@ -122,7 +136,7 @@ export default function ResetPasswordForm({ token = "" }: Props) {
               }
               if (allErrors.length === 0 && !serverError) return null;
               return (
-                <div className={styles.messageBox}>
+                <div>
                   {allErrors.map((err, i) => (
                     <p
                       key={`val-${i}`}
