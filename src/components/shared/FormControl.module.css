@@ -1,0 +1,36 @@
+/* The look shared by Input, Select and Textarea. */
+.control {
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  border: 2px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-radius: 8px;
+  background: white;
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.control:hover,
+.control:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.control:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.control[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.control[aria-invalid="true"]:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 15%, transparent);
+}
+
+.control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

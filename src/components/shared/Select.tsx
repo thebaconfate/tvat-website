@@ -1,4 +1,6 @@
 import type { SelectHTMLAttributes } from "react";
+import { cx } from "./cx";
+import control from "./FormControl.module.css";
 import styles from "./Select.module.css";
 type Option = {
   label: string;
@@ -20,7 +22,7 @@ export default function Select({
 }: SelectProps) {
   return (
     <select
-      className={className ? `${styles.select} ${className}` : styles.select}
+      className={cx(control.control, styles.select, className)}
       {...rest}
     >
       {placeholder && <option value="">{placeholder}</option>}
