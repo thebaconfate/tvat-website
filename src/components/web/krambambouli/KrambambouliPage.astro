@@ -2,6 +2,8 @@
 import Cookbook from "@/svgs/Cookbook.astro";
 import Expertise from "@/svgs/Expertise.astro";
 import Wine from "@/svgs/Wine.astro";
+import { Image } from "astro:assets";
+import banner from "@/assets/images/banner.jpg";
 import styles from "./KrambambouliPage.module.css";
 import KrambambouliForm from "./KrambambouliForm";
 import type {
@@ -23,11 +25,7 @@ const { errors, products, deliveryLocations, pickupLocations, formActive } =
 
 <main class={styles.contentContainer}>
   <picture class={styles.brouwersImageContainer}>
-    <img
-      src="/banner.jpg"
-      alt="brouwers aan het werk"
-      class={styles.brouwers}
-    />
+    <Image src={banner} alt="brouwers aan het werk" class={styles.brouwers} />
   </picture>
   <div class={styles.content}>
     <ul class={styles.introText}>
