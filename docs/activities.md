@@ -20,10 +20,13 @@ The site copies 't VAT's activities into its own `activities` table and shows th
 
   Without `SYNC_TOKEN` set (as locally by default), the endpoint answers 403 and nothing
   syncs.
+- **Only today and later:** upcoming activities come solely from the BSK. Activities before
+  today (Brussels time) are left as they are, so the history stays even after the BSK drops
+  old activities from its list (it returns roughly the last year).
 - **What it does**, in one SQL statement (`ActivitiesRepository.syncBskActivities`): adds new
-  BSK activities, updates changed ones, and deletes the ones the BSK no longer lists.
-  Activities added here by hand (no `bsk_id`) are left alone. If the BSK returns no activities
-  at all, nothing is deleted.
+  BSK activities from today on, updates changed ones, and deletes the ones from today on that
+  the BSK no longer lists. Activities added here by hand (no `bsk_id`) are left alone. If the
+  BSK returns no activities at all, nothing is deleted.
 
 ## Edited in both places: the latest edit wins
 
@@ -37,8 +40,8 @@ the next sync replaces your change with the BSK's version:
 UPDATE activities SET name = 'Nieuwe naam', updated_at = now() WHERE id = 42;
 ```
 
-Deleting at the BSK always deletes our copy: the BSK doesn't say when something was deleted,
-so there is nothing to compare.
+Deleting an upcoming activity at the BSK always deletes our copy: the BSK doesn't say when
+something was deleted, so there is nothing to compare.
 
 ## From their shape to ours
 
@@ -57,8 +60,12 @@ The BSK stores activities without a time at midnight (`T00:00`), so the site sho
 an activity at exactly 00:00. `endDate` (activities spanning several days) is not stored: those
 show their first day.
 
-## Later: a two-way sync
+## Later
 
-Activities created on our site could also be posted to the BSK (their API takes a kring
+**Merging with our own activities.** Once the site can create activities (it can't yet), the
+sync could match them with BSK activities on the same day and fill in what one side lacks,
+instead of keeping both. Until then, upcoming activities come only from the BSK.
+
+**A two-way sync.** Activities created on our site could also be posted to the BSK (their API takes a kring
 login), so each activity exists once on both sides. That needs a `bsk_updated_at` column, to
 know which local changes the BSK doesn't have yet.
